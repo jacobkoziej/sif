@@ -1,0 +1,52 @@
+[build-system]
+requires      = ['setuptools']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name        = 'sif'
+description = 'a preemptive rtos'
+version     = '0.0.0'
+
+authors = [
+	{name = 'Jacob Koziej', email = 'jacobkoziej@gmail.com'},
+]
+license = {'text' = 'GPL-3.0-or-later'}
+classifiers = [
+	'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+]
+
+requires-python = '>=3.12'
+dependencies = [
+]
+
+[project.urls]
+repo = 'https://github.com/jacobkoziej/sif'
+
+[project.optional-dependencies]
+dev = [
+	'black',
+	'mdformat-gfm',
+	'pip-tools',
+	'pre-commit',
+	'ruff',
+]
+
+[tool.black]
+line-length               = 79
+skip-string-normalization = true
+
+[tool.pip-tools]
+allow-unsafe    = true
+generate-hashes = true
+strip-extras    = false
+upgrade         = true
+verbose         = true
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.format]
+quote-style = 'single'
+
+[tool.setuptools.packages.find]
+exclude = ['*']
