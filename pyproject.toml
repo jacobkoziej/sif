@@ -29,6 +29,7 @@ dev = [
 	'pip-tools',
 	'pre-commit',
 	'ruff',
+	'scons',
 ]
 
 [tool.black]

@@ -195,6 +195,10 @@ ruff==0.1.14 \
     --hash=sha256:bea9be712b8f5b4ebed40e1949379cfb2a7d907f42921cf9ab3aae07e6fba9eb \
     --hash=sha256:e3d241aa61f92b0805a7082bd89a9990826448e4d0398f0e2bc8f05c75c63d99
     # via sif (pyproject.toml)
+scons==4.6.0.post1 \
+    --hash=sha256:9e0527b7a924e7af2b312c1f8961ef2776847bdc46a4d886af5a75f301da7ce3 \
+    --hash=sha256:d467a34546f5366a32e4d4419611d0138dd680210f24aa8491ebe9e4b83456cf
+    # via sif (pyproject.toml)
 uc-micro-py==1.0.2 \
     --hash=sha256:30ae2ac9c49f39ac6dce743bd187fcd2b574b16ca095fa74cd9396795c954c54 \
     --hash=sha256:8c9110c309db9d9e87302e2f4ad2c3152770930d88ab385cd544e7a7e75f3de0
@@ -219,3 +223,4 @@ setuptools==69.0.3 \
     # via
     #   nodeenv
     #   pip-tools
+    #   scons
