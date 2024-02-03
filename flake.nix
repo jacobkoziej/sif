@@ -13,12 +13,14 @@
           inherit system;
         };
 
+        llvm = pkgs.llvmPackages_17;
         python = pkgs.python312;
 
       in
       {
         devShells.default = pkgs.mkShell {
           packages = [
+            llvm.clang-unwrapped
             pkgs.nixpkgs-fmt
             python
           ];
