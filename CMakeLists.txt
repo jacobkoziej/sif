@@ -9,3 +9,5 @@ include(lib/pico-sdk/pico_sdk_init.cmake)
 project(sif)
 
 pico_sdk_init()
+
+add_subdirectory(src)
