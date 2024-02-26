@@ -9,4 +9,6 @@
 
 typedef void sif_arch_armv6_m_exception_handler_t(void);
 
+typedef unsigned long sif_arch_armv6_m_word_t;
+
 #endif	// SIF_ARCH_ARMV6_M_TYPES_H
