@@ -4,6 +4,8 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
+#include <sif/arch/armv6-m/port-asm.h>
+#include <sif/arch/armv6-m/port.h>
 #include <sif/arch/armv6-m/types.h>
 #include <sif/config.h>
 
@@ -14,3 +16,8 @@ const sif_arch_armv6_m_word_t sif_arch_armv6_m_systick_hz
 
 const sif_arch_armv6_m_word_t sif_arch_armv6_m_syst_rvr_reload
     = (sif_arch_armv6_m_system_clock_hz / sif_arch_armv6_m_systick_hz) - 1;
+
+void sif_arch_armv6_m_init(void)
+{
+	sif_arch_armv6_m_nvic_setup();
+}
