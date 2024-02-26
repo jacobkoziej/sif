@@ -21,3 +21,9 @@
 	.set SYST_RVR,   0xe000e014
 	.set SYST_CVR,   0xe000e018
 	.set SYST_CALIB, 0xe000e01c
+
+	// B3.3.3
+	.set SYST_CSR_COUNTFLAG, 1 << 16
+	.set SYST_CSR_CLKSOURCE, 1 << 2
+	.set SYST_CSR_TICKINIT,  1 << 1
+	.set SYST_CSR_ENABLE,    1 << 0

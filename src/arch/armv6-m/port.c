@@ -11,3 +11,6 @@ const sif_arch_armv6_m_word_t sif_arch_armv6_m_system_clock_hz
     = SIF_CONFIG_SYSTEM_CLOCK_HZ;
 const sif_arch_armv6_m_word_t sif_arch_armv6_m_systick_hz
     = SIF_CONFIG_SYSTICK_HZ;
+
+const sif_arch_armv6_m_word_t sif_arch_armv6_m_syst_rvr_reload
+    = (sif_arch_armv6_m_system_clock_hz / sif_arch_armv6_m_systick_hz) - 1;
