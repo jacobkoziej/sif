@@ -6,5 +6,5 @@ add_executable(
 	hello-world
 	hello-world.c
 )
-target_link_libraries(hello-world pico_stdlib)
+target_link_libraries(hello-world pico_stdlib sif)
 pico_add_extra_outputs(hello-world)

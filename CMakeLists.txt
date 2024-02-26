@@ -10,4 +10,5 @@ project(sif)
 
 pico_sdk_init()
 
+add_subdirectory(lib)
 add_subdirectory(src)
