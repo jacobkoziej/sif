@@ -15,3 +15,9 @@
 	.set SHPR2, 0xe000ed1c
 	.set SHPR3, 0xe000ed20
 	.set DFSR,  0xe000ed30
+
+	// B3.3.2
+	.set SYST_CSR,   0xe000e010
+	.set SYST_RVR,   0xe000e014
+	.set SYST_CVR,   0xe000e018
+	.set SYST_CALIB, 0xe000e01c
