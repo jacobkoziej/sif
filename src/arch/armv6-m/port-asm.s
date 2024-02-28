@@ -48,7 +48,15 @@ sif_arch_armv6_m_setup_systick:
 
 	// program control and status register
 	ldr r0, =SYST_CSR
-	ldr r1, =(SYST_CSR_CLKSOURCE | SYST_CSR_TICKINIT | SYST_CSR_ENABLE)
+	ldr r1, =((1 << SYST_CSR_CLKSOURCE) | (1 << SYST_CSR_TICKINIT) | (1 << SYST_CSR_ENABLE))
+	str r1, [r0]
+
+	// set systick to lowest priority
+	ldr r0, =SHPR3
+	ldr r1, =(0x03 << SHPR3_PRI_15)
+	ldr r2, =SHPR3_PRI_15
+	ldr r2, [r0]
+	orr r1, r1, r2
 	str r1, [r0]
 
 	bx lr

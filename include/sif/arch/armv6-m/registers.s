@@ -19,6 +19,10 @@
 	.set SHPR3, 0xe000ed20
 	.set DFSR,  0xe000ed30
 
+	// B3.2.10
+	.set SHPR3_PRI_15, 30
+	.set SHPR3_PRI_14, 22
+
 	// B3.3.2
 	.set SYST_CSR,   0xe000e010
 	.set SYST_RVR,   0xe000e014
@@ -26,7 +30,7 @@
 	.set SYST_CALIB, 0xe000e01c
 
 	// B3.3.3
-	.set SYST_CSR_COUNTFLAG, 1 << 16
-	.set SYST_CSR_CLKSOURCE, 1 << 2
-	.set SYST_CSR_TICKINIT,  1 << 1
-	.set SYST_CSR_ENABLE,    1 << 0
+	.set SYST_CSR_COUNTFLAG, 16
+	.set SYST_CSR_CLKSOURCE, 2
+	.set SYST_CSR_TICKINIT,  1
+	.set SYST_CSR_ENABLE,    0
