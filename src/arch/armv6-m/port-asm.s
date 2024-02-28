@@ -38,7 +38,7 @@ sif_arch_armv6_m_setup_nvic:
 sif_arch_armv6_m_setup_systick:
 	// program our reload value
 	ldr r0, =SYST_RVR
-	ldr r1, =sif_arch_armv6_m_syst_rvr_reload
+	ldr r1, =SIF_ARCH_ARMV6_M_SYST_RVR_RELOAD
 	ldr r1, [r1]
 	str r1, [r0]
 
