@@ -4,6 +4,9 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
+	// B1.5.2
+	.set EXCEPTION_NUMBER_SYSTICK, 15
+
 	// B3.2.2
 	.set ACTLR, 0xe000e008
 	.set CPUID, 0xe000ed00

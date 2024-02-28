@@ -6,15 +6,33 @@
 
 	.arch armv6-m
 
+	.include "sif/arch/armv6-m/macros.s"
 	.include "sif/arch/armv6-m/registers.s"
 
 	.text
 
+	.type   sif_arch_armv6_m_handler_systick, %function
+sif_arch_armv6_m_handler_systick:
+	push {lr}
+	bl sif_tick_step
+	pop {pc}
+
 	.type   sif_arch_armv6_m_nvic_setup, %function
 	.global sif_arch_armv6_m_nvic_setup
 sif_arch_armv6_m_nvic_setup:
+	push {lr}
+
 	bl sif_arch_armv6_m_setup_systick
-	bx lr
+
+	// load vector table
+	ldr r2, =VTOR
+	ldr r2, [r2]
+
+	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SYSTICK, sif_arch_armv6_m_handler_systick
+
+	dmb
+
+	pop {pc}
 
 	.type   sif_arch_armv6_m_setup_systick, %function
 sif_arch_armv6_m_setup_systick:
