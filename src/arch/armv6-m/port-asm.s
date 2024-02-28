@@ -16,6 +16,7 @@ sif_arch_armv6_m_nvic_setup:
 	bl sif_arch_armv6_m_setup_systick
 	bx lr
 
+	.type   sif_arch_armv6_m_setup_systick, %function
 sif_arch_armv6_m_setup_systick:
 	// program our reload value
 	ldr r0, =SYST_RVR
