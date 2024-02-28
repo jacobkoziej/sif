@@ -17,9 +17,9 @@ sif_arch_armv6_m_handler_systick:
 	bl sif_tick_step
 	pop {pc}
 
-	.type   sif_arch_armv6_m_nvic_setup, %function
-	.global sif_arch_armv6_m_nvic_setup
-sif_arch_armv6_m_nvic_setup:
+	.type   sif_arch_armv6_m_setup_nvic, %function
+	.global sif_arch_armv6_m_setup_nvic
+sif_arch_armv6_m_setup_nvic:
 	push {lr}
 
 	bl sif_arch_armv6_m_setup_systick

@@ -19,5 +19,5 @@ const sif_arch_armv6_m_word_t sif_arch_armv6_m_syst_rvr_reload
 
 void sif_arch_armv6_m_init(void)
 {
-	sif_arch_armv6_m_nvic_setup();
+	sif_arch_armv6_m_setup_nvic();
 }

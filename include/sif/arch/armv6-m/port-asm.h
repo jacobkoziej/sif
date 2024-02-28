@@ -7,6 +7,6 @@
 #ifndef SIF_ARCH_ARMV6_M_PORT_ASM_H
 #define SIF_ARCH_ARMV6_M_PORT_ASM_H
 
-void sif_arch_armv6_m_nvic_setup(void);
+void sif_arch_armv6_m_setup_nvic(void);
 
 #endif	// SIF_ARCH_ARMV6_M_PORT_ASM_H
