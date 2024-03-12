@@ -5,28 +5,86 @@
  */
 
 #include <sif/config.h>
+#include <sif/private/task.h>
 #include <sif/task.h>
 
 #include <stddef.h>
+#include <stdint.h>
 
 static struct {
 	sif_task_t tasks[SIF_CONFIG_MAXIMUM_TASKS];
 	size_t	   task_count;
 } sif;
 
-sif_task_error_t sif_task_create(sif_task_config_t * const config)
+sif_task_error_t sif_task_create(const sif_task_config_t * const config)
 {
 	size_t * const task_count = &sif.task_count;
 
 	if (*task_count >= SIF_CONFIG_MAXIMUM_TASKS - 1)
 		return SIF_TASK_ERROR_TASK_COUNT;
 
+	if (config->priority > SIF_TASK_PRIORITY_MINIMUM)
+		return SIF_TASK_ERROR_PRIORITY;
+
 	sif_task_t * const task = sif.tasks + (*task_count)++;
+
+	sif_task_error_t error;
+
+	error = sif_task_add_task(task, config);
+
+	if (error != SIF_TASK_ERROR_NONE) return error;
+
+	return SIF_TASK_ERROR_NONE;
+}
+
+static sif_task_error_t sif_task_add_task(sif_task_t * const task,
+    const sif_task_config_t * const			     config)
+{
+	size_t		stack_size   = config->stack_size;
+	const uintptr_t stack_buffer = (uintptr_t) config->stack;
+
+	if (stack_size <= SIF_CONFIG_STACK_ALIGNMENT_MASK)
+		return SIF_TASK_ERROR_STACK_SIZE;
+
+#if (SIF_CONFIG_STACK_GROWTH_DIRECTION < 0)
+	const uintptr_t stack_start_raw = stack_buffer + stack_size - 1;
+
+	const uintptr_t stack_start
+	    = stack_start_raw & ~((uintptr_t) SIF_CONFIG_STACK_ALIGNMENT_MASK);
+
+	const uintptr_t difference = stack_start_raw - stack_start;
+
+	stack_size -= difference;
+
+	const uintptr_t stack_end = stack_start - stack_size + 1;
+#else	// SIF_CONFIG_STACK_GROWTH_DIRECTION
+	const uintptr_t stack_start_raw = stack_buffer;
+
+	uintptr_t stack_start
+	    = stack_start_raw & ~((uintptr_t) SIF_CONFIG_STACK_ALIGNMENT_MASK);
+
+	if (stack_start < stack_start_raw)
+		stack_start += SIF_CONFIG_STACK_ALIGNMENT_MASK + 1;
+
+	const uintptr_t difference = stack_start - stack_start_raw;
+
+	stack_size -= difference;
+
+	const uintptr_t stack_end = stack_start + stack_size - 1;
+#endif	// SIF_CONFIG_STACK_GROWTH_DIRECTION
+
+	if (stack_size < SIF_CONFIG_MINIMUM_STACK_SIZE)
+		return SIF_TASK_ERROR_STACK_SIZE;
+
+	const sif_task_stack_t stack = (sif_task_stack_t){
+	    .start = (sif_task_stack_buffer_t *) stack_start,
+	    .end   = (sif_task_stack_buffer_t *) stack_end,
+	};
 
 	*task = (sif_task_t){
 	    .state    = SIF_TASK_STATE_SUSPENDED,
 	    .priority = config->priority,
-	    .stack    = config->stack,
+	    .stack    = stack,
 	    .name     = config->name,
 	};
 
