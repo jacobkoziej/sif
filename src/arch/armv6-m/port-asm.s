@@ -11,6 +11,24 @@
 
 	.text
 
+	.type   sif_arch_armv6_m_init_stack, %function
+	.global sif_arch_armv6_m_init_stack
+sif_arch_armv6_m_init_stack:
+	sub r0, r0, #EXCEPTION_OFFSET
+
+	str r1, [r0, #PC_OFFSET]
+	str r2, [r0, #R0_OFFSET]
+
+	ldr r1, =sif_task_delete
+	str r1, [r0, #LR_OFFSET]
+
+	ldr r1, =(1 << EPSR_T)
+	str r1, [r0, #XPSR_OFFSET]
+
+	sub r0, r0, #CONTEXT_OFFSET
+
+	bx lr
+
 	.type   sif_arch_armv6_m_handler_systick, %function
 sif_arch_armv6_m_handler_systick:
 	push {lr}

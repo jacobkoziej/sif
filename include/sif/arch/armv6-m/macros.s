@@ -4,7 +4,12 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
-	.set CONTEXT_OFFSET, 32
+	.set CONTEXT_OFFSET,   32
+	.set EXCEPTION_OFFSET, 32
+	.set LR_OFFSET,        0x14
+	.set PC_OFFSET,        0x18
+	.set R0_OFFSET,        0x00
+	.set XPSR_OFFSET,      0x1c
 
 	.macro RESTORE_CONTEXT sp
 	ldmia \sp!, {r4-r7}

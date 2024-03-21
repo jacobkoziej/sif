@@ -4,6 +4,9 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
+	// B1.4.2
+	.set EPSR_T, 24
+
 	// B1.5.2
 	.set EXCEPTION_NUMBER_SYSTICK, 15
 
