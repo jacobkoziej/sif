@@ -26,6 +26,7 @@ typedef enum sif_task_error {
 } sif_task_error_t;
 
 typedef struct sif_task_stack {
+	sif_task_stack_buffer_t *sp;
 	sif_task_stack_buffer_t *start;
 	sif_task_stack_buffer_t *end;
 } sif_task_stack_t;

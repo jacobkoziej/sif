@@ -86,6 +86,10 @@ static sif_task_error_t sif_task_add_task(sif_task_t * const task,
 		return SIF_TASK_ERROR_STACK_SIZE;
 
 	const sif_task_stack_t stack = (sif_task_stack_t){
+	    .sp
+	    = sif_port_task_init_stack((sif_task_stack_buffer_t *) stack_start,
+		config->func,
+		config->arg),
 	    .start = (sif_task_stack_buffer_t *) stack_start,
 	    .end   = (sif_task_stack_buffer_t *) stack_end,
 	};
