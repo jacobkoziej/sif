@@ -11,6 +11,13 @@
 
 	.text
 
+	.type   sif_arch_armv6_m_init, %function
+	.global sif_arch_armv6_m_init
+sif_arch_armv6_m_init:
+	push {lr}
+	bl   sif_arch_armv6_m_setup_nvic
+	pop  {pc}
+
 	.type   sif_arch_armv6_m_init_stack, %function
 	.global sif_arch_armv6_m_init_stack
 sif_arch_armv6_m_init_stack:
@@ -64,7 +71,6 @@ sif_arch_armv6_m_scheduler_start:
 	bx    r3
 
 	.type   sif_arch_armv6_m_setup_nvic, %function
-	.global sif_arch_armv6_m_setup_nvic
 sif_arch_armv6_m_setup_nvic:
 	push {lr}
 

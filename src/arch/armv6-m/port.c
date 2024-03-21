@@ -16,8 +16,3 @@ const sif_arch_armv6_m_word_t SIF_ARCH_ARMV6_M_SYSTICK_HZ
 
 const sif_arch_armv6_m_word_t SIF_ARCH_ARMV6_M_SYST_RVR_RELOAD
     = (SIF_ARCH_ARMV6_M_SYSTEM_CLOCK_HZ / SIF_ARCH_ARMV6_M_SYSTICK_HZ) - 1;
-
-void sif_arch_armv6_m_init(void)
-{
-	sif_arch_armv6_m_setup_nvic();
-}
