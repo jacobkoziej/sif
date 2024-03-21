@@ -23,6 +23,7 @@ typedef enum sif_task_error {
 	SIF_TASK_ERROR_PRIORITY,
 	SIF_TASK_ERROR_STACK_SIZE,
 	SIF_TASK_ERROR_TASK_COUNT,
+	SIF_TASK_ERROR_UNDEFINED,
 } sif_task_error_t;
 
 typedef struct sif_task_stack {
@@ -56,5 +57,6 @@ typedef struct sif_task_config {
 
 sif_task_error_t sif_task_create(const sif_task_config_t * const config);
 sif_task_error_t sif_task_delete(void);
+sif_task_error_t sif_task_scheduler_start(void);
 
 #endif	// SIF_TASK_H

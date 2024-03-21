@@ -46,6 +46,25 @@ sif_task_error_t sif_task_delete(void)
 	return SIF_TASK_ERROR_NONE;
 }
 
+sif_task_error_t sif_task_scheduler_start(void)
+{
+	size_t * const	   task_count = &sif.task_count;
+	sif_task_t * const task	      = sif.tasks + (*task_count)++;
+
+	sif_task_error_t  error;
+	sif_task_config_t config = {0};
+
+	sif_task_idle_task_config(&config);
+
+	error = sif_task_add_task(task, &config);
+
+	if (error != SIF_TASK_ERROR_NONE) return error;
+
+	sif_port_task_scheduler_start(task->stack.sp);
+
+	return SIF_TASK_ERROR_UNDEFINED;
+}
+
 static sif_task_error_t sif_task_add_task(sif_task_t * const task,
     const sif_task_config_t * const			     config)
 {
