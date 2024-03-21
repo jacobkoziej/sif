@@ -37,6 +37,15 @@ sif_task_error_t sif_task_create(const sif_task_config_t * const config)
 	return SIF_TASK_ERROR_NONE;
 }
 
+sif_task_error_t sif_task_delete(void)
+{
+	// TODO: svc to delete
+	while (1)
+		;
+
+	return SIF_TASK_ERROR_NONE;
+}
+
 static sif_task_error_t sif_task_add_task(sif_task_t * const task,
     const sif_task_config_t * const			     config)
 {

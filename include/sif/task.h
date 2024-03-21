@@ -34,6 +34,7 @@ typedef enum sif_task_state {
 	SIF_TASK_STATE_ACTIVE,
 	SIF_TASK_STATE_PENDING,
 	SIF_TASK_STATE_SUSPENDED,
+	SIF_TASK_STATE_DELETED,
 } sif_task_state_t;
 
 typedef struct sif_task {
@@ -53,5 +54,6 @@ typedef struct sif_task_config {
 } sif_task_config_t;
 
 sif_task_error_t sif_task_create(const sif_task_config_t * const config);
+sif_task_error_t sif_task_delete(void);
 
 #endif	// SIF_TASK_H
