@@ -45,12 +45,12 @@ sif_arch_armv6_m_scheduler_start:
 	msr msp, r1
 
 	// pop context
-	mov r1,   r0
-	add r1,   r1,  #CONTEXT_OFFSET
-	ldr r3,   [r1, #PC_OFFSET]
-	ldr r2,   [r1, #XPSR_OFFSET]
-	ldr r0,   [r1, #R0_OFFSET]
-	add r1,   r1,  #EXCEPTION_OFFSET
+	mov r1, r0
+	add r1, r1,  #CONTEXT_OFFSET
+	ldr r3, [r1, #PC_OFFSET]
+	ldr r2, [r1, #XPSR_OFFSET]
+	ldr r0, [r1, #R0_OFFSET]
+	add r1, r1,  #EXCEPTION_OFFSET
 
 	// set special registers
 	msr psp,        r1
