@@ -35,6 +35,34 @@ sif_arch_armv6_m_handler_systick:
 	bl sif_tick_step
 	pop {pc}
 
+	.type   sif_arch_armv6_m_scheduler_start, %function
+	.global sif_arch_armv6_m_scheduler_start
+sif_arch_armv6_m_scheduler_start:
+	// reset msp
+	ldr r1,  =VTOR
+	ldr r1,  [r1]
+	ldr r1,  [r1]
+	msr msp, r1
+
+	// pop context
+	mov r1,   r0
+	add r1,   r1,  #CONTEXT_OFFSET
+	ldr r3,   [r1, #PC_OFFSET]
+	ldr r2,   [r1, #XPSR_OFFSET]
+	ldr r0,   [r1, #R0_OFFSET]
+	add r1,   r1,  #EXCEPTION_OFFSET
+
+	// set special registers
+	msr psp,        r1
+	msr apsr_nzcvq, r2
+
+	// switch to psp and jump to task
+	ldr   r1,      =(1 << SPEL)
+	msr   control, r1
+	isb
+	cpsie i
+	bx    r3
+
 	.type   sif_arch_armv6_m_setup_nvic, %function
 	.global sif_arch_armv6_m_setup_nvic
 sif_arch_armv6_m_setup_nvic:

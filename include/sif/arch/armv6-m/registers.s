@@ -7,6 +7,10 @@
 	// B1.4.2
 	.set EPSR_T, 24
 
+	// B1.4.4
+	.set NPRIV, 0
+	.set SPEL,  1
+
 	// B1.5.2
 	.set EXCEPTION_NUMBER_SYSTICK, 15
 
