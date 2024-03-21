@@ -104,6 +104,14 @@ static sif_task_error_t sif_task_add_task(sif_task_t * const task,
 	return SIF_TASK_ERROR_NONE;
 }
 
+static void sif_task_idle_task(void * const arg)
+{
+	(void) arg;
+
+	while (1)
+		;
+}
+
 static void sif_task_idle_task_config(sif_task_config_t * const config)
 {
 	static sif_task_stack_buffer_t
