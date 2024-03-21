@@ -103,3 +103,18 @@ static sif_task_error_t sif_task_add_task(sif_task_t * const task,
 
 	return SIF_TASK_ERROR_NONE;
 }
+
+static void sif_task_idle_task_config(sif_task_config_t * const config)
+{
+	static sif_task_stack_buffer_t
+	    stack[SIF_CONFIG_MINIMUM_STACK_SIZE * 2];
+
+	*config = (sif_task_config_t){
+	    .name	= "idle",
+	    .func	= sif_task_idle_task,
+	    .arg	= NULL,
+	    .priority	= SIF_TASK_PRIORITY_MINIMUM + 1,
+	    .stack	= stack,
+	    .stack_size = sizeof(stack),
+	};
+}
