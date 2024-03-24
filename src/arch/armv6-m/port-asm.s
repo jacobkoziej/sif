@@ -36,19 +36,21 @@ sif_arch_armv6_m_init_stack:
 
 	bx lr
 
-	.type   sif_arch_armv6_m_handler_pendsv, %function
+	.type sif_arch_armv6_m_handler_pendsv, %function
 sif_arch_armv6_m_handler_pendsv:
-	push {lr}
+	push         {lr}
 	SAVE_CONTEXT r0
-	bkpt
-	RESTORE_CONTEXT r0
-	pop {pc}
 
-	.type   sif_arch_armv6_m_handler_systick, %function
+	bkpt
+
+	RESTORE_CONTEXT r0
+	pop             {pc}
+
+	.type sif_arch_armv6_m_handler_systick, %function
 sif_arch_armv6_m_handler_systick:
 	push {lr}
-	bl sif_systick
-	pop {pc}
+	bl   sif_systick
+	pop  {pc}
 
 	.type   sif_arch_armv6_m_scheduler_start, %function
 	.global sif_arch_armv6_m_scheduler_start
@@ -78,7 +80,7 @@ sif_arch_armv6_m_scheduler_start:
 	cpsie i
 	bx    r3
 
-	.type   sif_arch_armv6_m_setup_nvic, %function
+	.type sif_arch_armv6_m_setup_nvic, %function
 sif_arch_armv6_m_setup_nvic:
 	push {lr}
 
@@ -98,7 +100,7 @@ sif_arch_armv6_m_setup_nvic:
 
 	pop {pc}
 
-	.type   sif_arch_armv6_m_setup_pendsv, %function
+	.type sif_arch_armv6_m_setup_pendsv, %function
 sif_arch_armv6_m_setup_pendsv:
 	// set pendsv to lowest priority
 	ldr r1, =(0x03 << SHPR3_PRI_14)
@@ -109,7 +111,7 @@ sif_arch_armv6_m_setup_pendsv:
 
 	bx lr
 
-	.type   sif_arch_armv6_m_setup_systick, %function
+	.type sif_arch_armv6_m_setup_systick, %function
 sif_arch_armv6_m_setup_systick:
 	// program our reload value
 	ldr r0, =SYST_RVR
