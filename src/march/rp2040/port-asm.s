@@ -34,7 +34,7 @@ sif_march_rp2040_test_and_set:
 	// disable interrupts and synchronize
 	// so that we have a consistent view
 	cpsid i
-	dsb
+	dmb
 
 .Lacquire_spinlock:
 	ldr r2, [r3]
