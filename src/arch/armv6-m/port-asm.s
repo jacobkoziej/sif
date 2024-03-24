@@ -82,7 +82,9 @@ sif_arch_armv6_m_setup_nvic:
 
 	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SYSTICK, sif_arch_armv6_m_handler_systick
 
-	dmb
+	// ensure SCS registers are updated (B2.5)
+	dsb
+	isb
 
 	pop {pc}
 
