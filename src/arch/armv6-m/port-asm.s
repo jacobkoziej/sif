@@ -39,7 +39,7 @@ sif_arch_armv6_m_init_stack:
 	.type   sif_arch_armv6_m_handler_systick, %function
 sif_arch_armv6_m_handler_systick:
 	push {lr}
-	bl sif_tick_step
+	bl sif_systick
 	pop {pc}
 
 	.type   sif_arch_armv6_m_scheduler_start, %function

@@ -17,4 +17,6 @@ typedef struct sif {
 
 extern sif_t sif;
 
+void sif_systick(void);
+
 #endif	// SIF_SIF_H

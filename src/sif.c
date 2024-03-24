@@ -7,3 +7,8 @@
 #include <sif/sif.h>
 
 sif_t sif;
+
+void sif_systick(void)
+{
+	// wakey wakey it's time for schoo
+}
