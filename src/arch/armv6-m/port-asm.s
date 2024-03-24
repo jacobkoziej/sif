@@ -64,6 +64,18 @@ sif_arch_armv6_m_pendsv_set:
 	isb
 	bx  lr
 
+	.type   sif_arch_armv6_m_pendsv_clear, %function
+	.global sif_arch_armv6_m_pendsv_clear
+sif_arch_armv6_m_pendsv_clear:
+	ldr r0, =ICSR
+	ldr r1, [r0]
+	ldr r2, =(1 << ICSR_PENDSVCLR)
+	orr r1, r1, r2
+	str r1, [r0]
+	dsb
+	isb
+	bx  lr
+
 	.type   sif_arch_armv6_m_scheduler_start, %function
 	.global sif_arch_armv6_m_scheduler_start
 sif_arch_armv6_m_scheduler_start:
