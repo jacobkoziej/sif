@@ -12,6 +12,7 @@
 	.set SPEL,  1
 
 	// B1.5.2
+	.set EXCEPTION_NUMBER_PENDSV,  14
 	.set EXCEPTION_NUMBER_SYSTICK, 15
 
 	// B3.2.2

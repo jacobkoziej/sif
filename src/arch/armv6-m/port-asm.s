@@ -36,6 +36,14 @@ sif_arch_armv6_m_init_stack:
 
 	bx lr
 
+	.type   sif_arch_armv6_m_handler_pendsv, %function
+sif_arch_armv6_m_handler_pendsv:
+	push {lr}
+	SAVE_CONTEXT r0
+	bkpt
+	RESTORE_CONTEXT r0
+	pop {pc}
+
 	.type   sif_arch_armv6_m_handler_systick, %function
 sif_arch_armv6_m_handler_systick:
 	push {lr}
@@ -74,12 +82,14 @@ sif_arch_armv6_m_scheduler_start:
 sif_arch_armv6_m_setup_nvic:
 	push {lr}
 
+	bl sif_arch_armv6_m_setup_pendsv
 	bl sif_arch_armv6_m_setup_systick
 
 	// load vector table
 	ldr r2, =VTOR
 	ldr r2, [r2]
 
+	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_PENDSV,  sif_arch_armv6_m_handler_pendsv
 	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SYSTICK, sif_arch_armv6_m_handler_systick
 
 	// ensure SCS registers are updated (B2.5)
@@ -87,6 +97,17 @@ sif_arch_armv6_m_setup_nvic:
 	isb
 
 	pop {pc}
+
+	.type   sif_arch_armv6_m_setup_pendsv, %function
+sif_arch_armv6_m_setup_pendsv:
+	// set pendsv to lowest priority
+	ldr r1, =(0x03 << SHPR3_PRI_14)
+	ldr r0, =SHPR3
+	ldr r2, [r0]
+	orr r1, r1, r2
+	str r1, [r0]
+
+	bx lr
 
 	.type   sif_arch_armv6_m_setup_systick, %function
 sif_arch_armv6_m_setup_systick:
