@@ -56,6 +56,7 @@ sif_task_error_t sif_task_scheduler_start(void)
 
 	if (error != SIF_TASK_ERROR_NONE) return error;
 
+	task->state = SIF_TASK_STATE_ACTIVE;
 	sif_port_task_scheduler_start(task->stack.sp);
 
 	return SIF_TASK_ERROR_UNDEFINED;
@@ -110,7 +111,7 @@ static sif_task_error_t sif_task_add_task(sif_task_t * const task,
 	};
 
 	*task = (sif_task_t){
-	    .state    = SIF_TASK_STATE_SUSPENDED,
+	    .state    = SIF_TASK_STATE_PENDING,
 	    .priority = config->priority,
 	    .stack    = stack,
 	    .name     = config->name,
