@@ -103,10 +103,11 @@ sif_arch_armv6_m_setup_systick:
 	ldr r1, =((1 << SYST_CSR_CLKSOURCE) | (1 << SYST_CSR_TICKINIT) | (1 << SYST_CSR_ENABLE))
 	str r1, [r0]
 
-	// set systick to lowest priority
+	// set systick priority
+	ldr r1, =SIF_ARCH_ARMV6_M_KERNEL_PRIORITY
+	ldr r1, [r1]
+	lsl r1, r1, #SHPR3_PRI_15
 	ldr r0, =SHPR3
-	ldr r1, =(0x03 << SHPR3_PRI_15)
-	ldr r2, =SHPR3_PRI_15
 	ldr r2, [r0]
 	orr r1, r1, r2
 	str r1, [r0]
