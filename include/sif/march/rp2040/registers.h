@@ -7,9 +7,11 @@
 #ifndef SIF_MARCH_RP2040_REGISTERS_H
 #define SIF_MARCH_RP2040_REGISTERS_H
 
-#define SIF_MARCH_RP2040_REGISTER_SIO(X)                                 \
-	(*(volatile unsigned long *) (SIF_MARCH_RP2040_REGISTER_SIO_BASE \
-	    + (X)))
+#include <sif/arch/armv6-m/types.h>
+
+#define SIF_MARCH_RP2040_REGISTER_SIO(X)    \
+	(*(volatile sif_arch_armv6_m_word_t \
+		*) (SIF_MARCH_RP2040_REGISTER_SIO_BASE + (X)))
 
 #define SIF_MARCH_RP2040_REGISTER_SIO_BASE 0xd0000000
 
