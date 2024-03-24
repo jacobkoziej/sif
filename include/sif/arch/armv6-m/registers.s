@@ -27,8 +27,8 @@
 	.set DFSR,  0xe000ed30
 
 	// B3.2.10
-	.set SHPR3_PRI_15, 30
-	.set SHPR3_PRI_14, 22
+	.set SHPR3_PRI_15, 29
+	.set SHPR3_PRI_14, 21
 
 	// B3.3.2
 	.set SYST_CSR,   0xe000e010
