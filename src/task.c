@@ -6,15 +6,11 @@
 
 #include <sif/config.h>
 #include <sif/private/task.h>
+#include <sif/sif.h>
 #include <sif/task.h>
 
 #include <stddef.h>
 #include <stdint.h>
-
-static struct {
-	sif_task_t tasks[SIF_CONFIG_MAXIMUM_TASKS];
-	size_t	   task_count;
-} sif;
 
 sif_task_error_t sif_task_create(const sif_task_config_t * const config)
 {
