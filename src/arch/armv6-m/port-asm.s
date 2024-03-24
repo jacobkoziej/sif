@@ -52,6 +52,18 @@ sif_arch_armv6_m_handler_systick:
 	bl   sif_systick
 	pop  {pc}
 
+	.type   sif_arch_armv6_m_pendsv_set, %function
+	.global sif_arch_armv6_m_pendsv_set
+sif_arch_armv6_m_pendsv_set:
+	ldr r0, =ICSR
+	ldr r1, [r0]
+	ldr r2, =(1 << ICSR_PENDSVSET)
+	orr r1, r1, r2
+	str r1, [r0]
+	dsb
+	isb
+	bx  lr
+
 	.type   sif_arch_armv6_m_scheduler_start, %function
 	.global sif_arch_armv6_m_scheduler_start
 sif_arch_armv6_m_scheduler_start:
