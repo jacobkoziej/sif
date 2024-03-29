@@ -9,6 +9,7 @@
 #include <sif/sif.h>
 #include <sif/task.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -36,8 +37,7 @@ sif_task_error_t sif_task_create(const sif_task_config_t * const config)
 sif_task_error_t sif_task_delete(void)
 {
 	// TODO: svc to delete
-	while (1)
-		;
+	while (true) continue;
 
 	return SIF_TASK_ERROR_NONE;
 }
@@ -124,8 +124,7 @@ static void sif_task_idle_task(void * const arg)
 {
 	(void) arg;
 
-	while (1)
-		;
+	while (true) continue;
 }
 
 static void sif_task_idle_task_config(sif_task_config_t * const config)
