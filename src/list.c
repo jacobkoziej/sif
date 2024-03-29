@@ -23,3 +23,15 @@ void sif_list_insert(sif_list_t * const list, sif_list_t * const node)
 	prev->next = node;
 	next->prev = node;
 }
+
+void sif_list_remove(sif_list_t * const node)
+{
+	sif_list_t * const prev = node->prev;
+	sif_list_t * const next = node->next;
+
+	prev->next = next;
+	next->prev = prev;
+
+	node->prev = node;
+	node->next = node;
+}
