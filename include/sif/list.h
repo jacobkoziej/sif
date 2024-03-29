@@ -19,5 +19,6 @@ typedef struct sif_list {
 } sif_list_t;
 
 void sif_list_init(sif_list_t * const list);
+void sif_list_insert(sif_list_t * const list, sif_list_t * const node);
 
 #endif	// SIF_LIST_H

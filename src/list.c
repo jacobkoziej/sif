@@ -11,3 +11,15 @@ void sif_list_init(sif_list_t * const list)
 	list->prev = list;
 	list->next = list;
 }
+
+void sif_list_insert(sif_list_t * const list, sif_list_t * const node)
+{
+	sif_list_t * const prev = list->prev;
+	sif_list_t * const next = list->next;
+
+	node->prev = prev;
+	node->next = next;
+
+	prev->next = node;
+	next->prev = node;
+}
