@@ -9,11 +9,11 @@
 
 #include <sif/task.h>
 
-void			 sif_arch_armv6_m_init(void);
-sif_task_stack_buffer_t *sif_arch_armv6_m_init_stack(
-	sif_task_stack_buffer_t *stack, sif_task_function_t func, void *arg);
+void		  sif_arch_armv6_m_init(void);
+sif_task_stack_t *sif_arch_armv6_m_init_stack(
+	sif_task_stack_t *stack, sif_task_function_t func, void *arg);
 void sif_arch_armv6_m_pendsv_set(void);
 void sif_arch_armv6_m_pendsv_clear(void);
-void sif_arch_armv6_m_scheduler_start(sif_task_stack_buffer_t *stack);
+void sif_arch_armv6_m_scheduler_start(sif_task_stack_t *stack);
 
 #endif	// SIF_ARCH_ARMV6_M_PORT_ASM_H

@@ -101,14 +101,15 @@ static sif_task_error_t sif_task_add_task(
 	if (stack_size < SIF_CONFIG_MINIMUM_STACK_SIZE)
 		return SIF_TASK_ERROR_STACK_SIZE;
 
-	const sif_task_stack_t stack = (sif_task_stack_t){
-		.sp = sif_port_task_init_stack(
-			(sif_task_stack_buffer_t *) stack_start,
-			config->func,
-			config->arg),
-		.start = (sif_task_stack_buffer_t *) stack_start,
-		.end   = (sif_task_stack_buffer_t *) stack_end,
-	};
+	const sif_task_stack_descriptor_t stack
+		= (sif_task_stack_descriptor_t){
+			.sp = sif_port_task_init_stack(
+				(sif_task_stack_t *) stack_start,
+				config->func,
+				config->arg),
+			.start = (sif_task_stack_t *) stack_start,
+			.end   = (sif_task_stack_t *) stack_end,
+		};
 
 	*task = (sif_task_t){
 		.state	  = SIF_TASK_STATE_PENDING,
@@ -129,8 +130,7 @@ static void sif_task_idle_task(void * const arg)
 
 static void sif_task_idle_task_config(sif_task_config_t * const config)
 {
-	static sif_task_stack_buffer_t
-		stack[SIF_CONFIG_MINIMUM_STACK_SIZE * 2];
+	static sif_task_stack_t stack[SIF_CONFIG_MINIMUM_STACK_SIZE * 2];
 
 	*config = (sif_task_config_t){
 		.name	    = "idle",
