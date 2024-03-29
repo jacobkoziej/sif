@@ -13,6 +13,24 @@
 #include <stddef.h>
 #include <stdint.h>
 
+sif_task_error_t sif_task_init(
+	sif_task_t * const task, const sif_task_config_t * const config)
+{
+	if (config->priority >= SIF_CONFIG_PRIORITY_LEVELS)
+		return SIF_TASK_ERROR_PRIORITY;
+
+	sif_task_error_t error;
+
+	error = sif_task_init_stack(&task->stack, config);
+
+	if (error != SIF_TASK_ERROR_NONE) return error;
+
+	task->priority = config->priority;
+	task->name     = config->name;
+
+	return SIF_TASK_ERROR_NONE;
+}
+
 sif_task_error_t sif_task_create(const sif_task_config_t * const config)
 {
 	size_t * const task_count = &sif.task_count;
