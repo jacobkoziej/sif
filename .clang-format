@@ -22,7 +22,7 @@ AlignEscapedNewlines: Left
 AlignOperands: DontAlign
 AlignTrailingComments: Always
 AllowAllArgumentsOnNextLine: false
-AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortEnumsOnASingleLine: false
