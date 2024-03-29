@@ -18,9 +18,9 @@ sif_arch_armv6_m_init:
 	bl   sif_arch_armv6_m_setup_nvic
 	pop  {pc}
 
-	.type   sif_arch_armv6_m_init_stack, %function
-	.global sif_arch_armv6_m_init_stack
-sif_arch_armv6_m_init_stack:
+	.type   sif_arch_armv6_m_init_context, %function
+	.global sif_arch_armv6_m_init_context
+sif_arch_armv6_m_init_context:
 	sub r0, r0, #EXCEPTION_OFFSET
 
 	str r1, [r0, #PC_OFFSET]

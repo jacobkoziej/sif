@@ -10,7 +10,7 @@
 #include <sif/task.h>
 
 void		  sif_arch_armv6_m_init(void);
-sif_task_stack_t *sif_arch_armv6_m_init_stack(
+sif_task_stack_t *sif_arch_armv6_m_init_context(
 	sif_task_stack_t *stack, sif_task_function_t func, void *arg);
 void sif_arch_armv6_m_pendsv_set(void);
 void sif_arch_armv6_m_pendsv_clear(void);

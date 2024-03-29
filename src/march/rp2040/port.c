@@ -12,6 +12,6 @@
 void (* const sif_port_task_scheduler_start)(sif_task_stack_t *stack)
 	= sif_march_rp2040_scheduler_start;
 
-sif_task_stack_t *(* const sif_port_task_init_stack)(
+sif_task_stack_t *(* const sif_port_task_init_context)(
 	sif_task_stack_t *stack, sif_task_function_t *func, void *arg)
-	= sif_arch_armv6_m_init_stack;
+	= sif_arch_armv6_m_init_context;
