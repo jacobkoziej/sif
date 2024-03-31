@@ -92,9 +92,23 @@ sif_arch_armv6_m_handler_svcall:
 	add r1, r1, r0
 	ldr r1, [r1]
 
+	// lock kernel
+	push {r1}
+	ldr  r1,  =sif_port_kernel_lock
+	ldr  r1,  [r1]
+	blx  r1
+	pop  {r1}
+
 	// call syscall with arg
 	ldr r0, [r5, #R1_OFFSET]
 	blx r1
+
+	// unlock kernel
+	push {r0}
+	ldr  r0,  =sif_port_kernel_unlock
+	ldr  r0,  [r0]
+	blx  r0
+	pop  {r0}
 
 .Lset_syscall_return:
 	str r0, [r5, #R0_OFFSET]
