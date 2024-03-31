@@ -17,9 +17,6 @@ typedef enum sif_syscall_error {
 	SIF_SYSCALL_ERROR_INVALID,
 } sif_syscall_error_t;
 
-extern sif_syscall_error_t (* const sif_syscalls[SIF_SYSCALL_TOTAL])(
-	void * const arg);
-
 extern sif_syscall_error_t (* const sif_port_syscall)(
 	sif_syscall_t syscall, void * const arg);
 
