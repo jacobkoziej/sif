@@ -9,6 +9,7 @@
 	.set LR_OFFSET,        0x14
 	.set PC_OFFSET,        0x18
 	.set R0_OFFSET,        0x00
+	.set R1_OFFSET,        0x04
 	.set XPSR_OFFSET,      0x1c
 
 	.macro RESTORE_CONTEXT sp

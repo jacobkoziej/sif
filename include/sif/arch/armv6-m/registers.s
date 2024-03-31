@@ -12,8 +12,14 @@
 	.set SPEL,  1
 
 	// B1.5.2
+	.set EXCEPTION_NUMBER_SVCALL,  11
 	.set EXCEPTION_NUMBER_PENDSV,  14
 	.set EXCEPTION_NUMBER_SYSTICK, 15
+
+	// B1.5.8
+	.set EXEC_RETURN_HANDLER_MODE,    0xfffffff1
+	.set EXEC_RETURN_THREAD_MODE_MSP, 0xfffffff9
+	.set EXEC_RETURN_THREAD_MODE_PSP, 0xfffffffd
 
 	// B3.2.2
 	.set ACTLR, 0xe000e008
@@ -26,6 +32,9 @@
 	.set SHPR2, 0xe000ed1c
 	.set SHPR3, 0xe000ed20
 	.set DFSR,  0xe000ed30
+
+	// B3.2.9
+	.set SHPR2_PRI_11, 30
 
 	// B3.2.10
 	.set SHPR3_PRI_15, 30

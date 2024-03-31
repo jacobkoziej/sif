@@ -4,6 +4,7 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
+#include <sif/private/sif.h>
 #include <sif/sif.h>
 
 sif_t sif;

@@ -4,7 +4,7 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
-	.arch armv6-m
+	.arch armv6s-m
 
 	.include "sif/arch/armv6-m/macros.s"
 	.include "sif/arch/armv6-m/registers.s"
@@ -45,6 +45,75 @@ sif_arch_armv6_m_handler_pendsv:
 
 	RESTORE_CONTEXT r0
 	pop             {pc}
+
+	.type sif_arch_armv6_m_handler_svcall, %function
+sif_arch_armv6_m_handler_svcall:
+	push {r5,lr}
+
+	// determine what sp to use for caller context
+	ldr r5, =EXEC_RETURN_THREAD_MODE_PSP
+	cmp r5, lr
+	beq .Lpsp
+
+	// ignore pushed registers on msp
+	mov r5, sp
+	add r5, r5, #8
+	b   .Lextract_svc_immediate
+
+.Lpsp:
+	mrs r5, psp
+
+.Lextract_svc_immediate:
+	ldr  r1, [r5, #PC_OFFSET]
+	sub  r1, r1,  #2
+	ldrb r1, [r1]
+
+	// check if svc immediate is zero
+	tst r1, r1
+	beq .Lvalid_svc_immediate
+
+	// trigger a hard fault since we didn't execute svc
+	svc #0
+
+.Lvalid_svc_immediate:
+	// extract syscall number
+	ldr r0, [r5, #R0_OFFSET]
+
+	// check if we have a valid syscall
+	bl  sif_syscall_vaild
+	tst r0, r0
+	bne .Lset_syscall_return
+
+	// get syscall
+	ldr r0, [r5, #R0_OFFSET]
+	ldr r1, =4
+	mul r0, r0, r1
+	ldr r1, =sif_syscalls
+	add r1, r1, r0
+	ldr r1, [r1]
+
+	// lock kernel
+	push {r1}
+	ldr  r1,  =sif_port_kernel_lock
+	ldr  r1,  [r1]
+	blx  r1
+	pop  {r1}
+
+	// call syscall with arg
+	ldr r0, [r5, #R1_OFFSET]
+	blx r1
+
+	// unlock kernel
+	push {r0}
+	ldr  r0,  =sif_port_kernel_unlock
+	ldr  r0,  [r0]
+	blx  r0
+	pop  {r0}
+
+.Lset_syscall_return:
+	str r0, [r5, #R0_OFFSET]
+
+	pop {r5,pc}
 
 	.type sif_arch_armv6_m_handler_systick, %function
 sif_arch_armv6_m_handler_systick:
@@ -109,6 +178,7 @@ sif_arch_armv6_m_setup_nvic:
 	push {lr}
 
 	bl sif_arch_armv6_m_setup_pendsv
+	bl sif_arch_armv6_m_setup_svcall
 	bl sif_arch_armv6_m_setup_systick
 
 	// load vector table
@@ -116,6 +186,7 @@ sif_arch_armv6_m_setup_nvic:
 	ldr r2, [r2]
 
 	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_PENDSV,  sif_arch_armv6_m_handler_pendsv
+	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SVCALL,  sif_arch_armv6_m_handler_svcall
 	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SYSTICK, sif_arch_armv6_m_handler_systick
 
 	// ensure SCS registers are updated (B2.5)
@@ -129,6 +200,19 @@ sif_arch_armv6_m_setup_pendsv:
 	// set pendsv to lowest priority
 	ldr r1, =(0x03 << SHPR3_PRI_14)
 	ldr r0, =SHPR3
+	ldr r2, [r0]
+	orr r1, r1, r2
+	str r1, [r0]
+
+	bx lr
+
+	.type sif_arch_armv6_m_setup_svcall, %function
+sif_arch_armv6_m_setup_svcall:
+	// set svcall priority
+	ldr r1, =SIF_ARCH_ARMV6_M_KERNEL_PRIORITY
+	ldr r1, [r1]
+	lsl r1, r1, #SHPR2_PRI_11
+	ldr r0, =SHPR2
 	ldr r2, [r0]
 	orr r1, r1, r2
 	str r1, [r0]
@@ -162,3 +246,9 @@ sif_arch_armv6_m_setup_systick:
 	str r1, [r0]
 
 	bx lr
+
+	.type   sif_arch_armv6_m_syscall, %function
+	.global sif_arch_armv6_m_syscall
+sif_arch_armv6_m_syscall:
+	svc #0
+	bx  lr
