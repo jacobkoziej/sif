@@ -232,3 +232,9 @@ sif_arch_armv6_m_setup_systick:
 	str r1, [r0]
 
 	bx lr
+
+	.type   sif_arch_armv6_m_syscall, %function
+	.global sif_arch_armv6_m_syscall
+sif_arch_armv6_m_syscall:
+	svc #0
+	bx  lr
