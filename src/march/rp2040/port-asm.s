@@ -4,7 +4,7 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
-	.arch armv6-m
+	.arch armv6s-m
 	.cpu  cortex-m0plus
 
 	.include "sif/march/rp2040/registers.s"

@@ -4,7 +4,7 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
-	.arch armv6-m
+	.arch armv6s-m
 
 	.include "sif/arch/armv6-m/macros.s"
 	.include "sif/arch/armv6-m/registers.s"
