@@ -25,6 +25,18 @@ sif_march_rp2040_kernel_lock:
 
 	bx lr
 
+	.type   sif_march_rp2040_kernel_unlock, %function
+	.global sif_march_rp2040_kernel_unlock
+sif_march_rp2040_kernel_unlock:
+	ldr r0, =SPINLOCK15
+
+	dmb
+
+	// release spinlock
+	str r0, [r0]
+
+	bx lr
+
 	.type   sif_march_rp2040_scheduler_start, %function
 	.global sif_march_rp2040_scheduler_start
 sif_march_rp2040_scheduler_start:
