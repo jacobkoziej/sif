@@ -9,6 +9,6 @@
 
 #include <sif/syscall.h>
 
-static void sif_syscall_yield(void * const arg);
+static sif_syscall_error_t sif_syscall_yield(void * const arg);
 
 #endif	// SIF_PRIVATE_SYSCALL_H

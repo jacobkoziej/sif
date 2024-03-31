@@ -12,6 +12,11 @@ typedef enum sif_syscall {
 	SIF_SYSCALL_TOTAL,
 } sif_syscall_t;
 
-extern void (* const sif_syscalls[SIF_SYSCALL_TOTAL])(void * const arg);
+typedef enum sif_syscall_error {
+	SIF_SYSCALL_ERROR_NONE,
+} sif_syscall_error_t;
+
+extern sif_syscall_error_t (* const sif_syscalls[SIF_SYSCALL_TOTAL])(
+	void * const arg);
 
 #endif	// SIF_SYSCALL_H
