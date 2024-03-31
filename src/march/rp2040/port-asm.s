@@ -11,6 +11,20 @@
 
 	.text
 
+	.type   sif_march_rp2040_kernel_lock, %function
+	.global sif_march_rp2040_kernel_lock
+sif_march_rp2040_kernel_lock:
+	ldr r1, =SPINLOCK15
+
+.Lacquire_kernel_spinlock:
+	ldr r0, [r1]
+	tst r0, r0
+	beq .Lacquire_kernel_spinlock
+
+	dmb
+
+	bx lr
+
 	.type   sif_march_rp2040_scheduler_start, %function
 	.global sif_march_rp2040_scheduler_start
 sif_march_rp2040_scheduler_start:
@@ -36,10 +50,10 @@ sif_march_rp2040_test_and_set:
 	cpsid i
 	dmb
 
-.Lacquire_spinlock:
+.Lacquire_test_and_set_spinlock:
 	ldr r2, [r3]
 	tst r2, r2
-	beq .Lacquire_spinlock
+	beq .Lacquire_test_and_set_spinlock
 
 	ldr r1, [r0]
 	tst r1, r1
