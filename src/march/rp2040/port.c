@@ -18,6 +18,8 @@ sif_task_stack_t *(* const sif_port_task_init_context)(
 
 void (* const sif_port_kernel_lock)(void) = sif_march_rp2040_kernel_lock;
 
+void (* const sif_port_kernel_unlock)(void) = sif_march_rp2040_kernel_unlock;
+
 sif_syscall_error_t (* const sif_port_syscall)(
 	sif_syscall_t syscall, void * const arg)
 	= sif_arch_armv6_m_syscall;
