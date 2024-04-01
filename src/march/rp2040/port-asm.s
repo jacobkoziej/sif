@@ -11,6 +11,13 @@
 
 	.text
 
+	.type   sif_march_rp2040_get_coreid, %function
+	.global sif_march_rp2040_get_coreid
+sif_march_rp2040_get_coreid:
+	ldr r0, =COREID
+	ldr r0, [r0]
+	bx  lr
+
 	.type   sif_march_rp2040_kernel_lock, %function
 	.global sif_march_rp2040_kernel_lock
 sif_march_rp2040_kernel_lock:

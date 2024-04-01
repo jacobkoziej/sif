@@ -6,5 +6,7 @@
 
 	.set SIO_BASE, 0xd0000000
 
+	.set COREID, SIO_BASE + 0x00
+
 	.set SPINLOCK14, SIO_BASE + 0x138
 	.set SPINLOCK15, SIO_BASE + 0x13c
