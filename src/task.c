@@ -26,6 +26,7 @@ sif_task_error_t sif_task_init(
 	if (error != SIF_TASK_ERROR_NONE) return error;
 
 	task->priority = config->priority;
+	task->cpu_mask = config->cpu_mask;
 
 	return SIF_TASK_ERROR_NONE;
 }

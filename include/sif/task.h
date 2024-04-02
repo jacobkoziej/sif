@@ -15,6 +15,7 @@
 #define SIF_TASK_PRIORITY_MINIMUM (UINT_MAX - 1)
 
 typedef unsigned      sif_task_priority_t;
+typedef unsigned      sif_task_cpu_mask_t;
 typedef uint64_t      sif_task_pid_t;
 typedef unsigned char sif_task_stack_t;
 
@@ -45,6 +46,7 @@ typedef struct sif_task {
 	sif_task_state_t	    state;
 	sif_task_pid_t		    pid;
 	sif_task_priority_t	    priority;
+	sif_task_cpu_mask_t	    cpu_mask;
 	sif_task_stack_descriptor_t stack;
 } sif_task_t;
 
@@ -52,6 +54,7 @@ typedef struct sif_task_config {
 	sif_task_function_t *func;
 	void		    *arg;
 	sif_task_priority_t  priority;
+	sif_task_cpu_mask_t  cpu_mask;
 	sif_task_stack_t    *stack;
 	size_t		     stack_size;
 } sif_task_config_t;
