@@ -9,6 +9,11 @@
 
 sif_t sif;
 
+void sif_init(void)
+{
+	sif_port_init();
+}
+
 void sif_systick(void)
 {
 	// wakey wakey it's time for schoo

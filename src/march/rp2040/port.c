@@ -12,6 +12,8 @@
 sif_port_word_t (* const sif_port_get_coreid)(void)
 	= sif_march_rp2040_get_coreid;
 
+void (* const sif_port_init)(void) = sif_march_rp2040_init;
+
 void (* const sif_port_kernel_lock)(void) = sif_march_rp2040_kernel_lock;
 
 void (* const sif_port_kernel_unlock)(void) = sif_march_rp2040_kernel_unlock;

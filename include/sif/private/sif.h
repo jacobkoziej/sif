@@ -11,6 +11,7 @@
 #include <sif/sif.h>
 
 extern sif_port_word_t (* const sif_port_get_coreid)(void);
+extern void (* const sif_port_init)(void);
 extern void (* const sif_port_kernel_lock)(void);
 extern void (* const sif_port_kernel_unlock)(void);
 
