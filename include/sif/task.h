@@ -9,11 +9,13 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #define SIF_TASK_PRIORITY_MAXIMUM 0
 #define SIF_TASK_PRIORITY_MINIMUM (UINT_MAX - 1)
 
 typedef unsigned      sif_task_priority_t;
+typedef uint64_t      sif_task_pid_t;
 typedef unsigned char sif_task_stack_t;
 
 typedef void(sif_task_function_t)(void * const arg);
@@ -41,13 +43,12 @@ typedef enum sif_task_state {
 
 typedef struct sif_task {
 	sif_task_state_t	    state;
+	sif_task_pid_t		    pid;
 	sif_task_priority_t	    priority;
 	sif_task_stack_descriptor_t stack;
-	const char		   *name;
 } sif_task_t;
 
 typedef struct sif_task_config {
-	const char	    *name;
 	sif_task_function_t *func;
 	void		    *arg;
 	sif_task_priority_t  priority;

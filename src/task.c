@@ -26,7 +26,6 @@ sif_task_error_t sif_task_init(
 	if (error != SIF_TASK_ERROR_NONE) return error;
 
 	task->priority = config->priority;
-	task->name     = config->name;
 
 	return SIF_TASK_ERROR_NONE;
 }
