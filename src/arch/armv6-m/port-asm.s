@@ -36,6 +36,12 @@ sif_arch_armv6_m_init_context:
 
 	bx lr
 
+	.type   sif_arch_armv6_m_interrupt_disable, %function
+	.global sif_arch_armv6_m_interrupt_disable
+sif_arch_armv6_m_interrupt_disable:
+	cpsid i
+	bx lr
+
 	.type   sif_arch_armv6_m_interrupt_enable, %function
 	.global sif_arch_armv6_m_interrupt_enable
 sif_arch_armv6_m_interrupt_enable:
