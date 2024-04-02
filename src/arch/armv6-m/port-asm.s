@@ -140,6 +140,8 @@ sif_arch_armv6_m_pendsv_clear:
 	ldr r1, [r0]
 	ldr r2, =(1 << ICSR_PENDSVCLR)
 	orr r1, r1, r2
+	ldr r2, =~(1 << ICSR_PENDSVSET)
+	and r1, r1, r2
 	str r1, [r0]
 	dsb
 	isb
