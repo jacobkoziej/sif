@@ -36,6 +36,12 @@ sif_arch_armv6_m_init_context:
 
 	bx lr
 
+	.type   sif_arch_armv6_m_interrupt_enable, %function
+	.global sif_arch_armv6_m_interrupt_enable
+sif_arch_armv6_m_interrupt_enable:
+	cpsie i
+	bx lr
+
 	.type sif_arch_armv6_m_handler_pendsv, %function
 sif_arch_armv6_m_handler_pendsv:
 	push         {lr}
