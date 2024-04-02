@@ -156,6 +156,13 @@ sif_arch_armv6_m_scheduler_start:
 	ldr r1,  [r1]
 	msr msp, r1
 
+	// enable systick
+	ldr r1, =SYST_CSR
+	ldr r2, [r1]
+	ldr r3, =(1 << SYST_CSR_ENABLE)
+	orr r2, r2, r3
+	str r2, [r1]
+
 	// pop context
 	mov r1, r0
 	add r1, r1,  #CONTEXT_OFFSET
