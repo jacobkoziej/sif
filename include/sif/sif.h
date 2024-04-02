@@ -8,11 +8,19 @@
 #define SIF_SIF_H
 
 #include <sif/config.h>
+#include <sif/list.h>
 #include <sif/task.h>
 
+typedef struct sif_core {
+	sif_task_t	   *running;
+	sif_task_t	   *queued;
+	sif_task_priority_t priority;
+} sif_core_t;
+
 typedef struct sif {
-	sif_task_t tasks[SIF_CONFIG_MAXIMUM_TASKS];
-	size_t	   task_count;
+	sif_core_t     cores[SIF_CONFIG_CORES];
+	sif_list_t    *ready[SIF_CONFIG_PRIORITY_LEVELS];
+	sif_task_pid_t next_pid;
 } sif_t;
 
 extern sif_t sif;

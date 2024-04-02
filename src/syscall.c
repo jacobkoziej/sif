@@ -5,11 +5,14 @@
  */
 
 #include <sif/private/syscall.h>
+#include <sif/sif.h>
 #include <sif/syscall.h>
+#include <sif/task.h>
 
 sif_syscall_error_t (* const sif_syscalls[SIF_SYSCALL_TOTAL])(void * const arg)
 	= {
-		[SIF_SYSCALL_YIELD] = sif_syscall_yield,
+		[SIF_SYSCALL_TASK_ADD] = sif_syscall_task_add,
+		[SIF_SYSCALL_YIELD]    = sif_syscall_yield,
 };
 
 sif_syscall_error_t sif_syscall_vaild(int syscall)
@@ -17,6 +20,18 @@ sif_syscall_error_t sif_syscall_vaild(int syscall)
 	return ((syscall >= 0) && (syscall < SIF_SYSCALL_TOTAL))
 		? SIF_SYSCALL_ERROR_NONE
 		: SIF_SYSCALL_ERROR_INVALID;
+}
+
+static sif_syscall_error_t sif_syscall_task_add(void * const arg)
+{
+	sif_task_t * const task = arg;
+
+	task->state = SIF_TASK_STATE_READY;
+	task->pid   = sif.next_pid++;
+
+	sif_list_insert(&sif.ready[task->priority], &task->list);
+
+	return SIF_SYSCALL_ERROR_NONE;
 }
 
 static sif_syscall_error_t sif_syscall_yield(void * const arg)

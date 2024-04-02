@@ -5,13 +5,22 @@
  */
 
 #include <sif/config.h>
+#include <sif/list.h>
 #include <sif/private/task.h>
 #include <sif/sif.h>
+#include <sif/syscall.h>
 #include <sif/task.h>
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+sif_task_error_t sif_task_add(sif_task_t * const task)
+{
+	return sif_port_syscall(SIF_SYSCALL_TASK_ADD, task)
+		? SIF_TASK_ERROR_UNDEFINED
+		: SIF_TASK_ERROR_NONE;
+}
 
 sif_task_error_t sif_task_init(
 	sif_task_t * const task, const sif_task_config_t * const config)
@@ -24,6 +33,8 @@ sif_task_error_t sif_task_init(
 	error = sif_task_init_stack(&task->stack, config);
 
 	if (error != SIF_TASK_ERROR_NONE) return error;
+
+	sif_list_node_init(&task->list);
 
 	task->priority = config->priority;
 	task->cpu_mask = config->cpu_mask;

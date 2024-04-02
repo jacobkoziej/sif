@@ -7,12 +7,11 @@
 #ifndef SIF_TASK_H
 #define SIF_TASK_H
 
+#include <sif/list.h>
+
 #include <limits.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#define SIF_TASK_PRIORITY_MAXIMUM 0
-#define SIF_TASK_PRIORITY_MINIMUM (UINT_MAX - 1)
 
 typedef unsigned      sif_task_priority_t;
 typedef unsigned      sif_task_cpu_mask_t;
@@ -25,7 +24,6 @@ typedef enum sif_task_error {
 	SIF_TASK_ERROR_NONE,
 	SIF_TASK_ERROR_PRIORITY,
 	SIF_TASK_ERROR_STACK_SIZE,
-	SIF_TASK_ERROR_TASK_COUNT,
 	SIF_TASK_ERROR_UNDEFINED,
 } sif_task_error_t;
 
@@ -37,12 +35,13 @@ typedef struct sif_task_stack_descriptor {
 
 typedef enum sif_task_state {
 	SIF_TASK_STATE_ACTIVE,
-	SIF_TASK_STATE_PENDING,
+	SIF_TASK_STATE_READY,
 	SIF_TASK_STATE_SUSPENDED,
 	SIF_TASK_STATE_DELETED,
 } sif_task_state_t;
 
 typedef struct sif_task {
+	sif_list_t		    list;
 	sif_task_state_t	    state;
 	sif_task_pid_t		    pid;
 	sif_task_priority_t	    priority;
@@ -59,6 +58,7 @@ typedef struct sif_task_config {
 	size_t		     stack_size;
 } sif_task_config_t;
 
+sif_task_error_t sif_task_add(sif_task_t * const task);
 sif_task_error_t sif_task_init(
 	sif_task_t * const task, const sif_task_config_t * const config);
 sif_task_error_t sif_task_create(const sif_task_config_t * const config);
