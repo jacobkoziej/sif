@@ -233,7 +233,7 @@ sif_arch_armv6_m_setup_systick:
 
 	// program control and status register
 	ldr r0, =SYST_CSR
-	ldr r1, =((1 << SYST_CSR_CLKSOURCE) | (1 << SYST_CSR_TICKINIT) | (1 << SYST_CSR_ENABLE))
+	ldr r1, =((1 << SYST_CSR_CLKSOURCE) | (1 << SYST_CSR_TICKINIT))
 	str r1, [r0]
 
 	// set systick priority
