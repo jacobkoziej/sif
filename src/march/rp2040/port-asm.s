@@ -18,6 +18,15 @@ sif_march_rp2040_get_coreid:
 	ldr r0, [r0]
 	bx  lr
 
+	.type   sif_march_rp2040_init, %function
+	.global sif_march_rp2040_init
+sif_march_rp2040_init:
+	push  {lr}
+	cpsid i
+	bl    sif_arch_armv6_m_init
+	cpsie i
+	pop   {pc}
+
 	.type   sif_march_rp2040_kernel_lock, %function
 	.global sif_march_rp2040_kernel_lock
 sif_march_rp2040_kernel_lock:
@@ -48,12 +57,9 @@ sif_march_rp2040_kernel_unlock:
 	.global sif_march_rp2040_scheduler_start
 sif_march_rp2040_scheduler_start:
 	push  {lr}
-	push  {r0}
 	cpsid i
 
-	bl  sif_arch_armv6_m_init
-	pop {r0}
-	bl  sif_arch_armv6_m_scheduler_start
+	bl sif_arch_armv6_m_scheduler_start
 
 	// panic! something's gone horribly wrong
 	cpsie i

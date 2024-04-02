@@ -14,6 +14,7 @@ typedef sif_arch_armv6_m_word_t sif_port_word_t;
 typedef sif_port_word_t		sif_port_atomic_t;
 
 sif_port_word_t	  sif_march_rp2040_get_coreid(void);
+void		  sif_march_rp2040_init(void);
 void		  sif_march_rp2040_kernel_lock(void);
 void		  sif_march_rp2040_kernel_unlock(void);
 void		  sif_march_rp2040_scheduler_start(sif_task_stack_t *stack);
