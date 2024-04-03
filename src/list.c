@@ -8,6 +8,16 @@
 
 #include <stddef.h>
 
+void sif_list_append_back(sif_list_t ** const list, sif_list_t * const node)
+{
+	if (!*list) {
+		*list = node;
+		return;
+	}
+
+	sif_list_insert(node, (*list)->prev, *list);
+}
+
 void sif_list_insert(sif_list_t * const node,
 	sif_list_t * const		prev,
 	sif_list_t * const		next)

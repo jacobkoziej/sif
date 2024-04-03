@@ -18,6 +18,7 @@ typedef struct sif_list {
 	struct sif_list *next;
 } sif_list_t;
 
+void sif_list_append_back(sif_list_t ** const list, sif_list_t * const node);
 void sif_list_insert(sif_list_t * const node,
 	sif_list_t * const		prev,
 	sif_list_t * const		next);
