@@ -22,6 +22,7 @@ typedef void(sif_task_function_t)(void * const arg);
 
 typedef enum sif_task_error {
 	SIF_TASK_ERROR_NONE,
+	SIF_TASK_ERROR_NOTHING_TO_SCHEDULE,
 	SIF_TASK_ERROR_PRIORITY,
 	SIF_TASK_ERROR_STACK_SIZE,
 	SIF_TASK_ERROR_UNDEFINED,

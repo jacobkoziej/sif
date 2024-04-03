@@ -52,7 +52,32 @@ sif_task_error_t sif_task_delete(void)
 
 sif_task_error_t sif_task_scheduler_start(void)
 {
-	// sif_port_task_scheduler_start(task->stack.sp);
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+
+	sif_port_interrupt_disable();
+
+	// here we trick sif_task_reschedule() to give us
+	// the highest priority task available so that we
+	// can bootstrap the scheduler
+	sif_port_kernel_lock();
+	sif.cpu_enabled |= 1 << coreid;
+	sif_port_kernel_unlock();
+	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
+	sif_task_reschedule();
+	sif_port_pendsv_clear();
+
+	sif_task_t * const task = core->queued;
+
+	if (!task) return SIF_TASK_ERROR_NOTHING_TO_SCHEDULE;
+
+	task->state = SIF_TASK_STATE_ACTIVE;
+
+	core->running  = task;
+	core->queued   = NULL;
+	core->priority = task->priority;
+
+	sif_port_task_scheduler_start(task->stack.sp);
 
 	return SIF_TASK_ERROR_UNDEFINED;
 }
