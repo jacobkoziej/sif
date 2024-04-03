@@ -52,3 +52,18 @@ void sif_list_remove(sif_list_t * const node,
 	node->prev = node;
 	node->next = node;
 }
+
+void sif_list_remove_next(sif_list_t ** const list, sif_list_t * const node)
+{
+	sif_list_t * const prev = node->prev;
+	sif_list_t * const next = node->next;
+
+	if ((node == prev) & (node == next)) {
+		*list = NULL;
+		return;
+	}
+
+	if (*list == node) *list = (*list)->next;
+
+	sif_list_remove(node, prev, next);
+}
