@@ -52,9 +52,11 @@ sif_arch_armv6_m_interrupt_enable:
 sif_arch_armv6_m_handler_pendsv:
 	push         {lr}
 	SAVE_CONTEXT r0
+	cpsid        i
 
-	bkpt
+	bl sif_pendsv
 
+	cpsie           i
 	RESTORE_CONTEXT r0
 	pop             {pc}
 

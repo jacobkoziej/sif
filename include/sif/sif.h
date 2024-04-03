@@ -33,7 +33,8 @@ extern sif_port_word_t (* const sif_port_get_coreid)(void);
 extern void (* const sif_port_kernel_lock)(void);
 extern void (* const sif_port_kernel_unlock)(void);
 
-void sif_init(void);
-void sif_systick(void);
+void		  sif_init(void);
+sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp);
+void		  sif_systick(void);
 
 #endif	// SIF_SIF_H
