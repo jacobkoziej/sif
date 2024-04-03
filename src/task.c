@@ -22,6 +22,30 @@ sif_task_error_t sif_task_add(sif_task_t * const task)
 		: SIF_TASK_ERROR_NONE;
 }
 
+sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
+{
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t	  *task	  = core->running;
+
+	task->stack.sp = sp;
+	task->state    = SIF_TASK_STATE_READY;
+
+	sif_port_kernel_lock();
+	sif_list_append_back(sif.ready + task->priority, &task->list);
+	sif_port_kernel_unlock();
+
+	task = core->queued;
+
+	task->state = SIF_TASK_STATE_ACTIVE;
+
+	core->running  = task;
+	core->queued   = NULL;
+	core->priority = task->priority;
+
+	return task->stack.sp;
+}
+
 sif_task_error_t sif_task_init(
 	sif_task_t * const task, const sif_task_config_t * const config)
 {

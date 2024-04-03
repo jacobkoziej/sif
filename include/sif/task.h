@@ -59,9 +59,10 @@ typedef struct sif_task_config {
 	size_t		     stack_size;
 } sif_task_config_t;
 
-sif_task_error_t sif_task_add(sif_task_t * const task);
-sif_task_error_t sif_task_init(
-	sif_task_t * const task, const sif_task_config_t * const config);
+sif_task_error_t  sif_task_add(sif_task_t  *const task);
+sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp);
+sif_task_error_t  sif_task_init(
+	 sif_task_t  *const task, const sif_task_config_t  *const config);
 sif_task_error_t sif_task_create(const sif_task_config_t * const config);
 sif_task_error_t sif_task_delete(void);
 sif_task_error_t sif_task_scheduler_start(void);
