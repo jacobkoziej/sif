@@ -25,6 +25,9 @@ typedef struct sif {
 
 extern sif_t sif;
 
+extern void (* const sif_port_kernel_lock)(void);
+extern void (* const sif_port_kernel_unlock)(void);
+
 void sif_init(void);
 void sif_systick(void);
 

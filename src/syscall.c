@@ -27,9 +27,14 @@ static sif_syscall_error_t sif_syscall_task_add(void * const arg)
 	sif_task_t * const task = arg;
 
 	task->state = SIF_TASK_STATE_READY;
-	task->pid   = sif.next_pid++;
 
-	sif_list_insert(&sif.ready[task->priority], &task->list);
+	sif_port_kernel_lock();
+
+	task->pid = sif.next_pid++;
+
+	sif_list_append_back(sif.ready + task->priority, &task->list);
+
+	sif_port_kernel_unlock();
 
 	return SIF_SYSCALL_ERROR_NONE;
 }
