@@ -25,15 +25,10 @@ void sif_list_node_init(sif_list_t * const node)
 	node->next = node;
 }
 
-void sif_list_remove(sif_list_t ** const list, sif_list_t * const node)
+void sif_list_remove(sif_list_t * const node,
+	sif_list_t * const		prev,
+	sif_list_t * const		next)
 {
-	sif_list_t * const prev = node->prev;
-	sif_list_t * const next = node->next;
-
-	if (prev == next) {
-		*list = NULL;
-	}
-
 	prev->next = next;
 	next->prev = prev;
 
