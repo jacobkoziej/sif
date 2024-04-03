@@ -14,9 +14,19 @@ sif_port_word_t (* const sif_port_get_coreid)(void)
 
 void (* const sif_port_init)(void) = sif_march_rp2040_init;
 
+void (* const sif_port_interrupt_disable)(void)
+	= sif_arch_armv6_m_interrupt_disable;
+
+void (* const sif_port_interrupt_enable)(void)
+	= sif_arch_armv6_m_interrupt_enable;
+
 void (* const sif_port_kernel_lock)(void) = sif_march_rp2040_kernel_lock;
 
 void (* const sif_port_kernel_unlock)(void) = sif_march_rp2040_kernel_unlock;
+
+void (* const sif_port_pendsv_set)(void) = sif_arch_armv6_m_pendsv_set;
+
+void (* const sif_port_pendsv_clear)(void) = sif_arch_armv6_m_pendsv_clear;
 
 sif_syscall_error_t (* const sif_port_syscall)(
 	sif_syscall_t syscall, void * const arg)

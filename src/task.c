@@ -57,6 +57,65 @@ sif_task_error_t sif_task_scheduler_start(void)
 	return SIF_TASK_ERROR_UNDEFINED;
 }
 
+void sif_task_reschedule(void)
+{
+	sif_task_t *next_task = NULL;
+
+	const sif_word_t	  coreid   = sif_port_get_coreid();
+	sif_core_t * const	  core	   = sif.cores + coreid;
+	const sif_task_cpu_mask_t cpu_mask = 1 << coreid;
+
+	sif_port_kernel_lock();
+
+	if (!(sif.cpu_enabled & cpu_mask)) {
+		sif_port_kernel_unlock();
+		return;
+	}
+
+	sif_task_priority_t priority;
+	for (priority = 0; priority < SIF_CONFIG_PRIORITY_LEVELS; priority++) {
+		if (!sif.ready[priority]) continue;
+
+		if (priority > core->priority) break;
+
+		sif_list_t **list = sif.ready + priority;
+
+		sif_list_t *node = *list;
+
+		do {
+			sif_task_t * const task = SIF_TASK_LIST2TASK(node);
+
+			if (!(task->cpu_mask & cpu_mask)) {
+				node = node->next;
+				continue;
+			}
+
+			sif_list_remove_next(list, node);
+			next_task = task;
+
+			goto found;
+		} while (*list && *list != node);
+	}
+
+found:
+	sif_port_kernel_unlock();
+
+	if (!next_task) return;
+
+	if (core->queued) {
+		sif_task_t * const task = core->queued;
+
+		sif_port_kernel_lock();
+		sif_list_prepend_front(
+			sif.ready + task->priority, &task->list);
+		sif_port_kernel_unlock();
+	}
+
+	core->queued = next_task;
+
+	sif_port_pendsv_set();
+}
+
 static sif_task_error_t sif_task_init_stack(
 	sif_task_stack_descriptor_t * const stack,
 	const sif_task_config_t * const	    config)

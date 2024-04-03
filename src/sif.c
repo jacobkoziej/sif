@@ -16,5 +16,5 @@ void sif_init(void)
 
 void sif_systick(void)
 {
-	// wakey wakey it's time for schoo
+	sif_task_reschedule();
 }
