@@ -110,6 +110,11 @@ sif_arch_armv6_m_handler_svcall:
 	ldr r0, [r5, #R1_OFFSET]
 	blx r1
 
+	// check if we can reschedule
+	push {r0}
+	bl   sif_task_reschedule
+	pop  {r0}
+
 .Lset_syscall_return:
 	str r0, [r5, #R0_OFFSET]
 
