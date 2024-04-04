@@ -24,10 +24,15 @@ sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp)
 		if (core->queued) {
 			// TODO: exit tickless idle
 
-			core->running = core->queued;
-			core->queued  = NULL;
+			sif_task_t * const task = core->queued;
 
-			return core->running->stack.sp;
+			task->state = SIF_TASK_STATE_ACTIVE;
+
+			core->running  = task;
+			core->queued   = NULL;
+			core->priority = task->priority;
+
+			return task->stack.sp;
 		}
 
 		// TODO: tickless idle
