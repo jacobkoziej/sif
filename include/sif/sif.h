@@ -23,7 +23,7 @@ typedef struct sif_core {
 typedef struct sif {
 	sif_core_t	    cores[SIF_CONFIG_CORES];
 	sif_list_t	   *ready[SIF_CONFIG_PRIORITY_LEVELS];
-	sif_task_pid_t	    next_pid;
+	sif_task_tid_t	    next_tid;
 	sif_task_cpu_mask_t cpu_enabled;
 } sif_t;
 

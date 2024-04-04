@@ -31,7 +31,7 @@ static sif_syscall_error_t sif_syscall_task_add(void * const arg)
 
 	sif_port_kernel_lock();
 
-	task->pid = sif.next_pid++;
+	task->tid = sif.next_tid++;
 
 	sif_list_append_back(sif.ready + task->priority, &task->list);
 

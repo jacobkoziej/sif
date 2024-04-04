@@ -15,7 +15,7 @@
 
 typedef unsigned      sif_task_priority_t;
 typedef unsigned      sif_task_cpu_mask_t;
-typedef uint64_t      sif_task_pid_t;
+typedef uint64_t      sif_task_tid_t;
 typedef unsigned char sif_task_stack_t;
 
 typedef void(sif_task_function_t)(void * const arg);
@@ -44,7 +44,7 @@ typedef enum sif_task_state {
 typedef struct sif_task {
 	sif_list_t		    list;
 	sif_task_state_t	    state;
-	sif_task_pid_t		    pid;
+	sif_task_tid_t		    tid;
 	sif_task_priority_t	    priority;
 	sif_task_cpu_mask_t	    cpu_mask;
 	sif_task_stack_descriptor_t stack;
