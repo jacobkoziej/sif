@@ -68,8 +68,7 @@ sif_task_error_t sif_task_init(
 
 sif_task_error_t sif_task_delete(void)
 {
-	// TODO: svc to delete
-	while (true) continue;
+	sif_port_syscall(SIF_SYSCALL_TASK_DELETE, NULL);
 
 	return SIF_TASK_ERROR_NONE;
 }
