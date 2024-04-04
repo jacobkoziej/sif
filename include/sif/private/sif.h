@@ -9,7 +9,6 @@
 
 #include <sif/sif.h>
 
-extern void (* const sif_port_kernel_lock)(void);
-extern void (* const sif_port_kernel_unlock)(void);
+extern void (* const sif_port_init)(void);
 
 #endif	// SIF_PRIVATE_SIF_H

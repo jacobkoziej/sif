@@ -6,10 +6,47 @@
 
 #include <sif/private/sif.h>
 #include <sif/sif.h>
+#include <sif/task.h>
 
 sif_t sif;
 
+void sif_init(void)
+{
+	sif_port_init();
+}
+
+sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp)
+{
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+
+	if (!core->running) {
+		if (core->queued) {
+			// TODO: exit tickless idle
+
+			sif_task_t * const task = core->queued;
+
+			task->state = SIF_TASK_STATE_ACTIVE;
+
+			core->running  = task;
+			core->queued   = NULL;
+			core->priority = task->priority;
+
+			return task->stack.sp;
+		}
+
+		// TODO: tickless idle
+
+		return sp;
+	}
+
+	// TODO: enter tickless idle
+	if (!core->queued) return sp;
+
+	return sif_task_context_switch(sp);
+}
+
 void sif_systick(void)
 {
-	// wakey wakey it's time for schoo
+	sif_task_reschedule();
 }

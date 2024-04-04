@@ -36,13 +36,27 @@ sif_arch_armv6_m_init_context:
 
 	bx lr
 
+	.type   sif_arch_armv6_m_interrupt_disable, %function
+	.global sif_arch_armv6_m_interrupt_disable
+sif_arch_armv6_m_interrupt_disable:
+	cpsid i
+	bx lr
+
+	.type   sif_arch_armv6_m_interrupt_enable, %function
+	.global sif_arch_armv6_m_interrupt_enable
+sif_arch_armv6_m_interrupt_enable:
+	cpsie i
+	bx lr
+
 	.type sif_arch_armv6_m_handler_pendsv, %function
 sif_arch_armv6_m_handler_pendsv:
 	push         {lr}
 	SAVE_CONTEXT r0
+	cpsid        i
 
-	bkpt
+	bl sif_pendsv
 
+	cpsie           i
 	RESTORE_CONTEXT r0
 	pop             {pc}
 
@@ -92,22 +106,13 @@ sif_arch_armv6_m_handler_svcall:
 	add r1, r1, r0
 	ldr r1, [r1]
 
-	// lock kernel
-	push {r1}
-	ldr  r1,  =sif_port_kernel_lock
-	ldr  r1,  [r1]
-	blx  r1
-	pop  {r1}
-
 	// call syscall with arg
 	ldr r0, [r5, #R1_OFFSET]
 	blx r1
 
-	// unlock kernel
+	// check if we can reschedule
 	push {r0}
-	ldr  r0,  =sif_port_kernel_unlock
-	ldr  r0,  [r0]
-	blx  r0
+	bl   sif_task_reschedule
 	pop  {r0}
 
 .Lset_syscall_return:
@@ -140,6 +145,8 @@ sif_arch_armv6_m_pendsv_clear:
 	ldr r1, [r0]
 	ldr r2, =(1 << ICSR_PENDSVCLR)
 	orr r1, r1, r2
+	ldr r2, =~(1 << ICSR_PENDSVSET)
+	and r1, r1, r2
 	str r1, [r0]
 	dsb
 	isb

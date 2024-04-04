@@ -5,13 +5,46 @@
  */
 
 #include <sif/config.h>
+#include <sif/list.h>
 #include <sif/private/task.h>
 #include <sif/sif.h>
+#include <sif/syscall.h>
 #include <sif/task.h>
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+sif_task_error_t sif_task_add(sif_task_t * const task)
+{
+	return sif_port_syscall(SIF_SYSCALL_TASK_ADD, task)
+		? SIF_TASK_ERROR_UNDEFINED
+		: SIF_TASK_ERROR_NONE;
+}
+
+sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
+{
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t	  *task	  = core->running;
+
+	task->stack.sp = sp;
+	task->state    = SIF_TASK_STATE_READY;
+
+	sif_port_kernel_lock();
+	sif_list_append_back(sif.ready + task->priority, &task->list);
+	sif_port_kernel_unlock();
+
+	task = core->queued;
+
+	task->state = SIF_TASK_STATE_ACTIVE;
+
+	core->running  = task;
+	core->queued   = NULL;
+	core->priority = task->priority;
+
+	return task->stack.sp;
+}
 
 sif_task_error_t sif_task_init(
 	sif_task_t * const task, const sif_task_config_t * const config)
@@ -25,139 +58,110 @@ sif_task_error_t sif_task_init(
 
 	if (error != SIF_TASK_ERROR_NONE) return error;
 
+	sif_list_node_init(&task->list);
+
 	task->priority = config->priority;
-	task->name     = config->name;
-
-	return SIF_TASK_ERROR_NONE;
-}
-
-sif_task_error_t sif_task_create(const sif_task_config_t * const config)
-{
-	size_t * const task_count = &sif.task_count;
-
-	if (*task_count >= SIF_CONFIG_MAXIMUM_TASKS - 1)
-		return SIF_TASK_ERROR_TASK_COUNT;
-
-	if (config->priority > SIF_TASK_PRIORITY_MINIMUM)
-		return SIF_TASK_ERROR_PRIORITY;
-
-	sif_task_t * const task = sif.tasks + (*task_count)++;
-
-	sif_task_error_t error;
-
-	error = sif_task_add_task(task, config);
-
-	if (error != SIF_TASK_ERROR_NONE) return error;
+	task->cpu_mask = config->cpu_mask;
 
 	return SIF_TASK_ERROR_NONE;
 }
 
 sif_task_error_t sif_task_delete(void)
 {
-	// TODO: svc to delete
-	while (true) continue;
+	sif_port_syscall(SIF_SYSCALL_TASK_DELETE, NULL);
 
 	return SIF_TASK_ERROR_NONE;
 }
 
 sif_task_error_t sif_task_scheduler_start(void)
 {
-	size_t * const	   task_count = &sif.task_count;
-	sif_task_t * const task	      = sif.tasks + (*task_count)++;
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
 
-	sif_task_error_t  error;
-	sif_task_config_t config = {0};
+	sif_port_interrupt_disable();
 
-	sif_task_idle_task_config(&config);
+	// here we trick sif_task_reschedule() to give us
+	// the highest priority task available so that we
+	// can bootstrap the scheduler
+	sif_port_kernel_lock();
+	sif.cpu_enabled |= 1 << coreid;
+	sif_port_kernel_unlock();
+	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
+	sif_task_reschedule();
+	sif_port_pendsv_clear();
 
-	error = sif_task_add_task(task, &config);
+	sif_task_t * const task = core->queued;
 
-	if (error != SIF_TASK_ERROR_NONE) return error;
+	if (!task) return SIF_TASK_ERROR_NOTHING_TO_SCHEDULE;
 
 	task->state = SIF_TASK_STATE_ACTIVE;
+
+	core->running  = task;
+	core->queued   = NULL;
+	core->priority = task->priority;
+
 	sif_port_task_scheduler_start(task->stack.sp);
 
 	return SIF_TASK_ERROR_UNDEFINED;
 }
 
-static sif_task_error_t sif_task_add_task(
-	sif_task_t * const task, const sif_task_config_t * const config)
+void sif_task_reschedule(void)
 {
-	size_t		stack_size   = config->stack_size;
-	const uintptr_t stack_buffer = (uintptr_t) config->stack;
+	sif_task_t *next_task = NULL;
 
-	if (stack_size <= SIF_CONFIG_STACK_ALIGNMENT_MASK)
-		return SIF_TASK_ERROR_STACK_SIZE;
+	const sif_word_t	  coreid   = sif_port_get_coreid();
+	sif_core_t * const	  core	   = sif.cores + coreid;
+	const sif_task_cpu_mask_t cpu_mask = 1 << coreid;
 
-#if (SIF_CONFIG_STACK_GROWTH_DIRECTION < 0)
-	const uintptr_t stack_start_raw = stack_buffer + stack_size - 1;
+	sif_port_kernel_lock();
 
-	const uintptr_t stack_start = stack_start_raw
-		& ~((uintptr_t) SIF_CONFIG_STACK_ALIGNMENT_MASK);
+	if (!(sif.cpu_enabled & cpu_mask)) {
+		sif_port_kernel_unlock();
+		return;
+	}
 
-	const uintptr_t difference = stack_start_raw - stack_start;
+	sif_task_priority_t priority;
+	for (priority = 0; priority < SIF_CONFIG_PRIORITY_LEVELS; priority++) {
+		if (!sif.ready[priority]) continue;
 
-	stack_size -= difference;
+		if (priority > core->priority) break;
 
-	const uintptr_t stack_end = stack_start - stack_size + 1;
-#else	// SIF_CONFIG_STACK_GROWTH_DIRECTION
-	const uintptr_t stack_start_raw = stack_buffer;
+		sif_list_t **list = sif.ready + priority;
 
-	uintptr_t stack_start = stack_start_raw
-		& ~((uintptr_t) SIF_CONFIG_STACK_ALIGNMENT_MASK);
+		sif_list_t *node = *list;
 
-	if (stack_start < stack_start_raw)
-		stack_start += SIF_CONFIG_STACK_ALIGNMENT_MASK + 1;
+		do {
+			sif_task_t * const task = SIF_TASK_LIST2TASK(node);
 
-	const uintptr_t difference = stack_start - stack_start_raw;
+			if (!(task->cpu_mask & cpu_mask)) {
+				node = node->next;
+				continue;
+			}
 
-	stack_size -= difference;
+			sif_list_remove_next(list, node);
+			next_task = task;
 
-	const uintptr_t stack_end = stack_start + stack_size - 1;
-#endif	// SIF_CONFIG_STACK_GROWTH_DIRECTION
+			goto found;
+		} while (*list && *list != node);
+	}
 
-	if (stack_size < SIF_CONFIG_MINIMUM_STACK_SIZE)
-		return SIF_TASK_ERROR_STACK_SIZE;
+found:
+	sif_port_kernel_unlock();
 
-	const sif_task_stack_descriptor_t stack
-		= (sif_task_stack_descriptor_t){
-			.sp = sif_port_task_init_stack(
-				(sif_task_stack_t *) stack_start,
-				config->func,
-				config->arg),
-			.start = (sif_task_stack_t *) stack_start,
-			.end   = (sif_task_stack_t *) stack_end,
-		};
+	if (!next_task) return;
 
-	*task = (sif_task_t){
-		.state	  = SIF_TASK_STATE_PENDING,
-		.priority = config->priority,
-		.stack	  = stack,
-		.name	  = config->name,
-	};
+	if (core->queued) {
+		sif_task_t * const task = core->queued;
 
-	return SIF_TASK_ERROR_NONE;
-}
+		sif_port_kernel_lock();
+		sif_list_prepend_front(
+			sif.ready + task->priority, &task->list);
+		sif_port_kernel_unlock();
+	}
 
-static void sif_task_idle_task(void * const arg)
-{
-	(void) arg;
+	core->queued = next_task;
 
-	while (true) continue;
-}
-
-static void sif_task_idle_task_config(sif_task_config_t * const config)
-{
-	static sif_task_stack_t stack[SIF_CONFIG_MINIMUM_STACK_SIZE * 2];
-
-	*config = (sif_task_config_t){
-		.name	    = "idle",
-		.func	    = sif_task_idle_task,
-		.arg	    = NULL,
-		.priority   = SIF_TASK_PRIORITY_MINIMUM + 1,
-		.stack	    = stack,
-		.stack_size = sizeof(stack),
-	};
+	sif_port_pendsv_set();
 }
 
 static sif_task_error_t sif_task_init_stack(

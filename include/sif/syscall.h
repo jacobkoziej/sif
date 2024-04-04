@@ -8,6 +8,8 @@
 #define SIF_SYSCALL_H
 
 typedef enum sif_syscall {
+	SIF_SYSCALL_TASK_ADD,
+	SIF_SYSCALL_TASK_DELETE,
 	SIF_SYSCALL_YIELD,
 	SIF_SYSCALL_TOTAL,
 } sif_syscall_t;

@@ -11,6 +11,22 @@
 
 	.text
 
+	.type   sif_march_rp2040_get_coreid, %function
+	.global sif_march_rp2040_get_coreid
+sif_march_rp2040_get_coreid:
+	ldr r0, =COREID
+	ldr r0, [r0]
+	bx  lr
+
+	.type   sif_march_rp2040_init, %function
+	.global sif_march_rp2040_init
+sif_march_rp2040_init:
+	push  {lr}
+	cpsid i
+	bl    sif_arch_armv6_m_init
+	cpsie i
+	pop   {pc}
+
 	.type   sif_march_rp2040_kernel_lock, %function
 	.global sif_march_rp2040_kernel_lock
 sif_march_rp2040_kernel_lock:
@@ -40,22 +56,20 @@ sif_march_rp2040_kernel_unlock:
 	.type   sif_march_rp2040_scheduler_start, %function
 	.global sif_march_rp2040_scheduler_start
 sif_march_rp2040_scheduler_start:
-	push  {lr}
-	push  {r0}
-	cpsid i
+	push {lr}
 
-	bl  sif_arch_armv6_m_init
-	pop {r0}
-	bl  sif_arch_armv6_m_scheduler_start
+	bl sif_arch_armv6_m_scheduler_start
 
 	// panic! something's gone horribly wrong
-	cpsie i
-	pop   {pc}
+	pop {pc}
 
 	.type   sif_march_rp2040_test_and_set, %function
 	.global sif_march_rp2040_test_and_set
 sif_march_rp2040_test_and_set:
-	ldr r3, =SPINLOCK14
+	ldr r2, =SPINLOCK14
+
+	// preserve primask
+	mrs r3, primask
 
 	// disable interrupts and synchronize
 	// so that we have a consistent view
@@ -63,8 +77,8 @@ sif_march_rp2040_test_and_set:
 	dmb
 
 .Lacquire_test_and_set_spinlock:
-	ldr r2, [r3]
-	tst r2, r2
+	ldr r1, [r2]
+	tst r1, r1
 	beq .Lacquire_test_and_set_spinlock
 
 	ldr r1, [r0]
@@ -72,17 +86,18 @@ sif_march_rp2040_test_and_set:
 	bne .Ltest_failed
 
 	// set
-	mov r2, #1
-	str r2, [r0]
+	mov r1, #1
+	str r1, [r0]
+	mov r1, #0
 
 .Ltest_failed:
 	// release spinlock
-	str r3, [r3]
+	str r2, [r2]
 
-	// synchronize and enable interrupts
+	// synchronize and restore primask
 	// so that we have a consistent view
 	dsb
-	cpsie i
+	msr primask, r3
 
 	mov r0, r1
 	bx  lr
