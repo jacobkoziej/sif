@@ -7,9 +7,11 @@ set(SIF_SRC_DIR "$ENV{SIF_SRC_DIR}")
 set(SIF_SRC
 	"arch/armv6-m/port-asm.s"
 	"arch/armv6-m/port.c"
+	"list.c"
 	"march/rp2040/port-asm.s"
 	"march/rp2040/port.c"
 	"sif.c"
+	"syscall.c"
 	"task.c"
 )
 list(TRANSFORM SIF_SRC PREPEND "${SIF_SRC_DIR}/src/")
