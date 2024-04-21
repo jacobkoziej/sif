@@ -58,6 +58,7 @@ sif_arch_armv6_m_handler_pendsv:
 
 	cpsie           i
 	RESTORE_CONTEXT r0
+	dsb
 	pop             {pc}
 
 	.type sif_arch_armv6_m_handler_svcall, %function
