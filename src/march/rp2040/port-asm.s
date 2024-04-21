@@ -56,12 +56,7 @@ sif_march_rp2040_kernel_unlock:
 	.type   sif_march_rp2040_scheduler_start, %function
 	.global sif_march_rp2040_scheduler_start
 sif_march_rp2040_scheduler_start:
-	push {lr}
-
-	bl sif_arch_armv6_m_scheduler_start
-
-	// panic! something's gone horribly wrong
-	pop {pc}
+	b sif_arch_armv6_m_scheduler_start
 
 	.type   sif_march_rp2040_test_and_set, %function
 	.global sif_march_rp2040_test_and_set

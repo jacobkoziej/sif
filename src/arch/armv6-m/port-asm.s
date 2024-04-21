@@ -14,9 +14,7 @@
 	.type   sif_arch_armv6_m_init, %function
 	.global sif_arch_armv6_m_init
 sif_arch_armv6_m_init:
-	push {lr}
-	bl   sif_arch_armv6_m_setup_nvic
-	pop  {pc}
+	b sif_arch_armv6_m_setup_nvic
 
 	.type   sif_arch_armv6_m_init_context, %function
 	.global sif_arch_armv6_m_init_context
@@ -123,9 +121,7 @@ sif_arch_armv6_m_handler_svcall:
 
 	.type sif_arch_armv6_m_handler_systick, %function
 sif_arch_armv6_m_handler_systick:
-	push {lr}
-	bl   sif_systick
-	pop  {pc}
+	b sif_systick
 
 	.type   sif_arch_armv6_m_pendsv_set, %function
 	.global sif_arch_armv6_m_pendsv_set
