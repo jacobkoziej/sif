@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 sif_task_error_t sif_task_add(sif_task_t * const task)
 {
@@ -51,6 +52,8 @@ sif_task_error_t sif_task_init(
 {
 	if (config->priority >= SIF_CONFIG_PRIORITY_LEVELS)
 		return SIF_TASK_ERROR_PRIORITY;
+
+	memset(task, 0, sizeof(*task));
 
 	sif_task_error_t error;
 

@@ -7,6 +7,7 @@
 #ifndef SIF_TASK_H
 #define SIF_TASK_H
 
+#include <sif/config.h>
 #include <sif/list.h>
 
 #include <limits.h>
@@ -15,8 +16,10 @@
 
 typedef unsigned      sif_task_priority_t;
 typedef unsigned      sif_task_cpu_mask_t;
-typedef uint64_t      sif_task_tid_t;
 typedef unsigned char sif_task_stack_t;
+typedef uint64_t      sif_task_subticks_t;
+typedef uint64_t      sif_task_ticks_t;
+typedef uint64_t      sif_task_tid_t;
 
 typedef void(sif_task_function_t)(void * const arg);
 
@@ -41,12 +44,18 @@ typedef enum sif_task_state {
 	SIF_TASK_STATE_DELETED,
 } sif_task_state_t;
 
+typedef struct sif_task_time {
+	sif_task_ticks_t    ticks;
+	sif_task_subticks_t subticks;
+} sif_task_time_t;
+
 typedef struct sif_task {
 	sif_list_t		    list;
 	sif_task_state_t	    state;
 	sif_task_tid_t		    tid;
 	sif_task_priority_t	    priority;
 	sif_task_cpu_mask_t	    cpu_mask;
+	sif_task_time_t		    times[SIF_CONFIG_CORES];
 	sif_task_stack_descriptor_t stack;
 } sif_task_t;
 
