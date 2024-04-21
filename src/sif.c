@@ -48,5 +48,6 @@ sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp)
 
 void sif_systick(void)
 {
+	sif_task_systick();
 	sif_task_reschedule();
 }

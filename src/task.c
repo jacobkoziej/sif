@@ -108,6 +108,19 @@ sif_task_error_t sif_task_scheduler_start(void)
 	return SIF_TASK_ERROR_UNDEFINED;
 }
 
+void sif_task_systick(void)
+{
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t * const task	  = core->running;
+
+	if (!task) return;
+
+	sif_task_time_t * const time = task->times + coreid;
+
+	++time->ticks;
+}
+
 void sif_task_reschedule(void)
 {
 	sif_task_t *next_task = NULL;

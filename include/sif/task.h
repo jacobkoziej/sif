@@ -75,6 +75,7 @@ sif_task_error_t  sif_task_init(
 sif_task_error_t sif_task_create(const sif_task_config_t * const config);
 sif_task_error_t sif_task_delete(void);
 sif_task_error_t sif_task_scheduler_start(void);
+void		 sif_task_systick(void);
 void		 sif_task_reschedule(void);
 
 #endif	// SIF_TASK_H
