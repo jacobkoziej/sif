@@ -114,7 +114,10 @@ void sif_task_systick(void)
 	sif_core_t * const core	  = sif.cores + coreid;
 	sif_task_t * const task	  = core->running;
 
-	if (!task) return;
+	if (!task) {
+		++core->idle_time.ticks;
+		return;
+	}
 
 	sif_task_time_t * const time = task->times + coreid;
 
