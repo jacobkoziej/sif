@@ -52,6 +52,9 @@
 	.set SYST_CSR_TICKINIT,  1
 	.set SYST_CSR_ENABLE,    0
 
+	// B3.3.5
+	.set SYST_CVR_CURRENT, 0
+
 	// B3.2.4
 	.set ICSR_NMIPENDSET,  31
 	.set ICSR_PENDSVSET,   28

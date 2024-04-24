@@ -7,12 +7,14 @@
 #ifndef SIF_ARCH_ARMV6_M_PORT_ASM_H
 #define SIF_ARCH_ARMV6_M_PORT_ASM_H
 
+#include <sif/arch/armv6-m/types.h>
 #include <sif/syscall.h>
 #include <sif/task.h>
 
-void		  sif_arch_armv6_m_init(void);
-sif_task_stack_t *sif_arch_armv6_m_init_context(
-	sif_task_stack_t *stack, sif_task_function_t func, void *arg);
+sif_arch_armv6_m_word_t sif_arch_armv6_m_get_subtick_count(void);
+void			sif_arch_armv6_m_init(void);
+sif_task_stack_t       *sif_arch_armv6_m_init_context(
+	      sif_task_stack_t *stack, sif_task_function_t func, void *arg);
 void		    sif_arch_armv6_m_interrupt_disable(void);
 void		    sif_arch_armv6_m_interrupt_enable(void);
 void		    sif_arch_armv6_m_pendsv_set(void);

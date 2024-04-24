@@ -11,6 +11,13 @@
 
 	.text
 
+	.type   sif_arch_armv6_m_get_subtick_count, %function
+	.global sif_arch_armv6_m_get_subtick_count
+sif_arch_armv6_m_get_subtick_count:
+	ldr r0, =SYST_CVR
+	ldr r0, [r0]
+	bx  lr
+
 	.type   sif_arch_armv6_m_init, %function
 	.global sif_arch_armv6_m_init
 sif_arch_armv6_m_init:

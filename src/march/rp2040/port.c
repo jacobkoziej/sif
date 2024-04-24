@@ -12,6 +12,9 @@
 sif_port_word_t (* const sif_port_get_coreid)(void)
 	= sif_march_rp2040_get_coreid;
 
+sif_port_word_t (* const sif_port_get_subtick_count)(void)
+	= sif_arch_armv6_m_get_subtick_count;
+
 void (* const sif_port_init)(void) = sif_march_rp2040_init;
 
 void (* const sif_port_interrupt_disable)(void)

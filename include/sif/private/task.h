@@ -12,6 +12,7 @@
 
 #define SIF_TASK_LIST2TASK(x) SIF_LIST_CONTAINER_OF(x, sif_task_t, list)
 
+extern sif_port_word_t (* const sif_port_get_subtick_count)(void);
 extern void (* const sif_port_interrupt_disable)(void);
 extern void (* const sif_port_interrupt_enable)(void);
 extern void (* const sif_port_pendsv_clear)(void);
