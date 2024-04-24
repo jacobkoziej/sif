@@ -18,6 +18,7 @@ extern void (* const sif_port_interrupt_enable)(void);
 extern void (* const sif_port_pendsv_clear)(void);
 extern void (* const sif_port_pendsv_set)(void);
 extern void (* const sif_port_task_scheduler_start)(sif_task_stack_t *stack);
+extern void (* const sif_port_wait_for_interrupt)(void);
 
 extern sif_task_stack_t *(* const sif_port_task_init_context)(
 	sif_task_stack_t *stack, sif_task_function_t *func, void *arg);

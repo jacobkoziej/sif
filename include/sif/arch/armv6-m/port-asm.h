@@ -22,5 +22,6 @@ void		    sif_arch_armv6_m_pendsv_clear(void);
 void		    sif_arch_armv6_m_scheduler_start(sif_task_stack_t *stack);
 sif_syscall_error_t sif_arch_armv6_m_syscall(
 	sif_syscall_t syscall, void * const arg);
+void sif_arch_armv6_m_wait_for_interrupt(void);
 
 #endif	// SIF_ARCH_ARMV6_M_PORT_ASM_H

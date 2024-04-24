@@ -41,3 +41,6 @@ sif_task_stack_t *(* const sif_port_task_init_context)(
 
 void (* const sif_port_task_scheduler_start)(sif_task_stack_t *stack)
 	= sif_march_rp2040_scheduler_start;
+
+void (* const sif_port_wait_for_interrupt)(void)
+	= sif_arch_armv6_m_wait_for_interrupt;

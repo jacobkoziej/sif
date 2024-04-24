@@ -263,3 +263,9 @@ sif_arch_armv6_m_setup_systick:
 sif_arch_armv6_m_syscall:
 	svc #0
 	bx  lr
+
+	.type   sif_arch_armv6_m_wait_for_interrupt, %function
+	.global sif_arch_armv6_m_wait_for_interrupt
+sif_arch_armv6_m_wait_for_interrupt:
+	wfi
+	bx  lr
