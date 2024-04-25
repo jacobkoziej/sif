@@ -22,7 +22,10 @@ sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp)
 
 	if (!core->running) {
 		if (core->queued) {
-			// TODO: exit tickless idle
+			sif_task_time_t * const time	  = &core->idle_time;
+			sif_task_time_t * const prev_time = &core->prev_time;
+
+			sif_task_update_time(prev_time, time);
 
 			sif_task_t * const task = core->queued;
 
@@ -35,12 +38,13 @@ sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp)
 			return task->stack.sp;
 		}
 
-		// TODO: tickless idle
+		sif_task_idle();
 
 		return sp;
 	}
 
-	// TODO: enter tickless idle
+	// TODO: raise an exception
+	// since we didn't trigger pendsv
 	if (!core->queued) return sp;
 
 	return sif_task_context_switch(sp);
@@ -48,5 +52,6 @@ sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp)
 
 void sif_systick(void)
 {
+	sif_task_systick();
 	sif_task_reschedule();
 }

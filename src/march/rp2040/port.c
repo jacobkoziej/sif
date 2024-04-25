@@ -5,12 +5,19 @@
  */
 
 #include <sif/arch/armv6-m/port-asm.h>
+#include <sif/arch/armv6-m/port.h>
 #include <sif/config.h>
 #include <sif/march/rp2040/port-asm.h>
 #include <sif/march/rp2040/port.h>
 
+const sif_port_word_t * const SIF_PORT_SYSTICK_RELOAD
+	= &SIF_ARCH_ARMV6_M_SYST_RVR_RELOAD;
+
 sif_port_word_t (* const sif_port_get_coreid)(void)
 	= sif_march_rp2040_get_coreid;
+
+sif_port_word_t (* const sif_port_systick_current_value)(void)
+	= sif_arch_armv6_m_systick_current_value;
 
 void (* const sif_port_init)(void) = sif_march_rp2040_init;
 
@@ -38,3 +45,6 @@ sif_task_stack_t *(* const sif_port_task_init_context)(
 
 void (* const sif_port_task_scheduler_start)(sif_task_stack_t *stack)
 	= sif_march_rp2040_scheduler_start;
+
+void (* const sif_port_wait_for_interrupt)(void)
+	= sif_arch_armv6_m_wait_for_interrupt;

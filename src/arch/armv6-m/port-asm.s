@@ -14,9 +14,7 @@
 	.type   sif_arch_armv6_m_init, %function
 	.global sif_arch_armv6_m_init
 sif_arch_armv6_m_init:
-	push {lr}
-	bl   sif_arch_armv6_m_setup_nvic
-	pop  {pc}
+	b sif_arch_armv6_m_setup_nvic
 
 	.type   sif_arch_armv6_m_init_context, %function
 	.global sif_arch_armv6_m_init_context
@@ -58,6 +56,7 @@ sif_arch_armv6_m_handler_pendsv:
 
 	cpsie           i
 	RESTORE_CONTEXT r0
+	dsb
 	pop             {pc}
 
 	.type sif_arch_armv6_m_handler_svcall, %function
@@ -122,9 +121,7 @@ sif_arch_armv6_m_handler_svcall:
 
 	.type sif_arch_armv6_m_handler_systick, %function
 sif_arch_armv6_m_handler_systick:
-	push {lr}
-	bl   sif_systick
-	pop  {pc}
+	b sif_systick
 
 	.type   sif_arch_armv6_m_pendsv_set, %function
 	.global sif_arch_armv6_m_pendsv_set
@@ -164,6 +161,8 @@ sif_arch_armv6_m_scheduler_start:
 	// pop context
 	mov r1, r0
 	add r1, r1,  #CONTEXT_OFFSET
+	ldr r3, [r1, #LR_OFFSET]
+	mov lr, r3
 	ldr r3, [r1, #PC_OFFSET]
 	ldr r2, [r1, #XPSR_OFFSET]
 	ldr r0, [r1, #R0_OFFSET]
@@ -258,4 +257,17 @@ sif_arch_armv6_m_setup_systick:
 	.global sif_arch_armv6_m_syscall
 sif_arch_armv6_m_syscall:
 	svc #0
+	bx  lr
+
+	.type   sif_arch_armv6_m_systick_current_value, %function
+	.global sif_arch_armv6_m_systick_current_value
+sif_arch_armv6_m_systick_current_value:
+	ldr r0, =SYST_CVR
+	ldr r0, [r0]
+	bx  lr
+
+	.type   sif_arch_armv6_m_wait_for_interrupt, %function
+	.global sif_arch_armv6_m_wait_for_interrupt
+sif_arch_armv6_m_wait_for_interrupt:
+	wfi
 	bx  lr

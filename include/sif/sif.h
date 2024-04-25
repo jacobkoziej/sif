@@ -18,6 +18,8 @@ typedef struct sif_core {
 	sif_task_t	   *running;
 	sif_task_t	   *queued;
 	sif_task_priority_t priority;
+	sif_task_time_t	    idle_time;
+	sif_task_time_t	    prev_time;
 } sif_core_t;
 
 typedef struct sif {
