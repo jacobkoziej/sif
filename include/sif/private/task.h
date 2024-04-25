@@ -11,7 +11,8 @@
 #include <sif/port.h>
 #include <sif/task.h>
 
-#define SIF_TASK_LIST2TASK(x) SIF_LIST_CONTAINER_OF(x, sif_task_t, list)
+#define SIF_TASK_LIST2TASK(x) \
+	(SIF_LIST_CONTAINER_OF(x, sif_task_t, lists[0]) + SIF_TASK_LIST_READY)
 
 extern const sif_port_word_t * const SIF_PORT_SYSTICK_RELOAD;
 

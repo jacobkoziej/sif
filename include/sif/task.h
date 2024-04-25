@@ -43,8 +43,13 @@ typedef enum sif_task_state {
 	SIF_TASK_STATE_DELETED,
 } sif_task_state_t;
 
+typedef enum sif_task_list {
+	SIF_TASK_LIST_READY,
+	SIF_TASK_LISTS,
+} sif_task_suspend_type_t;
+
 typedef struct sif_task {
-	sif_list_t		    list;
+	sif_list_t		    lists[SIF_TASK_LISTS];
 	sif_task_state_t	    state;
 	sif_task_tid_t		    tid;
 	sif_task_priority_t	    priority;
