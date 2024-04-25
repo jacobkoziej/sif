@@ -81,6 +81,36 @@ sif_task_error_t sif_task_delete(void)
 	return SIF_TASK_ERROR_NONE;
 }
 
+void sif_task_idle(void)
+{
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t * const task	  = core->running;
+
+	sif_task_time_t	       *time;
+	sif_task_time_t * const prev_time = &core->prev_time;
+
+	if (!task) {
+		time = &core->idle_time;
+		goto skip_idle_enter;
+	}
+
+	sif_port_kernel_lock();
+	sif_list_append_back(sif.ready + task->priority, &task->list);
+	sif_port_kernel_unlock();
+
+	core->running  = NULL;
+	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
+
+	time = task->times + coreid;
+
+skip_idle_enter:;
+	sif_task_update_time(prev_time, time);
+
+	sif_port_wait_for_interrupt();
+	sif_port_pendsv_set();
+}
+
 sif_task_error_t sif_task_scheduler_start(void)
 {
 	const sif_word_t   coreid = sif_port_get_coreid();
