@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 /*
  * syscall.c -- system call
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>

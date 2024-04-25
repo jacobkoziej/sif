@@ -6,7 +6,7 @@
 
 Copyright (C) 2024 Jacob Koziej [`<jacobkoziej@gmail.com>`]
 
-Distributed under the [GPLv3] or later.
+Distributed under the [MPL 2.0].
 
-[gplv3]: LICENSE.md
+[mpl 2.0]: LICENSE
 [`<jacobkoziej@gmail.com>`]: mailto:jacobkoziej@gmail.com
