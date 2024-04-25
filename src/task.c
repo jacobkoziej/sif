@@ -212,7 +212,12 @@ void sif_task_reschedule(void)
 found:
 	sif_port_kernel_unlock();
 
-	if (!next_task) return;
+	if (!next_task) {
+		// enter idle
+		if (!core->running) sif_port_pendsv_set();
+
+		return;
+	}
 
 	if (core->queued) {
 		sif_task_t * const task = core->queued;
