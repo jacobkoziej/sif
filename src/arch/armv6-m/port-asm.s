@@ -11,13 +11,6 @@
 
 	.text
 
-	.type   sif_arch_armv6_m_get_subtick_count, %function
-	.global sif_arch_armv6_m_get_subtick_count
-sif_arch_armv6_m_get_subtick_count:
-	ldr r0, =SYST_CVR
-	ldr r0, [r0]
-	bx  lr
-
 	.type   sif_arch_armv6_m_init, %function
 	.global sif_arch_armv6_m_init
 sif_arch_armv6_m_init:
@@ -262,6 +255,13 @@ sif_arch_armv6_m_setup_systick:
 	.global sif_arch_armv6_m_syscall
 sif_arch_armv6_m_syscall:
 	svc #0
+	bx  lr
+
+	.type   sif_arch_armv6_m_systick_current_value, %function
+	.global sif_arch_armv6_m_systick_current_value
+sif_arch_armv6_m_systick_current_value:
+	ldr r0, =SYST_CVR
+	ldr r0, [r0]
 	bx  lr
 
 	.type   sif_arch_armv6_m_wait_for_interrupt, %function

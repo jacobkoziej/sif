@@ -17,9 +17,8 @@
 typedef unsigned      sif_task_priority_t;
 typedef unsigned      sif_task_cpu_mask_t;
 typedef unsigned char sif_task_stack_t;
-typedef uint64_t      sif_task_subticks_t;
-typedef uint64_t      sif_task_ticks_t;
 typedef uint64_t      sif_task_tid_t;
+typedef uint64_t      sif_task_time_t;
 
 typedef void(sif_task_function_t)(void * const arg);
 
@@ -43,11 +42,6 @@ typedef enum sif_task_state {
 	SIF_TASK_STATE_SUSPENDED,
 	SIF_TASK_STATE_DELETED,
 } sif_task_state_t;
-
-typedef struct sif_task_time {
-	sif_task_ticks_t    ticks;
-	sif_task_subticks_t subticks;
-} sif_task_time_t;
 
 typedef struct sif_task {
 	sif_list_t		    list;
@@ -74,8 +68,11 @@ sif_task_error_t  sif_task_init(
 	 sif_task_t  *const task, const sif_task_config_t  *const config);
 sif_task_error_t sif_task_create(const sif_task_config_t * const config);
 sif_task_error_t sif_task_delete(void);
+void		 sif_task_idle(void);
 sif_task_error_t sif_task_scheduler_start(void);
 void		 sif_task_systick(void);
 void		 sif_task_reschedule(void);
+void		 sif_task_update_time(
+		    sif_task_time_t		*const prev_time, sif_task_time_t		   *const time);
 
 #endif	// SIF_TASK_H

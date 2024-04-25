@@ -32,6 +32,11 @@ sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
 	task->stack.sp = sp;
 	task->state    = SIF_TASK_STATE_READY;
 
+	sif_task_time_t * const time	  = task->times + coreid;
+	sif_task_time_t * const prev_time = &core->prev_time;
+
+	sif_task_update_time(prev_time, time);
+
 	sif_port_kernel_lock();
 	sif_list_append_back(sif.ready + task->priority, &task->list);
 	sif_port_kernel_unlock();
@@ -99,13 +104,25 @@ sif_task_error_t sif_task_scheduler_start(void)
 
 	task->state = SIF_TASK_STATE_ACTIVE;
 
-	core->running  = task;
-	core->queued   = NULL;
-	core->priority = task->priority;
+	core->running	= task;
+	core->queued	= NULL;
+	core->priority	= task->priority;
+	core->prev_time = sif_port_systick_current_value();
 
 	sif_port_task_scheduler_start(task->stack.sp);
 
 	return SIF_TASK_ERROR_UNDEFINED;
+}
+
+void sif_task_update_time(
+	sif_task_time_t * const prev_time, sif_task_time_t * const time)
+{
+	const sif_task_time_t current_count = sif_port_systick_current_value();
+
+	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD)
+		% *SIF_PORT_SYSTICK_RELOAD;
+
+	*prev_time = current_count;
 }
 
 void sif_task_systick(void)
@@ -114,14 +131,12 @@ void sif_task_systick(void)
 	sif_core_t * const core	  = sif.cores + coreid;
 	sif_task_t * const task	  = core->running;
 
-	if (!task) {
-		++core->idle_time.ticks;
-		return;
-	}
+	if (!task) return;
 
-	sif_task_time_t * const time = task->times + coreid;
+	sif_task_time_t * const time	  = task->times + coreid;
+	sif_task_time_t * const prev_time = &core->prev_time;
 
-	++time->ticks;
+	sif_task_update_time(prev_time, time);
 }
 
 void sif_task_reschedule(void)

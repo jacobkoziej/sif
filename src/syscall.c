@@ -48,6 +48,11 @@ static sif_syscall_error_t sif_syscall_task_delete(void * const arg)
 	sif_core_t * const core	  = sif.cores + coreid;
 	sif_task_t	  *task	  = core->running;
 
+	sif_task_time_t * const time	  = task->times + coreid;
+	sif_task_time_t * const prev_time = &core->prev_time;
+
+	sif_task_update_time(prev_time, time);
+
 	task->state = SIF_TASK_STATE_DELETED;
 
 	task = core->queued;
