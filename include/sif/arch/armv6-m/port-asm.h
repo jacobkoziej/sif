@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 /*
  * port-asm.h -- armv6-m port
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>

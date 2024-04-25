@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 /*
  * list.h -- doubly linked list
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>

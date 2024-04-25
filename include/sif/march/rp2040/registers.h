@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 /*
  * registers.h -- rp2040 registers
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: MPL-2.0
 /*
  * macros.s -- armv6-m macros
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
