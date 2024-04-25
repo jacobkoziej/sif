@@ -161,6 +161,8 @@ sif_arch_armv6_m_scheduler_start:
 	// pop context
 	mov r1, r0
 	add r1, r1,  #CONTEXT_OFFSET
+	ldr r3, [r1, #LR_OFFSET]
+	mov lr, r3
 	ldr r3, [r1, #PC_OFFSET]
 	ldr r2, [r1, #XPSR_OFFSET]
 	ldr r0, [r1, #R0_OFFSET]
