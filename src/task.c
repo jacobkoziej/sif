@@ -144,17 +144,6 @@ sif_task_error_t sif_task_scheduler_start(void)
 	return SIF_TASK_ERROR_UNDEFINED;
 }
 
-void sif_task_update_time(
-	sif_task_time_t * const prev_time, sif_task_time_t * const time)
-{
-	const sif_task_time_t current_count = sif_port_systick_current_value();
-
-	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD)
-		% *SIF_PORT_SYSTICK_RELOAD;
-
-	*prev_time = current_count;
-}
-
 void sif_task_systick(void)
 {
 	const sif_word_t   coreid = sif_port_get_coreid();
@@ -231,6 +220,17 @@ found:
 	core->queued = next_task;
 
 	sif_port_pendsv_set();
+}
+
+void sif_task_update_time(
+	sif_task_time_t * const prev_time, sif_task_time_t * const time)
+{
+	const sif_task_time_t current_count = sif_port_systick_current_value();
+
+	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD)
+		% *SIF_PORT_SYSTICK_RELOAD;
+
+	*prev_time = current_count;
 }
 
 static sif_task_error_t sif_task_init_stack(
