@@ -123,6 +123,8 @@ sif_task_error_t sif_task_scheduler_start(void)
 	const sif_word_t   coreid = sif_port_get_coreid();
 	sif_core_t * const core	  = sif.cores + coreid;
 
+	memset(core, 0, sizeof(*core));
+
 	sif_port_interrupt_disable();
 
 	// here we trick sif_task_reschedule() to give us
@@ -141,10 +143,12 @@ sif_task_error_t sif_task_scheduler_start(void)
 
 	task->state = SIF_TASK_STATE_ACTIVE;
 
-	core->running	= task;
-	core->queued	= NULL;
-	core->priority	= task->priority;
+	core->running  = task;
+	core->queued   = NULL;
+	core->priority = task->priority;
+
 	core->prev_time = sif_port_systick_current_value();
+	sif_port_systick_count_flag();	// clear the existing count flag
 
 	sif_port_task_scheduler_start(task->stack.sp);
 
@@ -235,8 +239,13 @@ void sif_task_update_time(
 {
 	const sif_task_time_t current_count = sif_port_systick_current_value();
 
-	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD)
-		% *SIF_PORT_SYSTICK_RELOAD;
+	if (sif_port_systick_count_flag()) {
+		*time	   += *prev_time;
+		*prev_time  = *SIF_PORT_SYSTICK_RELOAD;
+	}
+
+	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD + 1)
+		% (*SIF_PORT_SYSTICK_RELOAD + 1);
 
 	*prev_time = current_count;
 }

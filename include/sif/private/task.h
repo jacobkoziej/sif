@@ -20,6 +20,7 @@ extern void (* const sif_port_interrupt_disable)(void);
 extern void (* const sif_port_interrupt_enable)(void);
 extern void (* const sif_port_pendsv_clear)(void);
 extern void (* const sif_port_pendsv_set)(void);
+extern sif_port_word_t (* const sif_port_systick_count_flag)(void);
 extern sif_port_word_t (* const sif_port_systick_current_value)(void);
 extern void (* const sif_port_task_scheduler_start)(sif_task_stack_t *stack);
 extern void (* const sif_port_wait_for_interrupt)(void);

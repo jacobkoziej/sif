@@ -16,6 +16,9 @@ const sif_port_word_t * const SIF_PORT_SYSTICK_RELOAD
 sif_port_word_t (* const sif_port_get_coreid)(void)
 	= sif_march_rp2040_get_coreid;
 
+sif_port_word_t (* const sif_port_systick_count_flag)(void)
+	= sif_arch_armv6_m_systick_count_flag;
+
 sif_port_word_t (* const sif_port_systick_current_value)(void)
 	= sif_arch_armv6_m_systick_current_value;
 
