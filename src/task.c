@@ -184,6 +184,14 @@ void sif_task_reschedule(void)
 		return;
 	}
 
+	if (core->queued) {
+		sif_task_t * const  task  = core->queued;
+		sif_list_t ** const ready = sif.ready + task->priority;
+		sif_list_t * const  list  = task->lists + SIF_TASK_LIST_READY;
+
+		sif_list_prepend_front(ready, list);
+	}
+
 	sif_task_priority_t priority;
 	for (priority = 0; priority < SIF_CONFIG_PRIORITY_LEVELS; priority++) {
 		if (!sif.ready[priority]) continue;
@@ -217,16 +225,6 @@ found:
 		if (!core->running) sif_port_pendsv_set();
 
 		return;
-	}
-
-	if (core->queued) {
-		sif_task_t * const  task  = core->queued;
-		sif_list_t ** const ready = sif.ready + task->priority;
-		sif_list_t * const  list  = task->lists + SIF_TASK_LIST_READY;
-
-		sif_port_kernel_lock();
-		sif_list_prepend_front(ready, list);
-		sif_port_kernel_unlock();
 	}
 
 	core->queued = next_task;
