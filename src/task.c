@@ -112,19 +112,7 @@ void sif_task_idle(sif_task_stack_t * const sp)
 		goto skip_idle_enter;
 	}
 
-	task->state    = SIF_TASK_STATE_READY;
 	task->stack.sp = sp;
-
-	sif_list_t ** const list = sif.ready + task->priority;
-	sif_list_t * const  node = &task->list;
-
-	sif_port_kernel_lock();
-
-	task->suspend_time = sif_system_time() + core->system_time_offset;
-
-	sif_list_append_back(list, node);
-
-	sif_port_kernel_unlock();
 
 	core->running  = NULL;
 	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
@@ -160,6 +148,8 @@ void sif_task_reschedule(void)
 
 		sif_list_merge_sorted(
 			list, &orphan, sif_task_compare_suspend_time);
+
+		core->queued = NULL;
 	}
 
 	sif_task_priority_t priority;
@@ -191,10 +181,9 @@ found:
 	sif_port_kernel_unlock();
 
 	if (!next_task) {
-		// enter idle
-		if (!core->running) sif_port_pendsv_set();
+		sif_task_t * const task = core->running;
 
-		return;
+		if (task && task->state == SIF_TASK_STATE_ACTIVE) return;
 	}
 
 	core->queued = next_task;
