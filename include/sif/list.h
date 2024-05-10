@@ -7,6 +7,7 @@
 #ifndef SIF_LIST_H
 #define SIF_LIST_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -19,6 +20,8 @@ typedef struct sif_list {
 } sif_list_t;
 
 void sif_list_append_back(sif_list_t ** const list, sif_list_t * const node);
+void sif_list_bulk_append_back(
+	sif_list_t ** const list, sif_list_t ** const back);
 void sif_list_insert(sif_list_t * const node,
 	sif_list_t * const		prev,
 	sif_list_t * const		next);
