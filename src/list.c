@@ -40,6 +40,38 @@ void sif_list_bulk_append_back(
 	*back = NULL;
 }
 
+void sif_list_filter(sif_list_t **list,
+	sif_list_t		**removed,
+	sif_list_filter_t * const filter)
+{
+	sif_list_t *head = *list;
+
+	if (!head) return;
+
+new_head:;
+	sif_list_t *node = head;
+
+	do {
+		if (filter(node)) {
+			node = node->next;
+			continue;
+		}
+
+		sif_list_t * const to_remove = node;
+		node			     = node->next;
+
+		sif_list_remove_next(list, to_remove);
+		sif_list_append_back(removed, to_remove);
+
+		if (!*list) break;
+
+		if (to_remove == head) {
+			head = node;
+			goto new_head;
+		}
+	} while (node != head);
+}
+
 void sif_list_insert(sif_list_t * const node,
 	sif_list_t * const		prev,
 	sif_list_t * const		next)
