@@ -34,6 +34,9 @@ void sif_list_insert(sif_list_t * const node,
 void sif_list_insert_prev(sif_list_t ** const list,
 	sif_list_t * const		      prev,
 	sif_list_t * const		      node);
+void sif_list_merge_sorted(sif_list_t ** const list,
+	sif_list_t ** const		       orphan,
+	sif_list_compare_t * const	       compare);
 void sif_list_node_init(sif_list_t * const node);
 void sif_list_prepend_front(sif_list_t ** const list, sif_list_t * const node);
 void sif_list_remove(sif_list_t * const node,

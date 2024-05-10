@@ -98,6 +98,39 @@ void sif_list_insert_prev(sif_list_t ** const list,
 	sif_list_insert(node, prev->prev, prev);
 }
 
+void sif_list_merge_sorted(sif_list_t ** const list,
+	sif_list_t ** const		       orphan,
+	sif_list_compare_t * const	       compare)
+{
+	if (!*list) {
+		*list	= *orphan;
+		*orphan = NULL;
+		return;
+	}
+
+	sif_list_t *a = *list;
+	sif_list_t *b = *orphan;
+
+	while (*orphan) {
+		if (compare(a, b)) {
+			a = a->next;
+
+			if (*list == a) {
+				sif_list_bulk_append_back(list, orphan);
+				break;
+			}
+
+			continue;
+		}
+
+		sif_list_t * const to_insert = b;
+		b			     = b->next;
+
+		sif_list_remove_next(orphan, to_insert);
+		sif_list_insert_prev(list, a, to_insert);
+	}
+}
+
 void sif_list_node_init(sif_list_t * const node)
 {
 	node->prev = node;
