@@ -34,6 +34,12 @@ void sif_list_bulk_append_back(
 	sif_list_t * const back_head = *back;
 	sif_list_t * const back_tail = (*back)->prev;
 
+	if (back_head == back_tail) {
+		sif_list_append_back(list, *back);
+		*back = NULL;
+		return;
+	}
+
 	sif_list_insert(back_head, list_tail, back_head->next);
 	sif_list_insert(back_tail, back_tail->prev, list_head);
 
