@@ -160,6 +160,23 @@ void sif_task_systick(void)
 	sif_core_t * const core	  = sif.cores + coreid;
 	sif_task_t * const task	  = core->running;
 
+	for (sif_task_priority_t priority = 0;
+		priority < SIF_CONFIG_PRIORITY_LEVELS;
+		priority++) {
+		sif_list_t **ready	= sif.ready + priority;
+		sif_list_t **tick_delay = core->tick_delay + priority;
+		sif_list_t  *removed	= NULL;
+
+		sif_list_filter(
+			tick_delay, &removed, sif_task_tick_delay_decrement);
+
+		if (removed) {
+			sif_port_kernel_lock();
+			sif_list_bulk_append_back(ready, &removed);
+			sif_port_kernel_unlock();
+		}
+	}
+
 	if (!task) return;
 
 	sif_task_time_t * const time	  = task->times + coreid;
@@ -302,4 +319,11 @@ static sif_task_error_t sif_task_init_stack(
 	};
 
 	return SIF_TASK_ERROR_NONE;
+}
+
+static bool sif_task_tick_delay_decrement(sif_list_t * const node)
+{
+	sif_task_t * const task = SIF_TASK_LIST2TASK(node);
+
+	return --task->tick_delay;
 }
