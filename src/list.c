@@ -51,6 +51,15 @@ void sif_list_insert(sif_list_t * const node,
 	next->prev = node;
 }
 
+void sif_list_insert_prev(sif_list_t ** const list,
+	sif_list_t * const		      prev,
+	sif_list_t * const		      node)
+{
+	if (*list == prev) *list = node;
+
+	sif_list_insert(node, prev->prev, prev);
+}
+
 void sif_list_node_init(sif_list_t * const node)
 {
 	node->prev = node;
