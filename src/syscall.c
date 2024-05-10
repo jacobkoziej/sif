@@ -63,9 +63,11 @@ static sif_syscall_error_t sif_syscall_task_delete(void * const arg)
 	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
 
 	if (task) {
+		sif_list_t ** const list = sif.ready + task->priority;
+		sif_list_t * const  node = &task->list;
+
 		sif_port_kernel_lock();
-		sif_list_prepend_front(
-			sif.ready + task->priority, &task->list);
+		sif_list_prepend_front(list, node);
 		sif_port_kernel_unlock();
 	}
 

@@ -40,9 +40,9 @@ void sif_list_bulk_append_back(
 	*back = NULL;
 }
 
-void sif_list_filter(sif_list_t **list,
-	sif_list_t		**removed,
-	sif_list_filter_t * const filter)
+void sif_list_filter(sif_list_t ** const list,
+	sif_list_t ** const		 removed,
+	sif_list_filter_t * const	 filter)
 {
 	sif_list_t *head = *list;
 

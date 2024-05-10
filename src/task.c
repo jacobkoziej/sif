@@ -101,8 +101,11 @@ void sif_task_idle(void)
 		goto skip_idle_enter;
 	}
 
+	sif_list_t ** const list = sif.ready + task->priority;
+	sif_list_t * const  node = &task->list;
+
 	sif_port_kernel_lock();
-	sif_list_append_back(sif.ready + task->priority, &task->list);
+	sif_list_append_back(list, node);
 	sif_port_kernel_unlock();
 
 	core->running  = NULL;
