@@ -18,4 +18,6 @@ typedef struct sif_mutex {
 	sif_list_t  *waiting[SIF_CONFIG_PRIORITY_LEVELS];
 } sif_mutex_t;
 
+void sif_mutex_init(sif_mutex_t * const mutex);
+
 #endif	// SIF_MUTEX_H
