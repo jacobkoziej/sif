@@ -113,7 +113,7 @@ void sif_task_idle(void)
 
 	time = task->times + coreid;
 
-skip_idle_enter:;
+skip_idle_enter:
 	sif_task_update_time(prev_time, time);
 
 	sif_port_wait_for_interrupt();
