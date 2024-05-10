@@ -19,6 +19,7 @@ typedef struct sif_list {
 	struct sif_list *next;
 } sif_list_t;
 
+typedef bool(sif_list_compare_t)(sif_list_t * const a, sif_list_t * const b);
 typedef bool(sif_list_filter_t)(sif_list_t * const node);
 
 void sif_list_append_back(sif_list_t ** const list, sif_list_t * const node);
