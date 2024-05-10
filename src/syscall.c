@@ -11,9 +11,10 @@
 
 sif_syscall_error_t (* const sif_syscalls[SIF_SYSCALL_TOTAL])(void * const arg)
 	= {
-		[SIF_SYSCALL_TASK_ADD]	  = sif_syscall_task_add,
-		[SIF_SYSCALL_TASK_DELETE] = sif_syscall_task_delete,
-		[SIF_SYSCALL_YIELD]	  = sif_syscall_yield,
+		[SIF_SYSCALL_TASK_ADD]	      = sif_syscall_task_add,
+		[SIF_SYSCALL_TASK_DELETE]     = sif_syscall_task_delete,
+		[SIF_SYSCALL_TASK_TICK_DELAY] = sif_syscall_task_tick_delay,
+		[SIF_SYSCALL_YIELD]	      = sif_syscall_yield,
 };
 
 sif_syscall_error_t sif_syscall_vaild(int syscall)
@@ -62,13 +63,35 @@ static sif_syscall_error_t sif_syscall_task_delete(void * const arg)
 	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
 
 	if (task) {
+		sif_list_t ** const list = sif.ready + task->priority;
+		sif_list_t * const  node = &task->list;
+
 		sif_port_kernel_lock();
-		sif_list_prepend_front(
-			sif.ready + task->priority, &task->list);
+		sif_list_prepend_front(list, node);
 		sif_port_kernel_unlock();
 	}
 
-	// we reschedule on exit from syscall dispatch
+	return SIF_SYSCALL_ERROR_NONE;
+}
+
+static sif_syscall_error_t sif_syscall_task_tick_delay(void * const arg)
+{
+	const sif_task_tick_delay_t * const tick_delay = arg;
+
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t	  *task	  = core->running;
+
+	task->tick_delay = *tick_delay;
+
+	sif_list_t ** const list = core->tick_delay + task->priority;
+	sif_list_t * const  node = &task->list;
+
+	sif_list_append_back(list, node);
+
+	task->state = SIF_TASK_STATE_SUSPENDED;
+
+	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
 
 	return SIF_SYSCALL_ERROR_NONE;
 }

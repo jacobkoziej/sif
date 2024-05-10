@@ -21,6 +21,7 @@ void		    sif_arch_armv6_m_pendsv_clear(void);
 void		    sif_arch_armv6_m_scheduler_start(sif_task_stack_t *stack);
 sif_syscall_error_t sif_arch_armv6_m_syscall(
 	sif_syscall_t syscall, void * const arg);
+sif_arch_armv6_m_word_t sif_arch_armv6_m_systick_count_flag(void);
 sif_arch_armv6_m_word_t sif_arch_armv6_m_systick_current_value(void);
 void			sif_arch_armv6_m_wait_for_interrupt(void);
 

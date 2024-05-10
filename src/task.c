@@ -29,17 +29,23 @@ sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
 	sif_core_t * const core	  = sif.cores + coreid;
 	sif_task_t	  *task	  = core->running;
 
-	task->stack.sp = sp;
-	task->state    = SIF_TASK_STATE_READY;
-
 	sif_task_time_t * const time	  = task->times + coreid;
 	sif_task_time_t * const prev_time = &core->prev_time;
 
 	sif_task_update_time(prev_time, time);
 
-	sif_port_kernel_lock();
-	sif_list_append_back(sif.ready + task->priority, &task->list);
-	sif_port_kernel_unlock();
+	task->stack.sp = sp;
+
+	if (task->state == SIF_TASK_STATE_ACTIVE) {
+		task->state = SIF_TASK_STATE_READY;
+
+		sif_list_t ** const list = sif.ready + task->priority;
+		sif_list_t * const  node = &task->list;
+
+		sif_port_kernel_lock();
+		sif_list_append_back(list, node);
+		sif_port_kernel_unlock();
+	}
 
 	task = core->queued;
 
@@ -95,8 +101,11 @@ void sif_task_idle(void)
 		goto skip_idle_enter;
 	}
 
+	sif_list_t ** const list = sif.ready + task->priority;
+	sif_list_t * const  node = &task->list;
+
 	sif_port_kernel_lock();
-	sif_list_append_back(sif.ready + task->priority, &task->list);
+	sif_list_append_back(list, node);
 	sif_port_kernel_unlock();
 
 	core->running  = NULL;
@@ -104,58 +113,11 @@ void sif_task_idle(void)
 
 	time = task->times + coreid;
 
-skip_idle_enter:;
+skip_idle_enter:
 	sif_task_update_time(prev_time, time);
 
 	sif_port_wait_for_interrupt();
 	sif_port_pendsv_set();
-}
-
-sif_task_error_t sif_task_scheduler_start(void)
-{
-	const sif_word_t   coreid = sif_port_get_coreid();
-	sif_core_t * const core	  = sif.cores + coreid;
-
-	sif_port_interrupt_disable();
-
-	// here we trick sif_task_reschedule() to give us
-	// the highest priority task available so that we
-	// can bootstrap the scheduler
-	sif_port_kernel_lock();
-	sif.cpu_enabled |= 1 << coreid;
-	sif_port_kernel_unlock();
-	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
-	sif_task_reschedule();
-	sif_port_pendsv_clear();
-
-	sif_task_t * const task = core->queued;
-
-	if (!task) return SIF_TASK_ERROR_NOTHING_TO_SCHEDULE;
-
-	task->state = SIF_TASK_STATE_ACTIVE;
-
-	core->running	= task;
-	core->queued	= NULL;
-	core->priority	= task->priority;
-	core->prev_time = sif_port_systick_current_value();
-
-	sif_port_task_scheduler_start(task->stack.sp);
-
-	return SIF_TASK_ERROR_UNDEFINED;
-}
-
-void sif_task_systick(void)
-{
-	const sif_word_t   coreid = sif_port_get_coreid();
-	sif_core_t * const core	  = sif.cores + coreid;
-	sif_task_t * const task	  = core->running;
-
-	if (!task) return;
-
-	sif_task_time_t * const time	  = task->times + coreid;
-	sif_task_time_t * const prev_time = &core->prev_time;
-
-	sif_task_update_time(prev_time, time);
 }
 
 void sif_task_reschedule(void)
@@ -173,13 +135,21 @@ void sif_task_reschedule(void)
 		return;
 	}
 
+	if (core->queued) {
+		sif_task_t * const  task = core->queued;
+		sif_list_t ** const list = sif.ready + task->priority;
+		sif_list_t * const  node = &task->list;
+
+		sif_list_prepend_front(list, node);
+	}
+
 	sif_task_priority_t priority;
 	for (priority = 0; priority < SIF_CONFIG_PRIORITY_LEVELS; priority++) {
 		if (!sif.ready[priority]) continue;
 
 		if (priority > core->priority) break;
 
-		sif_list_t **list = sif.ready + priority;
+		sif_list_t ** const list = sif.ready + priority;
 
 		sif_list_t *node = *list;
 
@@ -208,18 +178,84 @@ found:
 		return;
 	}
 
-	if (core->queued) {
-		sif_task_t * const task = core->queued;
-
-		sif_port_kernel_lock();
-		sif_list_prepend_front(
-			sif.ready + task->priority, &task->list);
-		sif_port_kernel_unlock();
-	}
-
 	core->queued = next_task;
 
 	sif_port_pendsv_set();
+}
+
+sif_task_error_t sif_task_scheduler_start(void)
+{
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+
+	memset(core, 0, sizeof(*core));
+
+	sif_port_interrupt_disable();
+
+	// here we trick sif_task_reschedule() to give us
+	// the highest priority task available so that we
+	// can bootstrap the scheduler
+	sif_port_kernel_lock();
+	sif.cpu_enabled |= 1 << coreid;
+	sif_port_kernel_unlock();
+	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
+	sif_task_reschedule();
+	sif_port_pendsv_clear();
+
+	sif_task_t * const task = core->queued;
+
+	if (!task) return SIF_TASK_ERROR_NOTHING_TO_SCHEDULE;
+
+	task->state = SIF_TASK_STATE_ACTIVE;
+
+	core->running  = task;
+	core->queued   = NULL;
+	core->priority = task->priority;
+
+	core->prev_time = sif_port_systick_current_value();
+	sif_port_systick_count_flag();	// clear the existing count flag
+
+	sif_port_task_scheduler_start(task->stack.sp);
+
+	return SIF_TASK_ERROR_UNDEFINED;
+}
+
+void sif_task_systick(void)
+{
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t * const task	  = core->running;
+
+	for (sif_task_priority_t priority = 0;
+		priority < SIF_CONFIG_PRIORITY_LEVELS;
+		priority++) {
+		sif_list_t **ready	= sif.ready + priority;
+		sif_list_t **tick_delay = core->tick_delay + priority;
+		sif_list_t  *removed	= NULL;
+
+		sif_list_filter(
+			tick_delay, &removed, sif_task_tick_delay_decrement);
+
+		if (removed) {
+			sif_port_kernel_lock();
+			sif_list_bulk_append_back(ready, &removed);
+			sif_port_kernel_unlock();
+		}
+	}
+
+	if (!task) return;
+
+	sif_task_time_t * const time	  = task->times + coreid;
+	sif_task_time_t * const prev_time = &core->prev_time;
+
+	sif_task_update_time(prev_time, time);
+}
+
+sif_task_error_t sif_task_tick_delay(sif_task_tick_delay_t tick_delay)
+{
+	return sif_port_syscall(SIF_SYSCALL_TASK_TICK_DELAY, &tick_delay)
+		? SIF_TASK_ERROR_UNDEFINED
+		: SIF_TASK_ERROR_NONE;
 }
 
 void sif_task_update_time(
@@ -227,8 +263,13 @@ void sif_task_update_time(
 {
 	const sif_task_time_t current_count = sif_port_systick_current_value();
 
-	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD)
-		% *SIF_PORT_SYSTICK_RELOAD;
+	if (sif_port_systick_count_flag()) {
+		*time	   += *prev_time;
+		*prev_time  = *SIF_PORT_SYSTICK_RELOAD;
+	}
+
+	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD + 1)
+		% (*SIF_PORT_SYSTICK_RELOAD + 1);
 
 	*prev_time = current_count;
 }
@@ -281,4 +322,11 @@ static sif_task_error_t sif_task_init_stack(
 	};
 
 	return SIF_TASK_ERROR_NONE;
+}
+
+static bool sif_task_tick_delay_decrement(sif_list_t * const node)
+{
+	sif_task_t * const task = SIF_TASK_LIST2TASK(node);
+
+	return --task->tick_delay;
 }

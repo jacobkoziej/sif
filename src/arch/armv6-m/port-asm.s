@@ -259,6 +259,15 @@ sif_arch_armv6_m_syscall:
 	svc #0
 	bx  lr
 
+	.type   sif_arch_armv6_m_systick_count_flag, %function
+	.global sif_arch_armv6_m_systick_count_flag
+sif_arch_armv6_m_systick_count_flag:
+	ldr r0, =SYST_CSR
+	ldr r0, [r0]
+	ldr r1, =(1 << SYST_CSR_COUNTFLAG)
+	and r0, r0, r1
+	bx  lr
+
 	.type   sif_arch_armv6_m_systick_current_value, %function
 	.global sif_arch_armv6_m_systick_current_value
 sif_arch_armv6_m_systick_current_value:
