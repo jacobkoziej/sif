@@ -28,13 +28,20 @@ static sif_syscall_error_t sif_syscall_task_add(void * const arg)
 {
 	sif_task_t * const task = arg;
 
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+
 	task->state = SIF_TASK_STATE_READY;
+
+	sif_list_t ** const list = sif.ready + task->priority;
+	sif_list_t * const  node = &task->list;
 
 	sif_port_kernel_lock();
 
-	task->tid = sif.next_tid++;
+	task->tid	   = sif.next_tid++;
+	task->suspend_time = sif_system_time() + core->system_time_offset;
 
-	sif_list_append_back(sif.ready + task->priority, &task->list);
+	sif_list_append_back(list, node);
 
 	sif_port_kernel_unlock();
 
@@ -56,20 +63,8 @@ static sif_syscall_error_t sif_syscall_task_delete(void * const arg)
 
 	task->state = SIF_TASK_STATE_DELETED;
 
-	task = core->queued;
-
 	core->running  = NULL;
-	core->queued   = NULL;
 	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
-
-	if (task) {
-		sif_list_t ** const list = sif.ready + task->priority;
-		sif_list_t * const  node = &task->list;
-
-		sif_port_kernel_lock();
-		sif_list_prepend_front(list, node);
-		sif_port_kernel_unlock();
-	}
 
 	return SIF_SYSCALL_ERROR_NONE;
 }
@@ -89,7 +84,8 @@ static sif_syscall_error_t sif_syscall_task_tick_delay(void * const arg)
 
 	sif_list_append_back(list, node);
 
-	task->state = SIF_TASK_STATE_SUSPENDED;
+	task->state	   = SIF_TASK_STATE_SUSPENDED;
+	task->suspend_time = sif_system_time() + core->system_time_offset;
 
 	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
 

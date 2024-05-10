@@ -22,6 +22,7 @@ typedef struct sif_core {
 	sif_task_time_t	    idle_time;
 	sif_task_time_t	    prev_time;
 	sif_task_time_t	    system_time;
+	sif_task_time_t	    system_time_offset;
 	sif_task_time_t	    prev_count;
 } sif_core_t;
 

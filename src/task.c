@@ -23,6 +23,12 @@ sif_task_error_t sif_task_add(sif_task_t * const task)
 		: SIF_TASK_ERROR_NONE;
 }
 
+bool sif_task_compare_suspend_time(sif_list_t * const a, sif_list_t * const b)
+{
+	return SIF_TASK_LIST2TASK(a)->suspend_time
+		> SIF_TASK_LIST2TASK(b)->suspend_time;
+}
+
 sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
 {
 	const sif_word_t   coreid = sif_port_get_coreid();
@@ -43,7 +49,12 @@ sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
 		sif_list_t * const  node = &task->list;
 
 		sif_port_kernel_lock();
+
+		task->suspend_time
+			= sif_system_time() + core->system_time_offset;
+
 		sif_list_append_back(list, node);
+
 		sif_port_kernel_unlock();
 	}
 
@@ -87,7 +98,7 @@ sif_task_error_t sif_task_delete(void)
 	return SIF_TASK_ERROR_NONE;
 }
 
-void sif_task_idle(void)
+void sif_task_idle(sif_task_stack_t * const sp)
 {
 	const sif_word_t   coreid = sif_port_get_coreid();
 	sif_core_t * const core	  = sif.cores + coreid;
@@ -101,11 +112,18 @@ void sif_task_idle(void)
 		goto skip_idle_enter;
 	}
 
+	task->state    = SIF_TASK_STATE_READY;
+	task->stack.sp = sp;
+
 	sif_list_t ** const list = sif.ready + task->priority;
 	sif_list_t * const  node = &task->list;
 
 	sif_port_kernel_lock();
+
+	task->suspend_time = sif_system_time() + core->system_time_offset;
+
 	sif_list_append_back(list, node);
+
 	sif_port_kernel_unlock();
 
 	core->running  = NULL;
@@ -136,11 +154,12 @@ void sif_task_reschedule(void)
 	}
 
 	if (core->queued) {
-		sif_task_t * const  task = core->queued;
-		sif_list_t ** const list = sif.ready + task->priority;
-		sif_list_t * const  node = &task->list;
+		sif_task_t * const  task   = core->queued;
+		sif_list_t ** const list   = sif.ready + task->priority;
+		sif_list_t	   *orphan = &task->list;
 
-		sif_list_prepend_front(list, node);
+		sif_list_merge_sorted(
+			list, &orphan, sif_task_compare_suspend_time);
 	}
 
 	sif_task_priority_t priority;
@@ -238,7 +257,9 @@ void sif_task_systick(void)
 
 		if (removed) {
 			sif_port_kernel_lock();
-			sif_list_bulk_append_back(ready, &removed);
+			sif_list_merge_sorted(ready,
+				&removed,
+				sif_task_compare_suspend_time);
 			sif_port_kernel_unlock();
 		}
 	}
