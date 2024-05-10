@@ -21,6 +21,8 @@ typedef struct sif_core {
 	sif_list_t	   *tick_delay[SIF_CONFIG_PRIORITY_LEVELS];
 	sif_task_time_t	    idle_time;
 	sif_task_time_t	    prev_time;
+	sif_task_time_t	    system_time;
+	sif_task_time_t	    prev_count;
 } sif_core_t;
 
 typedef struct sif {
@@ -38,6 +40,7 @@ extern void (* const sif_port_kernel_unlock)(void);
 
 void		  sif_init(void);
 sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp);
+sif_task_time_t	  sif_system_time(void);
 void		  sif_systick(void);
 
 #endif	// SIF_SIF_H

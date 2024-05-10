@@ -50,6 +50,29 @@ sif_task_stack_t *sif_pendsv(sif_task_stack_t * const sp)
 	return sif_task_context_switch(sp);
 }
 
+sif_task_time_t sif_system_time(void)
+{
+	const sif_word_t	coreid	    = sif_port_get_coreid();
+	sif_core_t * const	core	    = sif.cores + coreid;
+	sif_task_time_t * const system_time = &core->system_time;
+	sif_task_time_t * const prev_count  = &core->prev_count;
+
+	const sif_task_time_t current_count = sif_port_systick_current_value();
+
+	if (sif_port_systick_count_flag()) {
+		*system_time += *prev_count;
+		*prev_count   = *SIF_PORT_SYSTICK_RELOAD;
+	}
+
+	*system_time
+		+= (*prev_count - current_count + *SIF_PORT_SYSTICK_RELOAD + 1)
+		% (*SIF_PORT_SYSTICK_RELOAD + 1);
+
+	*prev_count = current_count;
+
+	return *system_time;
+}
+
 void sif_systick(void)
 {
 	sif_task_systick();

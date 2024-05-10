@@ -212,8 +212,8 @@ sif_task_error_t sif_task_scheduler_start(void)
 	core->queued   = NULL;
 	core->priority = task->priority;
 
-	core->prev_time = sif_port_systick_current_value();
-	sif_port_systick_count_flag();	// clear the existing count flag
+	(void) sif_system_time();  // clear the existing count flag
+	core->system_time = 0;
 
 	sif_port_task_scheduler_start(task->stack.sp);
 
@@ -261,17 +261,11 @@ sif_task_error_t sif_task_tick_delay(sif_task_tick_delay_t tick_delay)
 void sif_task_update_time(
 	sif_task_time_t * const prev_time, sif_task_time_t * const time)
 {
-	const sif_task_time_t current_count = sif_port_systick_current_value();
+	const sif_task_time_t current_time = sif_system_time();
 
-	if (sif_port_systick_count_flag()) {
-		*time	   += *prev_time;
-		*prev_time  = *SIF_PORT_SYSTICK_RELOAD;
-	}
+	*time += current_time - *prev_time;
 
-	*time += (*prev_time - current_count + *SIF_PORT_SYSTICK_RELOAD + 1)
-		% (*SIF_PORT_SYSTICK_RELOAD + 1);
-
-	*prev_time = current_count;
+	*prev_time = current_time;
 }
 
 static sif_task_error_t sif_task_init_stack(
