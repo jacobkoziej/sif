@@ -37,11 +37,8 @@ sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
 
 	sif_task_update_time(prev_time, time);
 
-	sif_list_t ** const ready = sif.ready + task->priority;
-	sif_list_t * const  list  = task->lists + SIF_TASK_LIST_READY;
-
 	sif_port_kernel_lock();
-	sif_list_append_back(ready, list);
+	sif_list_append_back(sif.ready + task->priority, &task->list);
 	sif_port_kernel_unlock();
 
 	task = core->queued;
@@ -69,8 +66,7 @@ sif_task_error_t sif_task_init(
 
 	if (error != SIF_TASK_ERROR_NONE) return error;
 
-	for (size_t i = 0; i < SIF_TASK_LISTS; i++)
-		sif_list_node_init(task->lists + i);
+	sif_list_node_init(&task->list);
 
 	task->priority = config->priority;
 	task->cpu_mask = config->cpu_mask;
@@ -99,11 +95,8 @@ void sif_task_idle(void)
 		goto skip_idle_enter;
 	}
 
-	sif_list_t ** const ready = sif.ready + task->priority;
-	sif_list_t * const  list  = task->lists + SIF_TASK_LIST_READY;
-
 	sif_port_kernel_lock();
-	sif_list_append_back(ready, list);
+	sif_list_append_back(sif.ready + task->priority, &task->list);
 	sif_port_kernel_unlock();
 
 	core->running  = NULL;
@@ -187,7 +180,7 @@ void sif_task_reschedule(void)
 	if (core->queued) {
 		sif_task_t * const  task  = core->queued;
 		sif_list_t ** const ready = sif.ready + task->priority;
-		sif_list_t * const  list  = task->lists + SIF_TASK_LIST_READY;
+		sif_list_t * const  list  = &task->list;
 
 		sif_list_prepend_front(ready, list);
 	}
