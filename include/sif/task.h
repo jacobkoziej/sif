@@ -17,6 +17,7 @@
 typedef unsigned      sif_task_priority_t;
 typedef unsigned      sif_task_cpu_mask_t;
 typedef unsigned char sif_task_stack_t;
+typedef unsigned      sif_task_tick_delay_t;
 typedef uint64_t      sif_task_tid_t;
 typedef uint64_t      sif_task_time_t;
 
@@ -50,6 +51,7 @@ typedef struct sif_task {
 	sif_task_priority_t	    priority;
 	sif_task_cpu_mask_t	    cpu_mask;
 	sif_task_time_t		    times[SIF_CONFIG_CORES];
+	sif_task_tick_delay_t	    tick_delay;
 	sif_task_stack_descriptor_t stack;
 } sif_task_t;
 
@@ -72,6 +74,7 @@ void		 sif_task_idle(void);
 sif_task_error_t sif_task_scheduler_start(void);
 void		 sif_task_systick(void);
 void		 sif_task_reschedule(void);
+sif_task_error_t sif_task_tick_delay(sif_task_tick_delay_t tick_delay);
 void		 sif_task_update_time(
 		    sif_task_time_t		*const prev_time, sif_task_time_t		   *const time);
 

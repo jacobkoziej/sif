@@ -29,17 +29,23 @@ sif_task_stack_t *sif_task_context_switch(sif_task_stack_t * const sp)
 	sif_core_t * const core	  = sif.cores + coreid;
 	sif_task_t	  *task	  = core->running;
 
-	task->stack.sp = sp;
-	task->state    = SIF_TASK_STATE_READY;
-
 	sif_task_time_t * const time	  = task->times + coreid;
 	sif_task_time_t * const prev_time = &core->prev_time;
 
 	sif_task_update_time(prev_time, time);
 
-	sif_port_kernel_lock();
-	sif_list_append_back(sif.ready + task->priority, &task->list);
-	sif_port_kernel_unlock();
+	task->stack.sp = sp;
+
+	if (task->state == SIF_TASK_STATE_ACTIVE) {
+		task->state = SIF_TASK_STATE_READY;
+
+		sif_list_t ** const list = sif.ready + task->priority;
+		sif_list_t * const  node = &task->list;
+
+		sif_port_kernel_lock();
+		sif_list_append_back(list, node);
+		sif_port_kernel_unlock();
+	}
 
 	task = core->queued;
 
@@ -223,6 +229,13 @@ found:
 	core->queued = next_task;
 
 	sif_port_pendsv_set();
+}
+
+sif_task_error_t sif_task_tick_delay(sif_task_tick_delay_t tick_delay)
+{
+	return sif_port_syscall(SIF_SYSCALL_TASK_TICK_DELAY, &tick_delay)
+		? SIF_TASK_ERROR_UNDEFINED
+		: SIF_TASK_ERROR_NONE;
 }
 
 void sif_task_update_time(
