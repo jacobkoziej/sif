@@ -4,6 +4,8 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
+#include <sif/atomic.h>
+#include <sif/mutex.h>
 #include <sif/private/syscall.h>
 #include <sif/sif.h>
 #include <sif/syscall.h>
@@ -11,6 +13,7 @@
 
 sif_syscall_error_t (* const sif_syscalls[SIF_SYSCALL_TOTAL])(void * const arg)
 	= {
+		[SIF_SYSCALL_MUTEX_LOCK]      = sif_syscall_mutex_lock,
 		[SIF_SYSCALL_TASK_ADD]	      = sif_syscall_task_add,
 		[SIF_SYSCALL_TASK_DELETE]     = sif_syscall_task_delete,
 		[SIF_SYSCALL_TASK_TICK_DELAY] = sif_syscall_task_tick_delay,
@@ -22,6 +25,44 @@ sif_syscall_error_t sif_syscall_vaild(int syscall)
 	return ((syscall >= 0) && (syscall < SIF_SYSCALL_TOTAL))
 		? SIF_SYSCALL_ERROR_NONE
 		: SIF_SYSCALL_ERROR_INVALID;
+}
+
+static sif_syscall_error_t sif_syscall_mutex_lock(void * const arg)
+{
+	sif_mutex_t * const mutex = arg;
+
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t	  *task	  = core->running;
+
+	sif_syscall_error_t error = SIF_SYSCALL_ERROR_NONE;
+
+	while (sif_port_atomic_test_and_set(&mutex->lock)) continue;
+
+	if (!mutex->owner) {
+		mutex->owner = task;
+		goto unlock;
+	}
+
+	if (mutex->owner == task) {
+		error = SIF_SYSCALL_ERROR_MUTEX_LOCKED;
+		goto unlock;
+	}
+
+	sif_list_t ** const list = mutex->waiting + task->priority;
+	sif_list_t * const  node = &task->list;
+
+	sif_list_append_back(list, node);
+
+	task->state	   = SIF_TASK_STATE_SUSPENDED;
+	task->suspend_time = sif_system_time() + core->system_time_offset;
+
+	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
+
+unlock:
+	mutex->lock = 0;
+
+	return error;
 }
 
 static sif_syscall_error_t sif_syscall_task_add(void * const arg)
