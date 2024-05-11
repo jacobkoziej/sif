@@ -14,8 +14,9 @@
 
 typedef enum sif_mutex_error {
 	SIF_MUTEX_ERROR_NONE,
+	SIF_MUTEX_ERROR_LOCKED,
+	SIF_MUTEX_ERROR_OWNER,
 	SIF_MUTEX_ERROR_UNDEFINED,
-	SIF_MUTEX_LOCKED,
 } sif_mutex_error_t;
 
 typedef struct sif_mutex {
@@ -26,5 +27,6 @@ typedef struct sif_mutex {
 
 void		  sif_mutex_init(sif_mutex_t		  *const mutex);
 sif_mutex_error_t sif_mutex_lock(sif_mutex_t * const mutex);
+sif_mutex_error_t sif_mutex_unlock(sif_mutex_t * const mutex);
 
 #endif	// SIF_MUTEX_H

@@ -15,6 +15,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define SIF_TASK_LIST2TASK(x) SIF_LIST_CONTAINER_OF(x, sif_task_t, list)
+
 typedef unsigned      sif_task_priority_t;
 typedef unsigned      sif_task_cpu_mask_t;
 typedef unsigned char sif_task_stack_t;

@@ -14,6 +14,7 @@
 sif_syscall_error_t (* const sif_syscalls[SIF_SYSCALL_TOTAL])(void * const arg)
 	= {
 		[SIF_SYSCALL_MUTEX_LOCK]      = sif_syscall_mutex_lock,
+		[SIF_SYSCALL_MUTEX_UNLOCK]    = sif_syscall_mutex_unlock,
 		[SIF_SYSCALL_TASK_ADD]	      = sif_syscall_task_add,
 		[SIF_SYSCALL_TASK_DELETE]     = sif_syscall_task_delete,
 		[SIF_SYSCALL_TASK_TICK_DELAY] = sif_syscall_task_tick_delay,
@@ -52,6 +53,50 @@ static sif_syscall_error_t sif_syscall_mutex_lock(void * const arg)
 	sif_list_t ** const list = mutex->waiting + task->priority;
 
 	sif_syscall_suspend(core, list, task);
+
+unlock:
+	mutex->lock = 0;
+
+	return error;
+}
+
+static sif_syscall_error_t sif_syscall_mutex_unlock(void * const arg)
+{
+	sif_mutex_t * const mutex = arg;
+
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t	  *task	  = core->running;
+
+	sif_syscall_error_t error = SIF_SYSCALL_ERROR_NONE;
+
+	while (sif_port_atomic_test_and_set(&mutex->lock)) continue;
+
+	if (mutex->owner != task) {
+		error = SIF_SYSCALL_ERROR_MUTEX_OWNER;
+		goto unlock;
+	}
+
+	for (sif_task_priority_t priority = 0;
+		priority < SIF_CONFIG_PRIORITY_LEVELS;
+		priority++) {
+		sif_list_t **waiting = mutex->waiting + priority;
+
+		if (!*waiting) continue;
+
+		sif_list_t *node = *waiting;
+		sif_list_remove_next(waiting, node);
+
+		mutex->owner = SIF_TASK_LIST2TASK(node);
+
+		sif_list_t **ready = sif.ready + priority;
+		sif_list_merge_sorted(
+			ready, &node, sif_task_compare_suspend_time);
+
+		goto unlock;
+	}
+
+	mutex->owner = NULL;
 
 unlock:
 	mutex->lock = 0;

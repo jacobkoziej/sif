@@ -9,6 +9,7 @@
 
 typedef enum sif_syscall {
 	SIF_SYSCALL_MUTEX_LOCK,
+	SIF_SYSCALL_MUTEX_UNLOCK,
 	SIF_SYSCALL_TASK_ADD,
 	SIF_SYSCALL_TASK_DELETE,
 	SIF_SYSCALL_TASK_TICK_DELAY,
@@ -20,6 +21,7 @@ typedef enum sif_syscall_error {
 	SIF_SYSCALL_ERROR_NONE,
 	SIF_SYSCALL_ERROR_INVALID,
 	SIF_SYSCALL_ERROR_MUTEX_LOCKED,
+	SIF_SYSCALL_ERROR_MUTEX_OWNER,
 } sif_syscall_error_t;
 
 extern sif_syscall_error_t (* const sif_port_syscall)(

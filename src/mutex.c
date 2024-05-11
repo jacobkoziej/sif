@@ -21,7 +21,21 @@ sif_mutex_error_t sif_mutex_lock(sif_mutex_t * const mutex)
 			return SIF_MUTEX_ERROR_NONE;
 
 		case SIF_SYSCALL_ERROR_MUTEX_LOCKED:
-			return SIF_MUTEX_LOCKED;
+			return SIF_MUTEX_ERROR_LOCKED;
+
+		default:
+			return SIF_MUTEX_ERROR_UNDEFINED;
+	}
+}
+
+sif_mutex_error_t sif_mutex_unlock(sif_mutex_t * const mutex)
+{
+	switch (sif_port_syscall(SIF_SYSCALL_MUTEX_UNLOCK, mutex)) {
+		case SIF_SYSCALL_ERROR_NONE:
+			return SIF_MUTEX_ERROR_NONE;
+
+		case SIF_SYSCALL_ERROR_MUTEX_OWNER:
+			return SIF_MUTEX_ERROR_OWNER;
 
 		default:
 			return SIF_MUTEX_ERROR_UNDEFINED;
