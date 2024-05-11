@@ -50,14 +50,8 @@ static sif_syscall_error_t sif_syscall_mutex_lock(void * const arg)
 	}
 
 	sif_list_t ** const list = mutex->waiting + task->priority;
-	sif_list_t * const  node = &task->list;
 
-	sif_list_append_back(list, node);
-
-	task->state	   = SIF_TASK_STATE_SUSPENDED;
-	task->suspend_time = sif_system_time() + core->system_time_offset;
-
-	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
+	sif_syscall_suspend(core, list, task);
 
 unlock:
 	mutex->lock = 0;
@@ -121,14 +115,8 @@ static sif_syscall_error_t sif_syscall_task_tick_delay(void * const arg)
 	task->tick_delay = *tick_delay;
 
 	sif_list_t ** const list = core->tick_delay + task->priority;
-	sif_list_t * const  node = &task->list;
 
-	sif_list_append_back(list, node);
-
-	task->state	   = SIF_TASK_STATE_SUSPENDED;
-	task->suspend_time = sif_system_time() + core->system_time_offset;
-
-	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
+	sif_syscall_suspend(core, list, task);
 
 	return SIF_SYSCALL_ERROR_NONE;
 }
@@ -140,4 +128,18 @@ static sif_syscall_error_t sif_syscall_yield(void * const arg)
 	// yield from task
 
 	return SIF_SYSCALL_ERROR_NONE;
+}
+
+static void sif_syscall_suspend(sif_core_t * const core,
+	sif_list_t ** const			   list,
+	sif_task_t * const			   task)
+{
+	sif_list_t * const node = &task->list;
+
+	sif_list_append_back(list, node);
+
+	task->state	   = SIF_TASK_STATE_SUSPENDED;
+	task->suspend_time = sif_system_time() + core->system_time_offset;
+
+	core->priority = SIF_CONFIG_PRIORITY_LEVELS - 1;
 }
