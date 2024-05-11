@@ -11,4 +11,6 @@
 
 typedef sif_port_atomic_t sif_atomic_t;
 
+extern sif_atomic_t (* const sif_port_atomic_test_and_set)(sif_atomic_t *var);
+
 #endif	// SIF_ATMOIC_H

@@ -13,6 +13,10 @@
 const sif_port_word_t * const SIF_PORT_SYSTICK_RELOAD
 	= &SIF_ARCH_ARMV6_M_SYST_RVR_RELOAD;
 
+sif_port_atomic_t (* const sif_port_atomic_test_and_set)(
+	sif_port_atomic_t *var)
+	= sif_march_rp2040_test_and_set;
+
 sif_port_word_t (* const sif_port_get_coreid)(void)
 	= sif_march_rp2040_get_coreid;
 
