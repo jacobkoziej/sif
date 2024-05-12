@@ -85,8 +85,9 @@ sif_task_error_t sif_task_init(
 
 	sif_list_node_init(&task->list);
 
-	task->priority = config->priority;
-	task->cpu_mask = config->cpu_mask;
+	task->priority	    = config->priority;
+	task->base_priority = config->priority;
+	task->cpu_mask	    = config->cpu_mask;
 
 	return SIF_TASK_ERROR_NONE;
 }

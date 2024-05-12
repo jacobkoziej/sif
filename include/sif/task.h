@@ -52,6 +52,7 @@ typedef struct sif_task {
 	sif_task_state_t	    state;
 	sif_task_tid_t		    tid;
 	sif_task_priority_t	    priority;
+	sif_task_priority_t	    base_priority;
 	sif_task_cpu_mask_t	    cpu_mask;
 	sif_task_time_t		    times[SIF_CONFIG_CORES];
 	sif_task_time_t		    suspend_time;

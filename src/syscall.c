@@ -51,6 +51,24 @@ static sif_syscall_error_t sif_syscall_mutex_lock(void * const arg)
 		goto unlock;
 	}
 
+	if (mutex->owner->priority > task->priority) {
+		sif_task_t * const boost = mutex->owner;
+
+		sif_list_t **old_ready = sif.ready + boost->priority;
+		sif_list_t **new_ready = sif.ready + task->priority;
+		sif_list_t  *node      = &boost->list;
+
+		boost->priority = task->priority;
+
+		sif_port_kernel_lock();
+
+		sif_list_remove_next(old_ready, node);
+		sif_list_merge_sorted(
+			new_ready, &node, sif_task_compare_suspend_time);
+
+		sif_port_kernel_unlock();
+	}
+
 	sif_list_t ** const list = mutex->waiting + task->priority;
 
 	sif_syscall_suspend(core, list, task);
@@ -102,6 +120,8 @@ static sif_syscall_error_t sif_syscall_mutex_unlock(void * const arg)
 		error = SIF_SYSCALL_ERROR_MUTEX_OWNER;
 		goto unlock;
 	}
+
+	task->priority = task->base_priority;
 
 	for (sif_task_priority_t priority = 0;
 		priority < SIF_CONFIG_PRIORITY_LEVELS;
