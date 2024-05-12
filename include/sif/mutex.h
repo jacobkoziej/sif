@@ -27,6 +27,7 @@ typedef struct sif_mutex {
 
 void		  sif_mutex_init(sif_mutex_t		  *const mutex);
 sif_mutex_error_t sif_mutex_lock(sif_mutex_t * const mutex);
+sif_mutex_error_t sif_mutex_trylock(sif_mutex_t * const mutex);
 sif_mutex_error_t sif_mutex_unlock(sif_mutex_t * const mutex);
 
 #endif	// SIF_MUTEX_H

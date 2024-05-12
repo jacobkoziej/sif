@@ -14,6 +14,7 @@
 sif_syscall_error_t (* const sif_syscalls[SIF_SYSCALL_TOTAL])(void * const arg)
 	= {
 		[SIF_SYSCALL_MUTEX_LOCK]      = sif_syscall_mutex_lock,
+		[SIF_SYSCALL_MUTEX_TRYLOCK]   = sif_syscall_mutex_trylock,
 		[SIF_SYSCALL_MUTEX_UNLOCK]    = sif_syscall_mutex_unlock,
 		[SIF_SYSCALL_TASK_ADD]	      = sif_syscall_task_add,
 		[SIF_SYSCALL_TASK_DELETE]     = sif_syscall_task_delete,
@@ -53,6 +54,31 @@ static sif_syscall_error_t sif_syscall_mutex_lock(void * const arg)
 	sif_list_t ** const list = mutex->waiting + task->priority;
 
 	sif_syscall_suspend(core, list, task);
+
+unlock:
+	mutex->lock = 0;
+
+	return error;
+}
+
+static sif_syscall_error_t sif_syscall_mutex_trylock(void * const arg)
+{
+	sif_mutex_t * const mutex = arg;
+
+	const sif_word_t   coreid = sif_port_get_coreid();
+	sif_core_t * const core	  = sif.cores + coreid;
+	sif_task_t	  *task	  = core->running;
+
+	sif_syscall_error_t error = SIF_SYSCALL_ERROR_NONE;
+
+	while (sif_port_atomic_test_and_set(&mutex->lock)) continue;
+
+	if (!mutex->owner) {
+		mutex->owner = task;
+		goto unlock;
+	}
+
+	error = SIF_SYSCALL_ERROR_MUTEX_LOCKED;
 
 unlock:
 	mutex->lock = 0;
