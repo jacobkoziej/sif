@@ -10,6 +10,7 @@ set(SIF_SRC
 	"list.c"
 	"march/rp2040/port-asm.s"
 	"march/rp2040/port.c"
+	"mutex.c"
 	"sif.c"
 	"syscall.c"
 	"task.c"
