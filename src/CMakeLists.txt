@@ -8,3 +8,10 @@ add_executable(
 )
 target_link_libraries(hello-world pico_stdlib sif)
 pico_add_extra_outputs(hello-world)
+
+add_executable(
+	mutex
+	mutex.c
+)
+target_link_libraries(mutex pico_stdlib sif)
+pico_add_extra_outputs(mutex)
