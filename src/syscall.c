@@ -116,8 +116,13 @@ static sif_syscall_error_t sif_syscall_mutex_unlock(void * const arg)
 		mutex->owner = SIF_TASK_LIST2TASK(node);
 
 		sif_list_t **ready = sif.ready + priority;
+
+		sif_port_kernel_lock();
+
 		sif_list_merge_sorted(
 			ready, &node, sif_task_compare_suspend_time);
+
+		sif_port_kernel_unlock();
 
 		goto unlock;
 	}
