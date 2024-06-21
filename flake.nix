@@ -13,7 +13,7 @@
           inherit system;
         };
 
-        llvm = pkgs.llvmPackages_17;
+        llvm = pkgs.llvmPackages_latest;
         python = pkgs.python312;
 
       in
