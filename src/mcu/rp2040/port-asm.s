@@ -7,29 +7,29 @@
 	.arch armv6s-m
 	.cpu  cortex-m0plus
 
-	.include "sif/march/rp2040/registers.s"
+	.include "sif/mcu/rp2040/registers.s"
 
 	.text
 
-	.type   sif_march_rp2040_get_coreid, %function
-	.global sif_march_rp2040_get_coreid
-sif_march_rp2040_get_coreid:
+	.type   sif_mcu_rp2040_get_coreid, %function
+	.global sif_mcu_rp2040_get_coreid
+sif_mcu_rp2040_get_coreid:
 	ldr r0, =COREID
 	ldr r0, [r0]
 	bx  lr
 
-	.type   sif_march_rp2040_init, %function
-	.global sif_march_rp2040_init
-sif_march_rp2040_init:
+	.type   sif_mcu_rp2040_init, %function
+	.global sif_mcu_rp2040_init
+sif_mcu_rp2040_init:
 	push  {lr}
 	cpsid i
 	bl    sif_arch_armv6_m_init
 	cpsie i
 	pop   {pc}
 
-	.type   sif_march_rp2040_kernel_lock, %function
-	.global sif_march_rp2040_kernel_lock
-sif_march_rp2040_kernel_lock:
+	.type   sif_mcu_rp2040_kernel_lock, %function
+	.global sif_mcu_rp2040_kernel_lock
+sif_mcu_rp2040_kernel_lock:
 	ldr r1, =SPINLOCK15
 
 .Lacquire_kernel_spinlock:
@@ -41,9 +41,9 @@ sif_march_rp2040_kernel_lock:
 
 	bx lr
 
-	.type   sif_march_rp2040_kernel_unlock, %function
-	.global sif_march_rp2040_kernel_unlock
-sif_march_rp2040_kernel_unlock:
+	.type   sif_mcu_rp2040_kernel_unlock, %function
+	.global sif_mcu_rp2040_kernel_unlock
+sif_mcu_rp2040_kernel_unlock:
 	ldr r0, =SPINLOCK15
 
 	dmb
@@ -53,14 +53,14 @@ sif_march_rp2040_kernel_unlock:
 
 	bx lr
 
-	.type   sif_march_rp2040_scheduler_start, %function
-	.global sif_march_rp2040_scheduler_start
-sif_march_rp2040_scheduler_start:
+	.type   sif_mcu_rp2040_scheduler_start, %function
+	.global sif_mcu_rp2040_scheduler_start
+sif_mcu_rp2040_scheduler_start:
 	b sif_arch_armv6_m_scheduler_start
 
-	.type   sif_march_rp2040_test_and_set, %function
-	.global sif_march_rp2040_test_and_set
-sif_march_rp2040_test_and_set:
+	.type   sif_mcu_rp2040_test_and_set, %function
+	.global sif_mcu_rp2040_test_and_set
+sif_mcu_rp2040_test_and_set:
 	ldr r2, =SPINLOCK14
 
 	// preserve primask

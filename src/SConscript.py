@@ -9,7 +9,7 @@ Import(
     [
         'arch',
         'env',
-        'march',
+        'mcu',
     ]
 )
 
@@ -18,8 +18,8 @@ arch = SConscript(
     exports='env',
 )
 
-march = SConscript(
-    f'march/{march}/SConscript.py',
+mcu = SConscript(
+    f'mcu/{mcu}/SConscript.py',
     exports='env',
 )
 
@@ -27,7 +27,7 @@ sif = env.StaticLibrary(
     target='sif',
     source=[
         arch,
-        march,
+        mcu,
         'list.c',
         'mutex.c',
         'sif.c',

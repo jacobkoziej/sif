@@ -7,7 +7,7 @@
 
 Import('env')
 
-march = [
+mcu = [
     env.File(src)
     for src in [
         'port.c',
@@ -15,4 +15,4 @@ march = [
     ]
 ]
 
-Return('march')
+Return('mcu')
