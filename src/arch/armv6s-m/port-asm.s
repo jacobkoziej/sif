@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: MPL-2.0
 /*
- * port-asm.s -- armv6-m port
+ * port-asm.s -- armv6s-m port
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
 	.arch armv6s-m
 
-	.include "sif/arch/armv6-m/macros.s"
-	.include "sif/arch/armv6-m/registers.s"
+	.include "sif/arch/armv6s-m/macros.s"
+	.include "sif/arch/armv6s-m/registers.s"
 
 	.text
 
-	.type   sif_arch_armv6_m_init, %function
-	.global sif_arch_armv6_m_init
-sif_arch_armv6_m_init:
-	b sif_arch_armv6_m_setup_nvic
+	.type   sif_arch_armv6s_m_init, %function
+	.global sif_arch_armv6s_m_init
+sif_arch_armv6s_m_init:
+	b sif_arch_armv6s_m_setup_nvic
 
-	.type   sif_arch_armv6_m_init_context, %function
-	.global sif_arch_armv6_m_init_context
-sif_arch_armv6_m_init_context:
+	.type   sif_arch_armv6s_m_init_context, %function
+	.global sif_arch_armv6s_m_init_context
+sif_arch_armv6s_m_init_context:
 	sub r0, r0, #EXCEPTION_OFFSET
 
 	str r1, [r0, #PC_OFFSET]
@@ -34,20 +34,20 @@ sif_arch_armv6_m_init_context:
 
 	bx lr
 
-	.type   sif_arch_armv6_m_interrupt_disable, %function
-	.global sif_arch_armv6_m_interrupt_disable
-sif_arch_armv6_m_interrupt_disable:
+	.type   sif_arch_armv6s_m_interrupt_disable, %function
+	.global sif_arch_armv6s_m_interrupt_disable
+sif_arch_armv6s_m_interrupt_disable:
 	cpsid i
 	bx lr
 
-	.type   sif_arch_armv6_m_interrupt_enable, %function
-	.global sif_arch_armv6_m_interrupt_enable
-sif_arch_armv6_m_interrupt_enable:
+	.type   sif_arch_armv6s_m_interrupt_enable, %function
+	.global sif_arch_armv6s_m_interrupt_enable
+sif_arch_armv6s_m_interrupt_enable:
 	cpsie i
 	bx lr
 
-	.type sif_arch_armv6_m_handler_pendsv, %function
-sif_arch_armv6_m_handler_pendsv:
+	.type sif_arch_armv6s_m_handler_pendsv, %function
+sif_arch_armv6s_m_handler_pendsv:
 	push         {lr}
 	SAVE_CONTEXT r0
 	cpsid        i
@@ -59,8 +59,8 @@ sif_arch_armv6_m_handler_pendsv:
 	dsb
 	pop             {pc}
 
-	.type sif_arch_armv6_m_handler_svcall, %function
-sif_arch_armv6_m_handler_svcall:
+	.type sif_arch_armv6s_m_handler_svcall, %function
+sif_arch_armv6s_m_handler_svcall:
 	push {r5,lr}
 
 	// determine what sp to use for caller context
@@ -119,13 +119,13 @@ sif_arch_armv6_m_handler_svcall:
 
 	pop {r5,pc}
 
-	.type sif_arch_armv6_m_handler_systick, %function
-sif_arch_armv6_m_handler_systick:
+	.type sif_arch_armv6s_m_handler_systick, %function
+sif_arch_armv6s_m_handler_systick:
 	b sif_systick
 
-	.type   sif_arch_armv6_m_pendsv_set, %function
-	.global sif_arch_armv6_m_pendsv_set
-sif_arch_armv6_m_pendsv_set:
+	.type   sif_arch_armv6s_m_pendsv_set, %function
+	.global sif_arch_armv6s_m_pendsv_set
+sif_arch_armv6s_m_pendsv_set:
 	ldr r0, =ICSR
 	ldr r1, [r0]
 	ldr r2, =(1 << ICSR_PENDSVSET)
@@ -135,9 +135,9 @@ sif_arch_armv6_m_pendsv_set:
 	isb
 	bx  lr
 
-	.type   sif_arch_armv6_m_pendsv_clear, %function
-	.global sif_arch_armv6_m_pendsv_clear
-sif_arch_armv6_m_pendsv_clear:
+	.type   sif_arch_armv6s_m_pendsv_clear, %function
+	.global sif_arch_armv6s_m_pendsv_clear
+sif_arch_armv6s_m_pendsv_clear:
 	ldr r0, =ICSR
 	ldr r1, [r0]
 	ldr r2, =(1 << ICSR_PENDSVCLR)
@@ -149,9 +149,9 @@ sif_arch_armv6_m_pendsv_clear:
 	isb
 	bx  lr
 
-	.type   sif_arch_armv6_m_scheduler_start, %function
-	.global sif_arch_armv6_m_scheduler_start
-sif_arch_armv6_m_scheduler_start:
+	.type   sif_arch_armv6s_m_scheduler_start, %function
+	.global sif_arch_armv6s_m_scheduler_start
+sif_arch_armv6s_m_scheduler_start:
 	// reset msp
 	ldr r1,  =VTOR
 	ldr r1,  [r1]
@@ -179,21 +179,21 @@ sif_arch_armv6_m_scheduler_start:
 	cpsie i
 	bx    r3
 
-	.type sif_arch_armv6_m_setup_nvic, %function
-sif_arch_armv6_m_setup_nvic:
+	.type sif_arch_armv6s_m_setup_nvic, %function
+sif_arch_armv6s_m_setup_nvic:
 	push {lr}
 
-	bl sif_arch_armv6_m_setup_pendsv
-	bl sif_arch_armv6_m_setup_svcall
-	bl sif_arch_armv6_m_setup_systick
+	bl sif_arch_armv6s_m_setup_pendsv
+	bl sif_arch_armv6s_m_setup_svcall
+	bl sif_arch_armv6s_m_setup_systick
 
 	// load vector table
 	ldr r2, =VTOR
 	ldr r2, [r2]
 
-	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_PENDSV,  sif_arch_armv6_m_handler_pendsv
-	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SVCALL,  sif_arch_armv6_m_handler_svcall
-	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SYSTICK, sif_arch_armv6_m_handler_systick
+	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_PENDSV,  sif_arch_armv6s_m_handler_pendsv
+	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SVCALL,  sif_arch_armv6s_m_handler_svcall
+	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SYSTICK, sif_arch_armv6s_m_handler_systick
 
 	// ensure SCS registers are updated (B2.5)
 	dsb
@@ -201,8 +201,8 @@ sif_arch_armv6_m_setup_nvic:
 
 	pop {pc}
 
-	.type sif_arch_armv6_m_setup_pendsv, %function
-sif_arch_armv6_m_setup_pendsv:
+	.type sif_arch_armv6s_m_setup_pendsv, %function
+sif_arch_armv6s_m_setup_pendsv:
 	// set pendsv to lowest priority
 	ldr r1, =(0x03 << SHPR3_PRI_14)
 	ldr r0, =SHPR3
@@ -212,8 +212,8 @@ sif_arch_armv6_m_setup_pendsv:
 
 	bx lr
 
-	.type sif_arch_armv6_m_setup_svcall, %function
-sif_arch_armv6_m_setup_svcall:
+	.type sif_arch_armv6s_m_setup_svcall, %function
+sif_arch_armv6s_m_setup_svcall:
 	// set svcall priority
 	ldr r1, =SIF_ARCH_ARMV6_M_KERNEL_PRIORITY
 	ldr r1, [r1]
@@ -225,8 +225,8 @@ sif_arch_armv6_m_setup_svcall:
 
 	bx lr
 
-	.type sif_arch_armv6_m_setup_systick, %function
-sif_arch_armv6_m_setup_systick:
+	.type sif_arch_armv6s_m_setup_systick, %function
+sif_arch_armv6s_m_setup_systick:
 	// program our reload value
 	ldr r0, =SYST_RVR
 	ldr r1, =SIF_ARCH_ARMV6_M_SYST_RVR_RELOAD
@@ -253,30 +253,30 @@ sif_arch_armv6_m_setup_systick:
 
 	bx lr
 
-	.type   sif_arch_armv6_m_syscall, %function
-	.global sif_arch_armv6_m_syscall
-sif_arch_armv6_m_syscall:
+	.type   sif_arch_armv6s_m_syscall, %function
+	.global sif_arch_armv6s_m_syscall
+sif_arch_armv6s_m_syscall:
 	svc #0
 	bx  lr
 
-	.type   sif_arch_armv6_m_systick_count_flag, %function
-	.global sif_arch_armv6_m_systick_count_flag
-sif_arch_armv6_m_systick_count_flag:
+	.type   sif_arch_armv6s_m_systick_count_flag, %function
+	.global sif_arch_armv6s_m_systick_count_flag
+sif_arch_armv6s_m_systick_count_flag:
 	ldr r0, =SYST_CSR
 	ldr r0, [r0]
 	ldr r1, =(1 << SYST_CSR_COUNTFLAG)
 	and r0, r0, r1
 	bx  lr
 
-	.type   sif_arch_armv6_m_systick_current_value, %function
-	.global sif_arch_armv6_m_systick_current_value
-sif_arch_armv6_m_systick_current_value:
+	.type   sif_arch_armv6s_m_systick_current_value, %function
+	.global sif_arch_armv6s_m_systick_current_value
+sif_arch_armv6s_m_systick_current_value:
 	ldr r0, =SYST_CVR
 	ldr r0, [r0]
 	bx  lr
 
-	.type   sif_arch_armv6_m_wait_for_interrupt, %function
-	.global sif_arch_armv6_m_wait_for_interrupt
-sif_arch_armv6_m_wait_for_interrupt:
+	.type   sif_arch_armv6s_m_wait_for_interrupt, %function
+	.global sif_arch_armv6s_m_wait_for_interrupt
+sif_arch_armv6s_m_wait_for_interrupt:
 	wfi
 	bx  lr

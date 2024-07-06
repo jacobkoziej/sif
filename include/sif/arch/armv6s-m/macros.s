@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 /*
- * macros.s -- armv6-m macros
+ * macros.s -- armv6s-m macros
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 

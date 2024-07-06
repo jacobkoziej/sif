@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 /*
- * registers.s -- armv6-m registers
+ * registers.s -- armv6s-m registers
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 

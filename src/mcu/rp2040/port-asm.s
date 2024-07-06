@@ -23,7 +23,7 @@ sif_mcu_rp2040_get_coreid:
 sif_mcu_rp2040_init:
 	push  {lr}
 	cpsid i
-	bl    sif_arch_armv6_m_init
+	bl    sif_arch_armv6s_m_init
 	cpsie i
 	pop   {pc}
 
@@ -56,7 +56,7 @@ sif_mcu_rp2040_kernel_unlock:
 	.type   sif_mcu_rp2040_scheduler_start, %function
 	.global sif_mcu_rp2040_scheduler_start
 sif_mcu_rp2040_scheduler_start:
-	b sif_arch_armv6_m_scheduler_start
+	b sif_arch_armv6s_m_scheduler_start
 
 	.type   sif_mcu_rp2040_test_and_set, %function
 	.global sif_mcu_rp2040_test_and_set

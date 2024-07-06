@@ -7,11 +7,11 @@
 #ifndef SIF_MARCH_RP2040_PORT_ASM_H
 #define SIF_MARCH_RP2040_PORT_ASM_H
 
-#include <sif/arch/armv6-m/types.h>
+#include <sif/arch/armv6s-m/types.h>
 #include <sif/task.h>
 
-typedef sif_arch_armv6_m_word_t sif_port_word_t;
-typedef sif_port_word_t		sif_port_atomic_t;
+typedef sif_arch_armv6s_m_word_t sif_port_word_t;
+typedef sif_port_word_t		 sif_port_atomic_t;
 
 sif_port_word_t	  sif_mcu_rp2040_get_coreid(void);
 void		  sif_mcu_rp2040_init(void);
