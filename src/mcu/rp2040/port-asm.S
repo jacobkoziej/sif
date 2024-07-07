@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MPL-2.0
 /*
- * port-asm.s -- rp2040 port
+ * port-asm.S -- rp2040 port
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
 	.arch armv6s-m
 	.cpu  cortex-m0plus
 
-	.include "sif/mcu/rp2040/registers.s"
+#include <sif/mcu/rp2040/registers.h>
 
 	.text
 
 	.type   sif_mcu_rp2040_get_coreid, %function
 	.global sif_mcu_rp2040_get_coreid
 sif_mcu_rp2040_get_coreid:
-	ldr r0, =COREID
+	ldr r0, =CPUID
 	ldr r0, [r0]
 	bx  lr
 

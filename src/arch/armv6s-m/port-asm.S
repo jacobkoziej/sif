@@ -1,13 +1,56 @@
 // SPDX-License-Identifier: MPL-2.0
 /*
- * port-asm.s -- armv6s-m port
+ * port-asm.S -- armv6s-m port
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
 	.arch armv6s-m
 
-	.include "sif/arch/armv6s-m/macros.s"
-	.include "sif/arch/armv6s-m/registers.s"
+#include <sif/arch/armv6s-m/registers.h>
+
+#define CONTEXT_OFFSET   0x20
+#define EXCEPTION_OFFSET 0x20
+#define LR_OFFSET        0x14
+#define PC_OFFSET        0x18
+#define R0_OFFSET        0x00
+#define R1_OFFSET        0x04
+#define XPSR_OFFSET      0x1c
+
+	.macro RESTORE_CONTEXT sp
+	ldm \sp!, {r4-r7}
+	mov r8,   r4
+	mov r9,   r5
+	mov r10,  r6
+	mov r11,  r7
+	ldm \sp!, {r4-r7}
+	msr psp,  \sp
+	.endm
+
+	.macro SAVE_CONTEXT sp
+	mrs \sp, psp
+
+	// save registers r4-r7
+	sub   \sp,  \sp, #(CONTEXT_OFFSET - 16)
+	stmia \sp!, {r4-r7}
+
+	// save registers r8-r11
+	mov r4,   r8
+	mov r5,   r9
+	mov r6,   r10
+	mov r7,   r11
+	sub \sp,  \sp, #CONTEXT_OFFSET
+	stm \sp!, {r4-r7}
+
+	// ensure \sp is at CONTEXT_OFFSET
+	sub \sp, \sp, #(CONTEXT_OFFSET - 16)
+	.endm
+
+	.macro SETUP_EXCEPTION_HANDLER vector_table, exception, handler
+	mov r1, #(\exception * 4)
+	add r1, r1, \vector_table
+	ldr r0, =\handler
+	str r0, [r1]
+	.endm
 
 	.text
 
@@ -215,7 +258,7 @@ sif_arch_armv6s_m_setup_pendsv:
 	.type sif_arch_armv6s_m_setup_svcall, %function
 sif_arch_armv6s_m_setup_svcall:
 	// set svcall priority
-	ldr r1, =SIF_ARCH_ARMV6_M_KERNEL_PRIORITY
+	ldr r1, =SIF_ARCH_ARMV6S_M_KERNEL_PRIORITY
 	ldr r1, [r1]
 	lsl r1, r1, #SHPR2_PRI_11
 	ldr r0, =SHPR2
@@ -229,7 +272,7 @@ sif_arch_armv6s_m_setup_svcall:
 sif_arch_armv6s_m_setup_systick:
 	// program our reload value
 	ldr r0, =SYST_RVR
-	ldr r1, =SIF_ARCH_ARMV6_M_SYST_RVR_RELOAD
+	ldr r1, =SIF_ARCH_ARMV6S_M_SYST_RVR_RELOAD
 	ldr r1, [r1]
 	str r1, [r0]
 
@@ -243,7 +286,7 @@ sif_arch_armv6s_m_setup_systick:
 	str r1, [r0]
 
 	// set systick priority
-	ldr r1, =SIF_ARCH_ARMV6_M_KERNEL_PRIORITY
+	ldr r1, =SIF_ARCH_ARMV6S_M_KERNEL_PRIORITY
 	ldr r1, [r1]
 	lsl r1, r1, #SHPR3_PRI_15
 	ldr r0, =SHPR3

@@ -4,8 +4,8 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
-#ifndef SIF_MARCH_RP2040_PORT_CONFIG_H
-#define SIF_MARCH_RP2040_PORT_CONFIG_H
+#ifndef SIF_MCU_RP2040_PORT_CONFIG_H
+#define SIF_MCU_RP2040_PORT_CONFIG_H
 
 #define SIF_CONFIG_CORES 2
 
@@ -25,4 +25,4 @@
 
 #define SIF_CONFIG_SYSTICK_HZ 100
 
-#endif	// SIF_MARCH_RP2040_PORT_CONFIG_H
+#endif	// SIF_MCU_RP2040_PORT_CONFIG_H

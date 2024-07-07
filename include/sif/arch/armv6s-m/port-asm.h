@@ -4,8 +4,8 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
-#ifndef SIF_ARCH_ARMV6_M_PORT_ASM_H
-#define SIF_ARCH_ARMV6_M_PORT_ASM_H
+#ifndef SIF_ARCH_ARMV6S_M_PORT_ASM_H
+#define SIF_ARCH_ARMV6S_M_PORT_ASM_H
 
 #include <sif/arch/armv6s-m/types.h>
 #include <sif/syscall.h>
@@ -25,4 +25,4 @@ sif_arch_armv6s_m_word_t sif_arch_armv6s_m_systick_count_flag(void);
 sif_arch_armv6s_m_word_t sif_arch_armv6s_m_systick_current_value(void);
 void			 sif_arch_armv6s_m_wait_for_interrupt(void);
 
-#endif	// SIF_ARCH_ARMV6_M_PORT_ASM_H
+#endif	// SIF_ARCH_ARMV6S_M_PORT_ASM_H

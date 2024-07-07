@@ -11,7 +11,7 @@ arch = [
     env.File(src)
     for src in [
         'port.c',
-        'port-asm.s',
+        'port-asm.S',
     ]
 ]
 

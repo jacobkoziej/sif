@@ -11,7 +11,7 @@
 #include <sif/mcu/rp2040/port.h>
 
 const sif_port_word_t * const SIF_PORT_SYSTICK_RELOAD
-	= &SIF_ARCH_ARMV6_M_SYST_RVR_RELOAD;
+	= &SIF_ARCH_ARMV6S_M_SYST_RVR_RELOAD;
 
 sif_port_atomic_t (* const sif_port_atomic_test_and_set)(
 	sif_port_atomic_t *var)
