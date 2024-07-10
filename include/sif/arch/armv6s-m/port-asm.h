@@ -11,6 +11,9 @@
 #include <sif/syscall.h>
 #include <sif/task.h>
 
+void		  sif_arch_armv6s_m_handler_pendsv(void);
+void		  sif_arch_armv6s_m_handler_svcall(sif_syscall_t syscall);
+void		  sif_arch_armv6s_m_handler_systick(void);
 void		  sif_arch_armv6s_m_init(void);
 sif_task_stack_t *sif_arch_armv6s_m_init_context(
 	sif_task_stack_t *stack, sif_task_function_t func, void *arg);

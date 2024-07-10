@@ -11,12 +11,16 @@
 
 	.text
 
+	.section .text.sif_mcu_rp2040_get_coreid, "ax", %progbits
+
 	.type   sif_mcu_rp2040_get_coreid, %function
 	.global sif_mcu_rp2040_get_coreid
 sif_mcu_rp2040_get_coreid:
 	ldr r0, =CPUID
 	ldr r0, [r0]
 	bx  lr
+
+	.section .text.sif_mcu_rp2040_init, "ax", %progbits
 
 	.type   sif_mcu_rp2040_init, %function
 	.global sif_mcu_rp2040_init
@@ -26,6 +30,8 @@ sif_mcu_rp2040_init:
 	bl    sif_arch_armv6s_m_init
 	cpsie i
 	pop   {pc}
+
+	.section .text.sif_mcu_rp2040_kernel_lock, "ax", %progbits
 
 	.type   sif_mcu_rp2040_kernel_lock, %function
 	.global sif_mcu_rp2040_kernel_lock
@@ -41,6 +47,8 @@ sif_mcu_rp2040_kernel_lock:
 
 	bx lr
 
+	.section .text.sif_mcu_rp2040_kernel_unlock, "ax", %progbits
+
 	.type   sif_mcu_rp2040_kernel_unlock, %function
 	.global sif_mcu_rp2040_kernel_unlock
 sif_mcu_rp2040_kernel_unlock:
@@ -53,10 +61,14 @@ sif_mcu_rp2040_kernel_unlock:
 
 	bx lr
 
+	.section .text.sif_mcu_rp2040_scheduler_start, "ax", %progbits
+
 	.type   sif_mcu_rp2040_scheduler_start, %function
 	.global sif_mcu_rp2040_scheduler_start
 sif_mcu_rp2040_scheduler_start:
-	b sif_arch_armv6s_m_scheduler_start
+	bl sif_arch_armv6s_m_scheduler_start
+
+	.section .text.sif_mcu_rp2040_test_and_set, "ax", %progbits
 
 	.type   sif_mcu_rp2040_test_and_set, %function
 	.global sif_mcu_rp2040_test_and_set

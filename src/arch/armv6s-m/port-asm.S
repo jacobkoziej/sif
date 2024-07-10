@@ -54,42 +54,10 @@
 
 	.text
 
-	.type   sif_arch_armv6s_m_init, %function
-	.global sif_arch_armv6s_m_init
-sif_arch_armv6s_m_init:
-	b sif_arch_armv6s_m_setup_nvic
+	.section .text.sif_arch_armv6s_m_handler_pendsv, "ax", %progbits
 
-	.type   sif_arch_armv6s_m_init_context, %function
-	.global sif_arch_armv6s_m_init_context
-sif_arch_armv6s_m_init_context:
-	sub r0, r0, #EXCEPTION_OFFSET
-
-	str r1, [r0, #PC_OFFSET]
-	str r2, [r0, #R0_OFFSET]
-
-	ldr r1, =sif_task_delete
-	str r1, [r0, #LR_OFFSET]
-
-	ldr r1, =(1 << EPSR_T)
-	str r1, [r0, #XPSR_OFFSET]
-
-	sub r0, r0, #CONTEXT_OFFSET
-
-	bx lr
-
-	.type   sif_arch_armv6s_m_interrupt_disable, %function
-	.global sif_arch_armv6s_m_interrupt_disable
-sif_arch_armv6s_m_interrupt_disable:
-	cpsid i
-	bx lr
-
-	.type   sif_arch_armv6s_m_interrupt_enable, %function
-	.global sif_arch_armv6s_m_interrupt_enable
-sif_arch_armv6s_m_interrupt_enable:
-	cpsie i
-	bx lr
-
-	.type sif_arch_armv6s_m_handler_pendsv, %function
+	.type   sif_arch_armv6s_m_handler_pendsv, %function
+	.global sif_arch_armv6s_m_handler_pendsv
 sif_arch_armv6s_m_handler_pendsv:
 	push         {lr}
 	SAVE_CONTEXT r0
@@ -102,7 +70,10 @@ sif_arch_armv6s_m_handler_pendsv:
 	dsb
 	pop             {pc}
 
-	.type sif_arch_armv6s_m_handler_svcall, %function
+	.section .text.sif_arch_armv6s_m_handler_svcall, "ax", %progbits
+
+	.type   sif_arch_armv6s_m_handler_svcall, %function
+	.global sif_arch_armv6s_m_handler_svcall
 sif_arch_armv6s_m_handler_svcall:
 	push {r5,lr}
 
@@ -162,9 +133,59 @@ sif_arch_armv6s_m_handler_svcall:
 
 	pop {r5,pc}
 
-	.type sif_arch_armv6s_m_handler_systick, %function
+	.section .text.sif_arch_armv6s_m_handler_systick, "ax", %progbits
+
+	.type   sif_arch_armv6s_m_handler_systick, %function
+	.global sif_arch_armv6s_m_handler_systick
 sif_arch_armv6s_m_handler_systick:
-	b sif_systick
+	push {lr}
+	bl   sif_systick
+	pop  {pc}
+
+	.section .text.sif_arch_armv6s_m_init, "ax", %progbits
+
+	.type   sif_arch_armv6s_m_init, %function
+	.global sif_arch_armv6s_m_init
+sif_arch_armv6s_m_init:
+	b sif_arch_armv6s_m_setup_nvic
+
+	.section .text.sif_arch_armv6s_m_init_context, "ax", %progbits
+
+	.type   sif_arch_armv6s_m_init_context, %function
+	.global sif_arch_armv6s_m_init_context
+sif_arch_armv6s_m_init_context:
+	sub r0, r0, #EXCEPTION_OFFSET
+
+	str r1, [r0, #PC_OFFSET]
+	str r2, [r0, #R0_OFFSET]
+
+	ldr r1, =sif_task_delete
+	str r1, [r0, #LR_OFFSET]
+
+	ldr r1, =(1 << EPSR_T)
+	str r1, [r0, #XPSR_OFFSET]
+
+	sub r0, r0, #CONTEXT_OFFSET
+
+	bx lr
+
+	.section .text.sif_arch_armv6s_m_interrupt_disable, "ax", %progbits
+
+	.type   sif_arch_armv6s_m_interrupt_disable, %function
+	.global sif_arch_armv6s_m_interrupt_disable
+sif_arch_armv6s_m_interrupt_disable:
+	cpsid i
+	bx lr
+
+	.section .text.sif_arch_armv6s_m_interrupt_enable, "ax", %progbits
+
+	.type   sif_arch_armv6s_m_interrupt_enable, %function
+	.global sif_arch_armv6s_m_interrupt_enable
+sif_arch_armv6s_m_interrupt_enable:
+	cpsie i
+	bx lr
+
+	.section .text.sif_arch_armv6s_m_pendsv_set, "ax", %progbits
 
 	.type   sif_arch_armv6s_m_pendsv_set, %function
 	.global sif_arch_armv6s_m_pendsv_set
@@ -177,6 +198,8 @@ sif_arch_armv6s_m_pendsv_set:
 	dsb
 	isb
 	bx  lr
+
+	.section .text.sif_arch_armv6s_m_pendsv_clear, "ax", %progbits
 
 	.type   sif_arch_armv6s_m_pendsv_clear, %function
 	.global sif_arch_armv6s_m_pendsv_clear
@@ -191,6 +214,8 @@ sif_arch_armv6s_m_pendsv_clear:
 	dsb
 	isb
 	bx  lr
+
+	.section .text.sif_arch_armv6s_m_scheduler_start, "ax", %progbits
 
 	.type   sif_arch_armv6s_m_scheduler_start, %function
 	.global sif_arch_armv6s_m_scheduler_start
@@ -222,6 +247,8 @@ sif_arch_armv6s_m_scheduler_start:
 	cpsie i
 	bx    r3
 
+	.section .text.sif_arch_armv6s_m_init, "ax", %progbits
+
 	.type sif_arch_armv6s_m_setup_nvic, %function
 sif_arch_armv6s_m_setup_nvic:
 	push {lr}
@@ -244,6 +271,8 @@ sif_arch_armv6s_m_setup_nvic:
 
 	pop {pc}
 
+	.section .text.sif_arch_armv6s_m_init, "ax", %progbits
+
 	.type sif_arch_armv6s_m_setup_pendsv, %function
 sif_arch_armv6s_m_setup_pendsv:
 	// set pendsv to lowest priority
@@ -254,6 +283,8 @@ sif_arch_armv6s_m_setup_pendsv:
 	str r1, [r0]
 
 	bx lr
+
+	.section .text.sif_arch_armv6s_m_init, "ax", %progbits
 
 	.type sif_arch_armv6s_m_setup_svcall, %function
 sif_arch_armv6s_m_setup_svcall:
@@ -267,6 +298,8 @@ sif_arch_armv6s_m_setup_svcall:
 	str r1, [r0]
 
 	bx lr
+
+	.section .text.sif_arch_armv6s_m_init, "ax", %progbits
 
 	.type sif_arch_armv6s_m_setup_systick, %function
 sif_arch_armv6s_m_setup_systick:
@@ -296,11 +329,15 @@ sif_arch_armv6s_m_setup_systick:
 
 	bx lr
 
+	.section .text.sif_arch_armv6s_m_syscall, "ax", %progbits
+
 	.type   sif_arch_armv6s_m_syscall, %function
 	.global sif_arch_armv6s_m_syscall
 sif_arch_armv6s_m_syscall:
 	svc #0
 	bx  lr
+
+	.section .text.sif_arch_armv6s_m_systick_count_flag, "ax", %progbits
 
 	.type   sif_arch_armv6s_m_systick_count_flag, %function
 	.global sif_arch_armv6s_m_systick_count_flag
@@ -311,12 +348,16 @@ sif_arch_armv6s_m_systick_count_flag:
 	and r0, r0, r1
 	bx  lr
 
+	.section .text.sif_arch_armv6s_m_systick_current_value, "ax", %progbits
+
 	.type   sif_arch_armv6s_m_systick_current_value, %function
 	.global sif_arch_armv6s_m_systick_current_value
 sif_arch_armv6s_m_systick_current_value:
 	ldr r0, =SYST_CVR
 	ldr r0, [r0]
 	bx  lr
+
+	.section .text.sif_arch_armv6s_m_wait_for_interrupt, "ax", %progbits
 
 	.type   sif_arch_armv6s_m_wait_for_interrupt, %function
 	.global sif_arch_armv6s_m_wait_for_interrupt
