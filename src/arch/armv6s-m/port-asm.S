@@ -45,13 +45,6 @@
 	sub \sp, \sp, #(CONTEXT_OFFSET - 16)
 	.endm
 
-	.macro SETUP_EXCEPTION_HANDLER vector_table, exception, handler
-	mov r1, #(\exception * 4)
-	add r1, r1, \vector_table
-	ldr r0, =\handler
-	str r0, [r1]
-	.endm
-
 	.text
 
 	.section .text.sif_arch_armv6s_m_handler_pendsv, "ax", %progbits
@@ -260,10 +253,6 @@ sif_arch_armv6s_m_setup_nvic:
 	// load vector table
 	ldr r2, =VTOR
 	ldr r2, [r2]
-
-	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_PENDSV,  sif_arch_armv6s_m_handler_pendsv
-	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SVCALL,  sif_arch_armv6s_m_handler_svcall
-	SETUP_EXCEPTION_HANDLER r2, EXCEPTION_NUMBER_SYSTICK, sif_arch_armv6s_m_handler_systick
 
 	// ensure SCS registers are updated (B2.5)
 	dsb
