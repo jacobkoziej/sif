@@ -9,8 +9,10 @@
 
 #ifndef __ASSEMBLER__
 #include <sif/arch/armv6s-m/types.h>
+
+#define SIF_ARCH_ARMV6S_M_REGISTER(X) ((sif_arch_armv6s_m_register_t) (X))
 #else  // __ASSEMBLER__
-#define sif_arch_armv6s_m_register_t
+#define SIF_ARCH_ARMV6S_M_REGISTER(X) (X)
 #endif	// __ASSEMBLER__
 
 // B1.4.2
@@ -31,16 +33,16 @@
 #define EXEC_RETURN_THREAD_MODE_PSP 0xfffffffd
 
 // B3.2.2
-#define ACTLR (sif_arch_armv6s_m_register_t 0xe000e008)
-#define CPUID (sif_arch_armv6s_m_register_t 0xe000ed00)
-#define ICSR  (sif_arch_armv6s_m_register_t 0xe000ed04)
-#define VTOR  (sif_arch_armv6s_m_register_t 0xe000ed08)
-#define AIRCR (sif_arch_armv6s_m_register_t 0xe000ed0c)
-#define SCR   (sif_arch_armv6s_m_register_t 0xe000ed10)
-#define CCR   (sif_arch_armv6s_m_register_t 0xe000ed14)
-#define SHPR2 (sif_arch_armv6s_m_register_t 0xe000ed1c)
-#define SHPR3 (sif_arch_armv6s_m_register_t 0xe000ed20)
-#define DFSR  (sif_arch_armv6s_m_register_t 0xe000ed30)
+#define ACTLR SIF_ARCH_ARMV6S_M_REGISTER(0xe000e008)
+#define CPUID SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed00)
+#define ICSR  SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed04)
+#define VTOR  SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed08)
+#define AIRCR SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed0c)
+#define SCR   SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed10)
+#define CCR   SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed14)
+#define SHPR2 SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed1c)
+#define SHPR3 SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed20)
+#define DFSR  SIF_ARCH_ARMV6S_M_REGISTER(0xe000ed30)
 
 // B3.2.9
 #define SHPR2_PRI_11 30
@@ -50,10 +52,10 @@
 #define SHPR3_PRI_14 22
 
 // B3.3.2
-#define SYST_CSR   (sif_arch_armv6s_m_register_t 0xe000e010)
-#define SYST_RVR   (sif_arch_armv6s_m_register_t 0xe000e014)
-#define SYST_CVR   (sif_arch_armv6s_m_register_t 0xe000e018)
-#define SYST_CALIB (sif_arch_armv6s_m_register_t 0xe000e01c)
+#define SYST_CSR   SIF_ARCH_ARMV6S_M_REGISTER(0xe000e010)
+#define SYST_RVR   SIF_ARCH_ARMV6S_M_REGISTER(0xe000e014)
+#define SYST_CVR   SIF_ARCH_ARMV6S_M_REGISTER(0xe000e018)
+#define SYST_CALIB SIF_ARCH_ARMV6S_M_REGISTER(0xe000e01c)
 
 // B3.3.3
 #define SYST_CSR_COUNTFLAG 16
