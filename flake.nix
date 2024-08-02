@@ -21,7 +21,6 @@
         devShells.default = pkgs.mkShell {
           packages = [
             llvm.clang-unwrapped
-            pkgs.gcc-arm-embedded
             pkgs.nixpkgs-fmt
             python
           ];
