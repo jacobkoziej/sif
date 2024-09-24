@@ -17,6 +17,7 @@ SECTIONS {
 	} > flash
 
 	INCLUDE sections.ld
+	INCLUDE zero.ld
 }
 
 INCLUDE symbols.ld

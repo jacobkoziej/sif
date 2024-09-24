@@ -4,6 +4,8 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
+	.syntax unified
+
 	.arch armv6s-m
 	.cpu  cortex-m0plus
 
@@ -28,36 +30,51 @@ _start:
 	msr msp, r0
 
 #ifndef NO_FLASH
-	// load .data
-	ldr r1, =__data_load__
-	ldr r2, =__data_start__
-	ldr r3, =__data_end__
-	b   1f
+	ldr r4, =__copy_start__
+	ldr r5, =__copy_start__
+	b   .Lget_next_copy_section
 
-0:
-	ldm r1!, {r0}
-	stm r2!, {r0}
-1:
-	cmp r2, r3
-	blt 0b
+.Lprepare_next_copy_section:
+	ldm r4!, {r0-r2}
+	cmp r2,  #0
+	beq .Lget_next_copy_section
+
+.Lcopy_section:
+	ldm r1!, {r3}
+	stm r0!, {r3}
+
+	cmp r0, r2
+	bgt .Lcopy_section
+
+.Lget_next_copy_section:
+	cmp r4, r5
+	blt .Lprepare_next_copy_section
 #endif  // NO_FLASH
 
-	// zero .bss
-	mov r0, #0
-	ldr r1, =__bss_start__
-	ldr r2, =__bss_end__
-	b   1f
+	movs r2, #0
 
-0:
-	stm r1!, {r0}
-1:
-	cmp r1, r2
-	blt 0b
+	ldr r4, =__zero_start__
+	ldr r5, =__zero_start__
+	b   .Lget_next_zero_section
 
-	// jump to main
+.Lprepare_next_zero_section:
+	ldm r4!, {r0-r1}
+	cmp r1,  #0
+	beq .Lget_next_zero_section
+
+.Lzero_section:
+	stm r0!, {r2}
+
+	cmp r0, r1
+	bgt .Lzero_section
+
+.Lget_next_zero_section:
+	cmp r4, r5
+	blt .Lprepare_next_zero_section
+
 	ldr r0, =main
 	bx  r0
 
-1:
+.Lexit:
 	bkpt
-	b 1b
+	b .Lexit
