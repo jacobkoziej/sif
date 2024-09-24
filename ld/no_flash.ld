@@ -6,15 +6,16 @@
 
 INCLUDE memory.ld
 
-REGION_ALIAS("flash", SRAM)
-REGION_ALIAS("sram",  SRAM)
+REGION_ALIAS("flash_lma", SRAM)
+REGION_ALIAS("flash_vma", SRAM)
+REGION_ALIAS("sram",      SRAM)
 
 ENTRY(_start)
 
 SECTIONS {
-	.text._start (READONLY) : ALIGN(4) {
+	.text._start (READONLY) : ALIGN(word_align) {
 		KEEP(*(.text._start))
-	} > flash
+	} > flash_vma AT> flash_lma
 
 	INCLUDE sections.ld
 	INCLUDE zero.ld

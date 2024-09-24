@@ -4,31 +4,31 @@
  * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
  */
 
-.rodata._vectors (READONLY) : ALIGN(256) {
+.rodata._vectors (READONLY) : ALIGN(vector_align) {
 	KEEP(*(.rodata._vectors))
-} > flash
+} > flash_vma AT> flash_lma
 
-.text (READONLY) : ALIGN(4) {
+.text (READONLY) : ALIGN(word_align) {
 	*(.text)
 	*(.text.*)
-} > flash
+} > flash_vma AT> flash_lma
 
-.ARM.exidx (READONLY) : ALIGN(4) {
+.ARM.exidx (READONLY) : ALIGN(word_align) {
 	*(.ARM.exidx)
 	*(.ARM.exidx.*)
-} > flash
+} > flash_vma AT> flash_lma
 
-.rodata (READONLY) : ALIGN(4) {
+.rodata (READONLY) : ALIGN(word_align) {
 	*(.rodata)
 	*(.rodata.*)
-} > flash
+} > flash_vma AT> flash_lma
 
-.data : ALIGN(4) {
+.data : ALIGN(word_align) {
 	*(.data)
 	*(.data.*)
-} > sram AT> flash
+} > sram AT> flash_lma
 
-.bss (NOLOAD) : ALIGN(4) {
+.bss (NOLOAD) : ALIGN(word_align) {
 	*(.bss)
 	*(.bss.*)
 } > sram

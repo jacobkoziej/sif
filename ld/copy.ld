@@ -8,7 +8,7 @@
 	LONG(ADDR(.data))
 	LONG(LOADADDR(.data))
 	LONG(SIZEOF(.data))
-} > flash
+} > flash_vma AT> flash_lma
 
 __copy_start__ = ADDR(.copy);
 __copy_end__   = __copy_start__ + SIZEOF(.copy);

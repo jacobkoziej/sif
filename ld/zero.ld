@@ -7,7 +7,7 @@
 .zero : ALIGN(word_align) {
 	LONG(ADDR(.bss))
 	LONG(SIZEOF(.bss))
-} > flash
+} > flash_vma AT> flash_lma
 
 __zero_start__ = ADDR(.zero);
 __zero_end__   = __zero_start__ + SIZEOF(.zero);

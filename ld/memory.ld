@@ -11,3 +11,6 @@ MEMORY {
 	SRAM4 (RWX) : ORIGIN = 0x20040000, LENGTH = 4K
 	SRAM5 (RWX) : ORIGIN = 0x20041000, LENGTH = 4K
 }
+
+HIDDEN(vector_align = 256);
+HIDDEN(word_align   = 4);
