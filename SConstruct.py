@@ -68,6 +68,7 @@ env = Environment(
     LICENSE="MPL-2.0",
     tools=[
         "default",
+        "Stage2Crc32",
         "github.jacobkoziej.scons-tools.Binutils.ObjCopy",
     ],
     variables=vars,
@@ -138,6 +139,7 @@ if not env["verbose_output"]:
         LINKCOMSTR="ld $TARGET",
         OBJCOPYCOMSTR="objcopy $TARGET",
         RANLIBCOMSTR="ranlib $TARGET",
+        STAGE2CRC32COMSTR="crc32 $TARGET",
     )
 
 build = f"build/{env['build_type']}"
