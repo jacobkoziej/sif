@@ -1,0 +1,3 @@
+[submodule "site_scons/site_tools/github/jacobkoziej/scons-tools"]
+	path = site_scons/site_tools/github/jacobkoziej/scons-tools
+	url  = ../scons-tools.git
