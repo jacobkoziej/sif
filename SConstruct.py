@@ -66,6 +66,10 @@ env = Environment(
         "TERM": os.environ.get("TERM"),
     },
     LICENSE="MPL-2.0",
+    tools=[
+        "default",
+        "github.jacobkoziej.scons-tools.Binutils.ObjCopy",
+    ],
     variables=vars,
 )
 env.Replace(
@@ -74,6 +78,7 @@ env.Replace(
     CC="arm-none-eabi-gcc",
     CXX="arm-none-eabi-g++",
     LINK="arm-none-eabi-gcc",
+    OBJCOPY="arm-none-eabi-objcopy",
     RANLIB="arm-none-eabi-gcc-ranlib",
     PROGSUFFIX=".elf",
 )
@@ -131,6 +136,7 @@ if not env["verbose_output"]:
         CCCOMSTR="cc $TARGET",
         CXXCOMSTR="c++ $TARGET",
         LINKCOMSTR="ld $TARGET",
+        OBJCOPYCOMSTR="objcopy $TARGET",
         RANLIBCOMSTR="ranlib $TARGET",
     )
 
