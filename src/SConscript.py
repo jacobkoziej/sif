@@ -5,14 +5,14 @@
 
 # ruff: noqa: F821
 
-Import('env')
+Import("env")
 
 rp2040 = env.StaticLibrary(
-    target='rp2040',
+    target="rp2040",
     source=[
-        'crt0.S',
-        'vectors.S',
+        "crt0.S",
+        "vectors.S",
     ],
 )
 
-Return('rp2040')
+Return("rp2040")
