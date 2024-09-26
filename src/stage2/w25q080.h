@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: MPL-2.0
+/*
+ * w25q080.h -- W25Q80 registers
+ * Copyright (C) 2024  Jacob Koziej <jacobkoziej@gmail.com>
+ */
+
+#ifndef STAGE2_W25Q80
+#define STAGE2_W25Q80
+
+#define W25Q80_WRITE_ENABLE           0x06
+#define W25Q80_WRITE_STATUS_REGISTER  0x01
+#define W25Q80_READ_STATUS_REGISTER_1 0x05
+#define W25Q80_READ_STATUS_REGISTER_2 0x35
+#define W25Q80_FAST_READ_QUAD_IO      0xeb
+
+#define W25Q80_READ_STATUS_REGISTER_1_BUSY_SHIFT 0
+
+#define W25Q80_READ_STATUS_REGISTER_2_QE_SHIFT 2
+
+#define W25Q80_FAST_READ_QUAD_IO_CONTINUOUS_READ_MODE 0xef
+
+#endif // STAGE2_W25Q80
