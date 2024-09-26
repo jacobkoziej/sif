@@ -8,6 +8,9 @@ INCLUDE memory.ld
 
 HIDDEN(flash_length = stage2_length);
 
+HIDDEN(sram5_origin = 0x20041f00);
+HIDDEN(sram5_length = stage2_length);
+
 REGION_ALIAS("flash_vma", SRAM5)
 REGION_ALIAS("flash_lma", FLASH)
 REGION_ALIAS("sram",      SRAM5)
