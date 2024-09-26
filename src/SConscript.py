@@ -7,6 +7,13 @@
 
 Import("env")
 
+stage2 = SConscript(
+    "stage2/SConscript.py",
+    exports=[
+        "env",
+    ],
+)
+
 rp2040 = env.StaticLibrary(
     target="rp2040",
     source=[

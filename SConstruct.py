@@ -47,6 +47,12 @@ vars.AddVariables(
         default="no_flash",
         allowed_values=("no_flash",),
     ),
+    EnumVariable(
+        "stage2",
+        help="stage2 selection",
+        default="w25q080",
+        allowed_values=("w25q080",),
+    ),
     BoolVariable(
         "verbose_output",
         help="enable verbose output",
