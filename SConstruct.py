@@ -44,8 +44,8 @@ vars.AddVariables(
     EnumVariable(
         "linker_script",
         help="linker script",
-        default="no_flash",
-        allowed_values=("no_flash",),
+        default="default",
+        allowed_values=("default", "no_flash"),
     ),
     EnumVariable(
         "stage2",
