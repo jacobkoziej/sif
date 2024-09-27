@@ -82,8 +82,7 @@ def main():
 
 
 def rbit(x: int, width: int) -> int:
-    y = int(f"{x:0{width}b}"[::-1], 2)
-    return y
+    return int(f"{x:0{width}b}"[::-1], 2)
 
 
 if __name__ == "__main__":
