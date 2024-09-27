@@ -7,11 +7,15 @@
 
 Import("env")
 
-stage2 = SConscript(
-    "stage2/SConscript.py",
-    exports=[
-        "env",
-    ],
+stage2 = (
+    SConscript(
+        "stage2/SConscript.py",
+        exports=[
+            "env",
+        ],
+    )
+    if env["linker_script"] != "no_flash"
+    else None
 )
 
 rp2040 = env.StaticLibrary(
@@ -21,5 +25,8 @@ rp2040 = env.StaticLibrary(
         "vectors.S",
     ],
 )
+
+if stage2:
+    rp2040 += stage2
 
 Return("rp2040")
