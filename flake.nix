@@ -1,30 +1,29 @@
+# SPDX-License-Identifier: MPL-2.0
+
 {
-  description = "sif";
+  description = "a preemptive rtos";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    inputs:
+
+    inputs.flake-utils.lib.eachDefaultSystem (
+      system:
+
       let
-        pkgs = import nixpkgs {
+        pkgs = import inputs.nixpkgs {
           inherit system;
         };
 
-        llvm = pkgs.llvmPackages_latest;
-        python = pkgs.python312;
-
       in
       {
-        devShells.default = pkgs.mkShell {
-          packages = [
-            llvm.clang-unwrapped
-            pkgs.nixpkgs-fmt
-            python
-          ];
-        };
+        devShells.default = pkgs.mkShellNoCC { };
+
+        formatter = pkgs.nixfmt-rfc-style;
       }
     );
 }

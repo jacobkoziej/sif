@@ -1,6 +1,0 @@
-*.egg-info
-.direnv
-.ruff_cache
-.venv
-__pycache__
-demo

@@ -4,7 +4,7 @@
 
 ## Copyright & Licensing
 
-Copyright (C) 2024 Jacob Koziej [`<jacobkoziej@gmail.com>`]
+Copyright (C) 2024--2025 Jacob Koziej [`<jacobkoziej@gmail.com>`]
 
 Distributed under the [MPL 2.0].
 
