@@ -19,9 +19,32 @@
           inherit system;
         };
 
+        inherit (pkgs) lib;
+
       in
       {
-        devShells.default = pkgs.mkShellNoCC { };
+        devShells.default = pkgs.mkShellNoCC (
+          let
+            pre-commit-bin = "${lib.getBin pkgs.pre-commit}/bin/pre-commit";
+
+          in
+          {
+            packages = with pkgs; [
+              black
+              commitlint-rs
+              mdformat
+              pre-commit
+              toml-sort
+              treefmt
+              yamlfmt
+              yamllint
+            ];
+
+            shellHook = ''
+              ${pre-commit-bin} install --allow-missing-config > /dev/null
+            '';
+          }
+        );
 
         formatter = pkgs.nixfmt-rfc-style;
       }

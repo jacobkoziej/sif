@@ -1,0 +1,39 @@
+[formatter.mdformat]
+command = "mdformat"
+includes = [
+  "*.md",
+]
+
+[formatter.nix]
+command = "nix"
+options = [
+  "fmt",
+]
+includes = [
+  "*.nix",
+]
+
+[formatter.toml-sort]
+command = "toml-sort"
+includes = [
+  "*.toml",
+]
+
+[formatter.yamlfmt]
+command = "yamlfmt"
+includes = [
+  "*.yaml",
+]
+
+[formatter.yamllint]
+command = "yamllint"
+includes = [
+  "*.yaml",
+]
+
+[global]
+excludes = [
+  "*.lock",
+  ".editorconfig",
+  "LICENSE",
+]

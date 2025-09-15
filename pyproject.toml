@@ -1,0 +1,3 @@
+[tool.tomlsort]
+in_place = true
+trailing_comma_inline_array = true
