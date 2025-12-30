@@ -17,7 +17,7 @@
       ];
 
       imports = [
-        ./nix/dev-shells.nix
+        ./nix
       ];
 
       perSystem =
