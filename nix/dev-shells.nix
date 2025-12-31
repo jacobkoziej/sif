@@ -15,6 +15,7 @@
         {
           packages = with pkgs; [
             black
+            buck2
             commitlint-rs
             mdformat
             pre-commit
