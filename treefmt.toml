@@ -9,6 +9,21 @@ includes = [
   "PACKAGE",
 ]
 
+[formatter.buck2-starlark-lint]
+command = "buck2"
+options = [
+  "starlark",
+  "lint",
+  "--no-interactive-console",
+]
+includes = [
+  "**/BUCK",
+  "**/PACKAGE",
+  "*.bzl",
+  "BUCK",
+  "PACKAGE",
+]
+
 [formatter.mdformat]
 command = "mdformat"
 includes = [
