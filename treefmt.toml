@@ -1,3 +1,14 @@
+[formatter.black]
+command = "black"
+includes = [
+  "**/BUCK",
+  "**/PACKAGE",
+  "*.bzl",
+  "*.py",
+  "BUCK",
+  "PACKAGE",
+]
+
 [formatter.mdformat]
 command = "mdformat"
 includes = [
