@@ -24,6 +24,21 @@ includes = [
   "PACKAGE",
 ]
 
+[formatter.buck2-starlark-typecheck]
+command = "buck2"
+options = [
+  "starlark",
+  "typecheck",
+  "--no-interactive-console",
+]
+includes = [
+  "**/BUCK",
+  "**/PACKAGE",
+  "*.bzl",
+  "BUCK",
+  "PACKAGE",
+]
+
 [formatter.mdformat]
 command = "mdformat"
 includes = [
