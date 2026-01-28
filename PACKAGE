@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//cfg:modifiers.bzl", "gather_modifiers", "apply_modifiers")
+
+set_cfg_constructor(
+    stage0=gather_modifiers,
+    stage1=apply_modifiers,
+    key="buck.cfg_modifiers",
+    aliases={},
+)

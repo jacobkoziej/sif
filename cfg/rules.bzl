@@ -33,3 +33,15 @@ cfg = rule(
     },
     is_configuration_rule=True,
 )
+
+
+def is_subset(a: ConfigurationInfo, b: ConfigurationInfo) -> bool:
+    for a_constraint_value in a.constraints.values():
+        setting_info = a_constraint_value.setting
+
+        b_constraint_value = b.get(setting_info)
+
+        if a_constraint_value != b_constraint_value:
+            return False
+
+    return True
