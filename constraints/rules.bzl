@@ -19,7 +19,11 @@ def _constraint_impl(ctx: AnalysisContext) -> list[Provider]:
         if reserved_value in values:
             fail("`{}` is a reserved constraint() value".format(reserved_value))
 
-    values.add("none")
+    if ctx.attrs.nullable:
+        values.add("none")
+
+    elif ctx.attrs.default == None:
+        fail("default value must be specified for non-nullable constraint() value")
 
     default = ctx.attrs.default or "none"
     if default not in values:
@@ -62,6 +66,7 @@ constraint = rule(
     impl=_constraint_impl,
     attrs={
         "values": attrs.list(attrs.string(), default=[]),
+        "nullable": attrs.bool(default=True),
         "default": attrs.option(attrs.string(), default=None),
     },
     is_configuration_rule=True,
