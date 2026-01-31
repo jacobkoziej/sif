@@ -3,3 +3,6 @@ root = .
 
 [project]
 ignore = .git
+
+[build]
+execution_platforms = //execution-platforms:default
