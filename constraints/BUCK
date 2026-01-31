@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//constraints:rules.bzl", "constraint")
+
+constraint(
+    name="arch",
+    values=[
+        "x86_64",
+        "unknown",
+    ],
+    default="unknown",
+    visibility=["PUBLIC"],
+)
+
+constraint(
+    name="os",
+    values=[
+        "linux",
+        "sif",
+    ],
+    visibility=["PUBLIC"],
+)
