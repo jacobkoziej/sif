@@ -7,7 +7,11 @@
 # <https://github.com/facebook/buck2-prelude/tree/8c031a1936f91633c0321e8c3c894e35c9066b9b/cfg/modifier>
 
 load("//cfg/rules.bzl", "is_subset")
-load("//utils/graph.bzl", "fill_empty_edges", "post_order_traversal")
+load(
+    "//utils/graph.bzl",
+    "fill_empty_edges",
+    "post_order_traversal",
+)
 
 Constraints = dict[TargetLabel, ConstraintValueInfo]
 Refs = dict[str, ProviderCollection]

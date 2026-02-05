@@ -1,6 +1,10 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//cfg:modifiers.bzl", "gather_modifiers", "apply_modifiers")
+load(
+    "//cfg:modifiers.bzl",
+    "apply_modifiers",
+    "gather_modifiers",
+)
 
 set_cfg_constructor(
     stage0=gather_modifiers,
