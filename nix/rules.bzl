@@ -2,6 +2,9 @@
 #
 # rules.bzl -- nix rules
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
+#
+# Inspired by the original work of Mercury Technologies and Tweag.
+# <https://github.com/tweag/buck2.nix/blob/038b031b84846101030b9d081445003e82e3be5c/flake.bzl>
 
 _common_attrs: dict[str, Attr] = {
     "flake": attrs.string(),
