@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//tools/rules.bzl", "binary")
+
+llvmPackages = "llvmPackages_latest"
+
+binary(
+    name="lld",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "lld"],
+    visibility=["PUBLIC"],
+)
