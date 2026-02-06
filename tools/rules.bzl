@@ -30,7 +30,7 @@ def binary(
     name: str,
     binary: str | None = None,
     set_system: bool = True,
-    **kwargs,
+    **kwargs: dict[str, typing.Any],
 ) -> None:
     path = read_config(package_name(), name, None)
 
