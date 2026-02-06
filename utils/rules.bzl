@@ -20,10 +20,10 @@ def export_path(
     path: str,
     *,
     name: str | None = None,
-    visibility: list[str] | None,
+    **kwargs: dict[str, typing.Any],
 ) -> None:
     _export_path(
         name=name or path,
         path=path,
-        visibility=visibility,
+        **kwargs,
     )
