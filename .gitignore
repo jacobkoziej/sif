@@ -1,2 +1,3 @@
+/.buckconfig.local
 /.direnv
 /buck-out
