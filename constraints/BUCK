@@ -9,7 +9,6 @@ constraint(
         "unknown",
     ],
     default="unknown",
-    visibility=["PUBLIC"],
 )
 
 constraint(
@@ -18,5 +17,4 @@ constraint(
         "linux",
         "sif",
     ],
-    visibility=["PUBLIC"],
 )

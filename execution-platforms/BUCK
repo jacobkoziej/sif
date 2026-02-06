@@ -11,7 +11,6 @@ execution_platform(
     name="localhost",
     constraints=get_host_constraints(),
     execution="local",
-    visibility=["PUBLIC"],
 )
 
 execution_platforms(
@@ -19,5 +18,4 @@ execution_platforms(
     platforms=[
         ":localhost",
     ],
-    visibility=["PUBLIC"],
 )
