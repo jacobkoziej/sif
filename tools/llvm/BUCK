@@ -10,3 +10,11 @@ binary(
     derivation=["legacyPackages", llvmPackages, "lld"],
     visibility=["PUBLIC"],
 )
+
+binary(
+    name="mc",
+    binary="llvm-mc",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+    visibility=["PUBLIC"],
+)
