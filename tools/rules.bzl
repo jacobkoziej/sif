@@ -6,7 +6,7 @@
 load("//nix/rules.bzl", "derivation_output_path")
 
 
-def _binary_path_impl(ctx: AnalysisContext) -> list[Provider]:
+def _tool_path_impl(ctx: AnalysisContext) -> list[Provider]:
     path = ctx.attrs.path
 
     return [
@@ -17,15 +17,15 @@ def _binary_path_impl(ctx: AnalysisContext) -> list[Provider]:
     ]
 
 
-binary_path = rule(
-    impl=_binary_path_impl,
+tool_path = rule(
+    impl=_tool_path_impl,
     attrs={
         "path": attrs.string(),
     },
 )
 
 
-def binary(
+def tool(
     *,
     name: str,
     binary: str | None = None,
@@ -35,7 +35,7 @@ def binary(
     path = read_config(package_name(), name, None)
 
     if path != None:
-        binary_path(name=name, path=path)
+        tool_path(name=name, path=path)
         return
 
     system = (
