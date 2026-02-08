@@ -1,5 +1,12 @@
 # SPDX-License-Identifier: MPL-2.0
 
+load("//execution-platforms:rules.bzl", "get_host_constraints")
+load("//cfg/modifiers.bzl", "set_cfg_modifiers")
+
 package(
     visibility=["PUBLIC"],
+)
+
+set_cfg_modifiers(
+    get_host_constraints(),
 )
