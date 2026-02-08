@@ -6,6 +6,11 @@ llvmPackages = "llvmPackages_latest"
 
 tool(
     name="lld",
+    binary=select(
+        {
+            "//constraints:os[linux]": "ld.lld",
+        }
+    ),
     flake="nixpkgs",
     derivation=["legacyPackages", llvmPackages, "lld"],
 )
