@@ -28,7 +28,7 @@ tool_path = rule(
 def tool(
     *,
     name: str,
-    binary: str | None = None,
+    binary: str | Select | None = None,
     set_system: bool = True,
     **kwargs: dict[str, typing.Any],
 ) -> None:
