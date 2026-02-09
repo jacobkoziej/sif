@@ -5,10 +5,18 @@ load("//constraints:rules.bzl", "constraint")
 constraint(
     name="arch",
     values=[
+        "arm",
         "x86_64",
         "unknown",
     ],
     default="unknown",
+)
+
+constraint(
+    name="cpu",
+    values=[
+        "cortex-m33",
+    ],
 )
 
 constraint(

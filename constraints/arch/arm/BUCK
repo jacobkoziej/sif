@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//constraints:rules.bzl", "constraint")
+
+constraint(
+    name="profile",
+    values=[
+        "m",
+    ],
+)
+
+constraint(
+    name="version",
+    values=[
+        "8",
+    ],
+)
