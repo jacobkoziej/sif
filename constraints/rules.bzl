@@ -71,3 +71,24 @@ constraint = rule(
     },
     is_configuration_rule=True,
 )
+
+
+def binary_constraint(
+    name: str,
+    *,
+    default: bool = False,
+    **kwargs: dict[str, typing.Any],
+) -> None:
+    for key in kwargs:
+        if key in ["values", "nullable"]:
+            fail("cannot pass `{}` to binary_constraint()".format(key))
+
+    constraint(
+        name=name,
+        values=[
+            "true",
+            "false",
+        ],
+        default="true" if default else "false",
+        **kwargs,
+    )
