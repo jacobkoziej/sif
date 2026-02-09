@@ -1,0 +1,14 @@
+---
+
+armv8m-rm:
+  type: reference
+  title: Armv8-M Architecture Reference Manual
+  date: 2024-08-09
+  publisher: Arm Limited
+  organization: Arm Limited
+  edition: ID09082024
+  page-total: 2149
+  url: https://developer.arm.com/documentation/ddi0553/by/
+  serial-number:
+    arm: DDI0553B.y
+  language: en-US
