@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//tools/rules.bzl", "tool")
+
+tool(
+    name="hayagriva",
+    flake="nixpkgs",
+    derivation=["legacyPackages", "hayagriva"],
+)
