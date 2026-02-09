@@ -1,5 +1,7 @@
 ---
 
+# yamllint disable rule:line-length
+
 armv8m-rm:
   type: reference
   title: Armv8-M Architecture Reference Manual
@@ -11,4 +13,17 @@ armv8m-rm:
   url: https://developer.arm.com/documentation/ddi0553/by/
   serial-number:
     arm: DDI0553B.y
+  language: en-US
+
+rpi-rp2350-datasheet:
+  type: reference
+  title: 'RP2350 Datasheet: A microcontroller by Raspberry Pi'
+  date: 2025-07-29
+  publisher: Raspberry Pi Limited
+  organization: Raspberry Pi Limited
+  edition: d126e9e-clean
+  page-total: 1380
+  url: https://pip-assets.raspberrypi.com/categories/1214-rp2350/documents/RP-008373-DS-2-rp2350-datasheet.pdf
+  serial-number:
+    rpi: RP-008373-DS-2
   language: en-US
