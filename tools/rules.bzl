@@ -41,11 +41,13 @@ def tool(
     system = (
         select(
             {
-                "//constraints:os[linux]": select(
-                    {
-                        "//constraints:arch[x86_64]": "x86_64-linux",
-                    }
-                ),
+                "//constraints:arch[x86_64]": "x86_64",
+            }
+        )
+        + "-"
+        + select(
+            {
+                "//constraints:os[linux]": "linux",
             }
         )
         if set_system
