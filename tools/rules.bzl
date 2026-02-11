@@ -41,6 +41,7 @@ def tool(
     system = (
         select(
             {
+                "//constraints:arch[aarch64]": "aarch64",
                 "//constraints:arch[x86_64]": "x86_64",
             }
         )

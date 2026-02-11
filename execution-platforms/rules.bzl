@@ -9,6 +9,9 @@ def get_host_constraints() -> list[str]:
 
     arch = host_info().arch
 
+    if arch.is_aarch64:
+        constraints += ["//constraints:arch[aarach64]"]
+
     if arch.is_x86_64:
         constraints += ["//constraints:arch[x86_64]"]
 
