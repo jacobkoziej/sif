@@ -24,6 +24,7 @@ constraint(
     name="os",
     values=[
         "linux",
+        "macos",
         "sif",
     ],
 )

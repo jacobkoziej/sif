@@ -49,6 +49,7 @@ def tool(
         + select(
             {
                 "//constraints:os[linux]": "linux",
+                "//constraints:os[macos]": "darwin",
             }
         )
         if set_system

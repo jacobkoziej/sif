@@ -20,6 +20,9 @@ def get_host_constraints() -> list[str]:
     if os.is_linux:
         constraints += ["//constraints:os[linux]"]
 
+    if os.is_macos:
+        constraints += ["//constraints:os[macos]"]
+
     return constraints
 
 
