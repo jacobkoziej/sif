@@ -20,5 +20,6 @@ constraint(
     name="version",
     values=[
         "8",
+        "8.1",
     ],
 )
