@@ -9,6 +9,7 @@ tool(
     binary=select(
         {
             "//constraints:os[linux]": "ld.lld",
+            "//constraints:os[macos]": "ld64.lld",
         }
     ),
     flake="nixpkgs",
