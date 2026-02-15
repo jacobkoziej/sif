@@ -10,6 +10,7 @@ cfg(
         "//constraints:arch[arm]",
         "//constraints:arch/arm:version[8]",
         "//constraints:arch/arm:profile[m]",
+        "//constraints:arch/arm:cpu[cortex-m33]",
         "//constraints:arch/arm/version/8/extension:debug[true]",
         "//constraints:arch/arm/version/8/extension:dsp[true]",
         "//constraints:arch/arm/version/8/extension:floating-point[true]",
