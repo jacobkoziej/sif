@@ -14,13 +14,6 @@ constraint(
 )
 
 constraint(
-    name="cpu",
-    values=[
-        "cortex-m33",
-    ],
-)
-
-constraint(
     name="os",
     values=[
         "linux",

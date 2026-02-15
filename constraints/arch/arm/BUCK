@@ -3,6 +3,13 @@
 load("//constraints:rules.bzl", "constraint")
 
 constraint(
+    name="cpu",
+    values=[
+        "cortex-m33",
+    ],
+)
+
+constraint(
     name="profile",
     values=[
         "m",
