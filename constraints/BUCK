@@ -21,3 +21,12 @@ constraint(
         "sif",
     ],
 )
+
+constraint(
+    name="toolchain",
+    values=[
+        "llvm",
+    ],
+    nullable=False,
+    default="llvm",
+)

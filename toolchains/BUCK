@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//toolchains:rules.bzl", "toolchain_alias")
+
+toolchain_alias(
+    name="as",
+    actual=select(
+        {
+            "//constraints:toolchain[llvm]": "//toolchains/as:llvm",
+        }
+    ),
+)
