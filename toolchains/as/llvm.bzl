@@ -3,6 +3,7 @@
 # llvm.bzl -- llvm-mc assembler toolchain
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
+load("//rules:object.bzl", "ObjectEmitterInfo")
 load("//toolchains/rules.bzl", "AsToolchainInfo")
 load(
     "//tools/llvm/flags.bzl",
@@ -17,12 +18,18 @@ def _llvm_impl(ctx: AnalysisContext) -> list[Provider]:
     cpu = "-mcpu=" + ctx.attrs.cpu
     attributes = "-mattr=" + ",".join(ctx.attrs.attributes)
 
+    as_toolchain_info = AsToolchainInfo(
+        name="llvm-mc",
+        path=ctx.attrs.path[RunInfo],
+        flags=[arch, cpu, attributes],
+    )
+
     return [
         DefaultInfo(),
-        AsToolchainInfo(
-            name="llvm-mc",
-            path=ctx.attrs.path[RunInfo],
-            flags=[arch, cpu, attributes],
+        as_toolchain_info,
+        ObjectEmitterInfo(
+            tool=as_toolchain_info.path,
+            flags=as_toolchain_info.flags + ["--filetype=obj"],
         ),
     ]
 
