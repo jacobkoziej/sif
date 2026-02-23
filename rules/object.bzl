@@ -19,6 +19,12 @@ ObjectEmitterInfo = provider(
     },
 )
 
+ObjectInfo = provider(
+    fields={
+        "object": provider_field(Artifact),
+    },
+)
+
 object_toolchains: dict[str, str] = {
     ".s": "//toolchains:as",
 }
@@ -127,6 +133,9 @@ def _object_impl(ctx: AnalysisContext) -> list[Provider]:
     return [
         DefaultInfo(
             default_output=out,
+        ),
+        ObjectInfo(
+            object=out,
         ),
     ]
 
