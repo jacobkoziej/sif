@@ -8,9 +8,8 @@ load("//rules/alias.bzl", "alias_impl")
 AsToolchainInfo = provider(
     fields={
         "name": provider_field(str),
-        "path": provider_field(RunInfo),
-        "flags": provider_field(list[str]),
-        "include_prefix": provider_field(str, default="-I"),
+        "object_flags": provider_field(list[str] | None, default=None),
+        "include_prefix": provider_field(str | None, default=None),
         "output_flag": provider_field(str, default="-o"),
     },
 )

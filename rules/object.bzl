@@ -8,16 +8,29 @@ load(
     "IncludeInfo",
     "IncludeTSet",
 )
-load("//utils:attrs.bzl", "attrs_to_dict")
+load("//toolchains:rules.bzl", "AsToolchainInfo")
+load("//utils:dict.bzl", "obj_to_dict")
 
-ObjectEmitterInfo = provider(
-    fields={
-        "tool": provider_field(RunInfo),
-        "flags": provider_field(list[str]),
-        "include_prefix": provider_field(str | None, default="-I"),
-        "output_flag": provider_field(str, default="-o"),
-    },
-)
+_object_providers: list[typing.Any] = [
+    AsToolchainInfo,
+]
+
+object_toolchains: dict[str, str] = {
+    ".s": "//toolchains:as",
+}
+
+_object_field_attrs: dict[str, Attr] = {
+    "object_flags": attrs.list(attrs.string()),
+    "include_prefix": attrs.option(attrs.string(), default=None),
+    "output_flag": attrs.string(),
+}
+
+_object_attrs: dict[str, Attr] = {
+    "src": attrs.source(),
+    "out": attrs.option(attrs.source(), default=None),
+    "flags": attrs.list(attrs.string(), default=[]),
+    "includes": attrs.list(attrs.dep(providers=[IncludeInfo]), default=[]),
+}
 
 ObjectInfo = provider(
     fields={
@@ -25,68 +38,35 @@ ObjectInfo = provider(
     },
 )
 
-object_toolchains: dict[str, str] = {
-    ".s": "//toolchains:as",
-}
-
-_object_attrs: dict[str, Attr] = {
-    "src": attrs.source(),
-    "out": attrs.option(attrs.source(), default=None),
-    "flags": attrs.list(attrs.string(), default=[]),
-    "deps": attrs.list(
-        attrs.one_of(
-            attrs.dep(providers=[IncludeInfo]),
-        ),
-        default=[],
-    ),
-}
-
 
 def _emit_object_impl(ctx: AnalysisContext) -> list[Provider]:
-    toolchain = ctx.attrs.toolchain
-
-    emitter = toolchain.get(ObjectEmitterInfo)
-
-    if emitter == None:
-        fail(
-            "toolchain `{}` does not provide `ObjectEmitterInfo`",
-            toolchain,
-        )
-
     src = ctx.attrs.src
     out = ctx.attrs.out
 
     extension = src.extension
 
     if out == None:
-        out = src.short_path.removesuffix(extension) + ".o"
+        out = src.basename.removesuffix(extension) + ".o"
 
     out = ctx.actions.declare_output(out)
 
-    include_paths = []
+    include_paths = [include[IncludeInfo].paths for include in ctx.attrs.includes]
 
-    for dep in ctx.attrs.deps:
-        if dep.get(IncludeInfo):
-            include_paths.append(dep[IncludeInfo].paths)
+    include_prefix = ctx.attrs.include_prefix
 
-    if len(include_paths) and not emitter.include_prefix:
-        fail(
-            "include paths specified but toolchain `{}` doesn't specify an include prefix".format(
-                toolchain.label
-            )
-        )
+    if len(include_paths) and not include_prefix:
+        fail("include paths specified but toolchain doesn't specify an include prefix")
 
     include_paths = ctx.actions.tset(IncludeTSet, children=include_paths)
-    include_flags = include_paths.project_as_args(
-        emitter.include_prefix, ordering="postorder"
-    )
+    include_flags = include_paths.project_as_args(include_prefix, ordering="postorder")
+
+    tool = ctx.attrs.toolchain[RunInfo].args
 
     cmd = cmd_args(
-        emitter.tool,
-        emitter.flags,
-        ctx.attrs.flags,
+        tool,
+        ctx.attrs.object_flags,
         include_flags,
-        emitter.output_flag,
+        ctx.attrs.output_flag,
         out.as_output(),
         src,
     )
@@ -103,8 +83,9 @@ def _emit_object_impl(ctx: AnalysisContext) -> list[Provider]:
 emit_object = anon_rule(
     impl=_emit_object_impl,
     attrs=_object_attrs
+    | _object_field_attrs
     | {
-        "toolchain": attrs.dep(),
+        "toolchain": attrs.dep(providers=[RunInfo]),
     },
     artifact_promise_mappings={
         "object": lambda x: x[DefaultInfo].default_outputs[0],
@@ -122,9 +103,25 @@ def _object_impl(ctx: AnalysisContext) -> list[Provider]:
 
     toolchain = ctx.attrs.toolchains[extension]
 
+    object_providers = [
+        toolchain[provider]
+        for provider in _object_providers
+        if toolchain.get(provider) != None
+    ]
+
+    if len(object_providers) != 1:
+        fail(
+            "toolchain `{}` must specify only one object provider but found: {}".format(
+                toolchain, object_providers
+            )
+        )
+
+    object_provider = object_providers.pop()
+
     out = ctx.actions.anon_target(
         emit_object,
-        attrs_to_dict(ctx.attrs, _object_attrs.keys())
+        obj_to_dict(ctx.attrs, _object_attrs.keys())
+        | obj_to_dict(object_provider, _object_field_attrs.keys())
         | {
             "toolchain": toolchain,
         },
