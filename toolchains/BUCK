@@ -10,3 +10,12 @@ toolchain_alias(
         }
     ),
 )
+
+toolchain_alias(
+    name="ld",
+    actual=select(
+        {
+            "//constraints:toolchain[llvm]": "//toolchains/ld:llvm",
+        }
+    ),
+)

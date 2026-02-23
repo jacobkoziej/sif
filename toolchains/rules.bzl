@@ -14,6 +14,16 @@ AsToolchainInfo = provider(
     },
 )
 
+LdToolchainInfo = provider(
+    fields={
+        "name": provider_field(str),
+        "elf_flags": provider_field(list[str] | None, default=None),
+        "script_flag": provider_field(str, default="-T"),
+        "include_prefix": provider_field(str | None, default="--library-path="),
+        "output_flag": provider_field(str, default="-o"),
+    },
+)
+
 toolchain_alias = rule(
     impl=alias_impl,
     is_toolchain_rule=True,
