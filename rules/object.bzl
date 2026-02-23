@@ -3,13 +3,18 @@
 # object.bzl -- object rule
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
+load(
+    "//rules:include.bzl",
+    "IncludeInfo",
+    "IncludeTSet",
+)
 load("//utils:attrs.bzl", "attrs_to_dict")
 
 ObjectEmitterInfo = provider(
     fields={
         "tool": provider_field(RunInfo),
         "flags": provider_field(list[str]),
-        "include_prefix": provider_field(str, default="-I"),
+        "include_prefix": provider_field(str | None, default="-I"),
         "output_flag": provider_field(str, default="-o"),
     },
 )
@@ -22,6 +27,12 @@ _object_attrs: dict[str, Attr] = {
     "src": attrs.source(),
     "out": attrs.option(attrs.source(), default=None),
     "flags": attrs.list(attrs.string(), default=[]),
+    "deps": attrs.list(
+        attrs.one_of(
+            attrs.dep(providers=[IncludeInfo]),
+        ),
+        default=[],
+    ),
 }
 
 
@@ -46,10 +57,29 @@ def _emit_object_impl(ctx: AnalysisContext) -> list[Provider]:
 
     out = ctx.actions.declare_output(out)
 
+    include_paths = []
+
+    for dep in ctx.attrs.deps:
+        if dep.get(IncludeInfo):
+            include_paths.append(dep[IncludeInfo].paths)
+
+    if len(include_paths) and not emitter.include_prefix:
+        fail(
+            "include paths specified but toolchain `{}` doesn't specify an include prefix".format(
+                toolchain.label
+            )
+        )
+
+    include_paths = ctx.actions.tset(IncludeTSet, children=include_paths)
+    include_flags = include_paths.project_as_args(
+        emitter.include_prefix, ordering="postorder"
+    )
+
     cmd = cmd_args(
         emitter.tool,
         emitter.flags,
         ctx.attrs.flags,
+        include_flags,
         emitter.output_flag,
         out.as_output(),
         src,
