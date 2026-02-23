@@ -15,6 +15,7 @@ IncludeTSet = transitive_set(
     args_projections={
         prefix: _prefix_projection(prefix)
         for prefix in [
+            "--library-path=",
             "-I",
         ]
     },
