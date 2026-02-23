@@ -72,9 +72,7 @@ def attributes() -> Select:
             }
         )
 
-        target = version + profile
-
-        features = ["+arm" + target, "+" + target]
+        features = ["+" + version + profile]
 
         for version in ["8", "8.1"]:
             for extension, flag in [
