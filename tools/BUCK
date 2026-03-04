@@ -3,6 +3,12 @@
 load("//tools/rules.bzl", "tool")
 
 tool(
+    name="cargo",
+    flake="nixpkgs",
+    derivation=["legacyPackages", "cargo"],
+)
+
+tool(
     name="hayagriva",
     flake="nixpkgs",
     derivation=["legacyPackages", "hayagriva"],
