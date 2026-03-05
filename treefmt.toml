@@ -54,6 +54,12 @@ includes = [
   "*.nix",
 ]
 
+[formatter.rustfmt]
+command = "rustfmt"
+includes = [
+  "*.rs",
+]
+
 [formatter.toml-sort]
 command = "toml-sort"
 includes = [

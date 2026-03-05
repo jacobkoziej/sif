@@ -19,6 +19,7 @@
             commitlint-rs
             mdformat
             pre-commit
+            rustfmt
             toml-sort
             treefmt
             yamlfmt
