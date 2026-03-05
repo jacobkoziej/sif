@@ -1,0 +1,12 @@
+[dependencies]
+clap = {version = "4.5.60", features = ["derive"]}
+depfile = "0.1.1"
+path-absolutize = "3.1.1"
+
+[package]
+name = "buck2-dep-format"
+version = "0.0.0"
+edition = "2024"
+description = "buck2 dependency file formatter"
+homepage = "https://github.com/jacobkoziej/sif/tree/master/tools/buck2-dep-format"
+license = "MPL-2.0"

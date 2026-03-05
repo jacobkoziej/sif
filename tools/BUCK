@@ -3,6 +3,12 @@
 load("//tools/rules.bzl", "tool")
 
 tool(
+    name="buck2-dep-format",
+    flake=".",
+    derivation=["packages", "buck2-dep-format"],
+)
+
+tool(
     name="cargo",
     flake="nixpkgs",
     derivation=["legacyPackages", "cargo"],

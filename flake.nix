@@ -21,6 +21,7 @@
 
       imports = [
         ./nix
+        ./tools
       ];
 
       perSystem =
