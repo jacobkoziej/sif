@@ -19,6 +19,7 @@ LdToolchainInfo = provider(
         "name": provider_field(str),
         "elf_flags": provider_field(list[str] | None, default=None),
         "script_flag": provider_field(str, default="-T"),
+        "dep_file_flag": provider_field(str | None, default=None),
         "include_prefix": provider_field(str | None, default="--library-path="),
         "output_flag": provider_field(str, default="-o"),
     },

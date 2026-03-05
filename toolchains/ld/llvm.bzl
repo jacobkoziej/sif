@@ -17,6 +17,7 @@ def _llvm_impl(ctx: AnalysisContext) -> list[Provider]:
                 "--nostdlib",
             ],
             script_flag="--script",
+            dep_file_flag="--dependency-file",
         ),
     ]
 

@@ -42,6 +42,36 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
     cmd = cmd_args(
         tool,
         linker.elf_flags,
+    )
+
+    dep_files = {}
+
+    if linker.dep_file_flag:
+        dep_wrapper = ctx.attrs.dep_wrapper[RunInfo].args
+        dep_file = ctx.actions.declare_output(out.basename + ".d").as_output()
+
+        cmd = cmd_args(
+            dep_wrapper,
+            "--input",
+            dep_file,
+            "--target",
+            out.as_output(),
+            "--",
+            cmd,
+        )
+
+        deps_tag = ctx.actions.artifact_tag()
+
+        script = deps_tag.tag_artifacts(script)
+        include_flags = deps_tag.tag_artifacts(include_flags)
+        objects = [deps_tag.tag_artifacts(object) for object in objects]
+        dep_file = deps_tag.tag_artifacts(dep_file)
+
+        cmd.add(linker.dep_file_flag, dep_file)
+
+        dep_files["deps"] = deps_tag
+
+    cmd.add(
         linker.script_flag,
         script,
         include_flags,
@@ -50,7 +80,11 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
         out.as_output(),
     )
 
-    ctx.actions.run(cmd, category="elf")
+    ctx.actions.run(
+        cmd,
+        category="elf",
+        dep_files=dep_files,
+    )
 
     return [
         DefaultInfo(default_output=out),
@@ -67,6 +101,12 @@ elf = rule(
         "linker": attrs.toolchain_dep(
             providers=[LdToolchainInfo],
             default="//toolchains:ld",
+        ),
+        "dep_wrapper": attrs.default_only(
+            attrs.exec_dep(
+                providers=[RunInfo],
+                default="//tools:buck2-dep-format",
+            ),
         ),
     },
 )
