@@ -22,3 +22,10 @@ tool(
     flake="nixpkgs",
     derivation=["legacyPackages", llvmPackages, "llvm"],
 )
+
+tool(
+    name="objdump",
+    binary="llvm-objdump",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+)
