@@ -19,3 +19,9 @@ tool(
     flake="nixpkgs",
     derivation=["legacyPackages", "hayagriva"],
 )
+
+tool(
+    name="rustc",
+    flake=".",
+    derivation=["packages", "rust-bin"],
+)

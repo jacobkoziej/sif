@@ -2,4 +2,16 @@
   imports = [
     ./buck2-dep-format/package.nix
   ];
+
+  perSystem =
+    {
+      pkgs,
+      ...
+    }:
+
+    {
+      packages = {
+        rust-bin = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+      };
+    };
 }
