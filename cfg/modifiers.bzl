@@ -349,7 +349,7 @@ def apply_modifiers(
     )
 
 
-def set_cfg_modifiers(modifiers: list[Modifier]) -> None:
+def set_cfg_modifiers(*modifiers: tuple[Modifier, ...]) -> None:
     parent_modifiers = get_parent_modifiers() or []
 
     def tag_modifier(modifier: Modifier) -> TaggedModifier:

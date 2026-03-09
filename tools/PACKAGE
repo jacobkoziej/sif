@@ -8,5 +8,5 @@ package(
 )
 
 set_cfg_modifiers(
-    get_host_constraints(),
+    *get_host_constraints(),
 )
