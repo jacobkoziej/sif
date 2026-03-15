@@ -1,6 +1,10 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//constraints:rules.bzl", "constraint")
+load(
+    "//constraints:rules.bzl",
+    "binary_constraint",
+    "constraint",
+)
 
 constraint(
     name="arch",
@@ -12,6 +16,8 @@ constraint(
     ],
     default="unknown",
 )
+
+binary_constraint("eabihf")
 
 constraint(
     name="os",
