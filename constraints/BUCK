@@ -23,6 +23,13 @@ constraint(
 )
 
 constraint(
+    name="opt-level",
+    values=["0", "1", "2", "3", "s", "z"],
+    nullable=False,
+    default="0",
+)
+
+constraint(
     name="toolchain",
     values=[
         "llvm",

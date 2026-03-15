@@ -4,12 +4,24 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load("//toolchains/rules.bzl", "LdToolchainInfo")
+load("//tools/llvm/flags.bzl", "opt_level")
 
 
 def _llvm_impl(ctx: AnalysisContext) -> list[Provider]:
+    tool = ctx.attrs.tool[RunInfo].args
+
+    cmd = cmd_args(tool)
+
+    opt_level = ctx.attrs.opt_level
+
+    if opt_level.isdigit():
+        cmd.add("-O" + ctx.attrs.opt_level)
+
     return [
         DefaultInfo(),
-        ctx.attrs.tool[RunInfo],
+        RunInfo(
+            args=cmd,
+        ),
         LdToolchainInfo(
             name="lld",
             elf_flags=[
@@ -27,5 +39,6 @@ llvm = rule(
     is_toolchain_rule=True,
     attrs={
         "tool": attrs.exec_dep(providers=[RunInfo], default="//tools/llvm:lld"),
+        "opt_level": attrs.string(default=opt_level()),
     },
 )

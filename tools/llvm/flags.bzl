@@ -41,3 +41,16 @@ def cpu() -> Select:
             "//constraints/arch/arm:cpu[cortex-m33]": "cortex-m33",
         }
     )
+
+
+def opt_level() -> Select:
+    return select(
+        {
+            "//constraints:opt-level[0]": "0",
+            "//constraints:opt-level[1]": "1",
+            "//constraints:opt-level[2]": "2",
+            "//constraints:opt-level[3]": "3",
+            "//constraints:opt-level[s]": "s",
+            "//constraints:opt-level[z]": "z",
+        }
+    )
