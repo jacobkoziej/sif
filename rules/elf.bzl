@@ -67,13 +67,12 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
         objects = [deps_tag.tag_artifacts(object) for object in objects]
         dep_file = deps_tag.tag_artifacts(dep_file)
 
-        cmd.add(linker.dep_file_flag, dep_file)
+        cmd.add(cmd_args(dep_file, format=linker.dep_file_flag + "{}"))
 
         dep_files["deps"] = deps_tag
 
     cmd.add(
-        linker.script_flag,
-        script,
+        cmd_args(script, format=linker.script_flag + "{}"),
         include_flags,
         objects,
         linker.output_flag,
