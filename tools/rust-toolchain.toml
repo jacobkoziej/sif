@@ -1,5 +1,5 @@
 [toolchain]
-channel = "1.94.0"
+channel = "nightly-2026-03-21"
 profile = "minimal"
 targets = [
   "thumbv8m.base-none-eabi",
