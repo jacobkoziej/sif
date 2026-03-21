@@ -5,7 +5,7 @@
 
 
 def _prefix_projection(prefix: str) -> typing.Callable[[Artifact], cmd_args]:
-    def projection(path: Artifact) -> cmd_args:
+    def projection(path: Artifact | cmd_args) -> cmd_args:
         return cmd_args(path, format=prefix + "{}")
 
     return projection
@@ -17,6 +17,7 @@ IncludeTSet = transitive_set(
         for prefix in [
             "--library-path=",
             "-I",
+            "-L",
         ]
     },
 )
