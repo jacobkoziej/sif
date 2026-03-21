@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 load("//toolchains:rules.bzl", "toolchain_alias")
+load("//toolchains:rustc.bzl", "rustc")
 
 toolchain_alias(
     name="as",
@@ -18,4 +19,8 @@ toolchain_alias(
             "//constraints:toolchain[llvm]": "//toolchains/ld:llvm",
         }
     ),
+)
+
+rustc(
+    name="rustc",
 )
