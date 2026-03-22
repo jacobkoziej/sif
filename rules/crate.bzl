@@ -1,4 +1,4 @@
-# SPDX--Identifier: MPL-2.0
+# SPDX-License-Identifier: MPL-2.0
 #
 # crate.bzl -- crate rule
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
@@ -86,7 +86,8 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         include_paths.project_as_args("-L", ordering="postorder")
     )
 
-    src = dep_tag.tag_artifacts(ctx.attrs.src)
+    crate_root = dep_tag.tag_artifacts(ctx.attrs.root)
+    srcs = map(dep_tag.tag_artifacts, ctx.attrs.srcs)
 
     dep_file = ctx.actions.declare_output(name + ".d").as_output()
 
@@ -115,7 +116,8 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         cmd_args(out.as_output(), format="--emit=link"),
         "-o",
         out.as_output(),
-        src,
+        crate_root,
+        hidden=srcs,
     )
 
     ctx.actions.run(
@@ -132,7 +134,8 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 crate = rule(
     impl=_crate_impl,
     attrs={
-        "src": attrs.source(),
+        "root": attrs.source(),
+        "srcs": attrs.list(attrs.source(), default=[]),
         "out_name": attrs.option(attrs.string(), default=None),
         "type": attrs.enum(_crate_type.keys(), default="rlib"),
         "emit": attrs.list(attrs.enum(_emit.keys()), default=["obj"]),
