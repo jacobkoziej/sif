@@ -29,3 +29,10 @@ tool(
     flake="nixpkgs",
     derivation=["legacyPackages", llvmPackages, "llvm"],
 )
+
+tool(
+    name="readelf",
+    binary="llvm-readelf",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+)
