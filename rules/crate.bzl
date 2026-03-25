@@ -52,30 +52,6 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         emit: ctx.actions.declare_output(name + _emit[emit]) for emit in ctx.attrs.emit
     }
 
-    providers = [
-        DefaultInfo(
-            default_outputs=outputs.values(),
-        ),
-        CrateInfo(
-            type=CrateType(crate_type),
-            metadata=rmeta,
-            out=out,
-        ),
-        IncludeInfo(
-            paths=ctx.actions.tset(
-                IncludeTSet,
-                value=cmd_args(out.as_output(), parent=1),
-            ),
-        ),
-    ]
-
-    if "obj" in outputs:
-        providers.append(
-            ObjectInfo(
-                object=outputs["obj"],
-            ),
-        )
-
     dep_tag = ctx.actions.artifact_tag()
 
     include_paths = ctx.actions.tset(
@@ -128,7 +104,35 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         },
     )
 
-    return providers
+    sub_targets: dict[str, list[Provider]] = {
+        target: [DefaultInfo(default_output=output)]
+        for target, output in outputs.items()
+    }
+
+    if "obj" in outputs:
+        sub_targets["obj"].append(
+            ObjectInfo(
+                object=outputs["obj"],
+            ),
+        )
+
+    return [
+        DefaultInfo(
+            default_output=out,
+            sub_targets=sub_targets,
+        ),
+        CrateInfo(
+            type=CrateType(crate_type),
+            metadata=rmeta,
+            out=out,
+        ),
+        IncludeInfo(
+            paths=ctx.actions.tset(
+                IncludeTSet,
+                value=cmd_args(out.as_output(), parent=1),
+            ),
+        ),
+    ]
 
 
 crate = rule(
