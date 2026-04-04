@@ -6,10 +6,22 @@
       ...
     }:
 
+    let
+      inherit (lib) getExe;
+
+    in
     {
       devShells.default = pkgs.mkShellNoCC (
         let
-          pre-commit-bin = "${lib.getBin pkgs.pre-commit}/bin/pre-commit";
+          pre-commit-bin = getExe pkgs.pre-commit;
+
+          buck2 = pkgs.writeShellScriptBin "buck2" ''
+            exec \
+              "${getExe pkgs.buck2}" \
+              ${"$"}{BUCK2FLAGS:+"$BUCK2FLAGS"} \
+              ${"$"}{@:+"$@"} \
+              ;
+          '';
 
         in
         {
