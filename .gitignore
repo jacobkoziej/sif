@@ -1,3 +1,4 @@
 /.buckconfig.local
 /.direnv
+/.envrc.local
 /buck-out
