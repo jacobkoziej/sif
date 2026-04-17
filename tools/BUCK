@@ -25,3 +25,9 @@ tool(
     flake=".",
     derivation=["packages", "rust-bin"],
 )
+
+tool(
+    name="xip-elf",
+    flake=".",
+    derivation=["packages", "xip-elf"],
+)

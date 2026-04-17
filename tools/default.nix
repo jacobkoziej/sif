@@ -1,6 +1,7 @@
 {
   imports = [
     ./buck2-dep-format/package.nix
+    ./xip-elf/package.nix
   ];
 
   perSystem =
