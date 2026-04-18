@@ -27,6 +27,12 @@ tool(
 )
 
 tool(
+    name="srec_cat",
+    flake="nixpkgs",
+    derivation=["legacyPackages", "srecord"],
+)
+
+tool(
     name="xip-elf",
     flake=".",
     derivation=["packages", "xip-elf"],
