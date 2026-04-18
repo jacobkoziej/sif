@@ -13,7 +13,7 @@ use std::fs::File;
 use std::io;
 use std::io::{BufWriter, Write};
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Command, exit};
 
 /// buck2 dependency file formatter
 #[derive(Parser)]
@@ -40,7 +40,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
     if let Some((program, args)) = args.command.split_first() {
-        Command::new(program).args(args).spawn()?.wait()?;
+        let status = Command::new(program).args(args).spawn()?.wait()?;
+
+        match status.code() {
+            Some(code) if code != 0 => {
+                exit(code);
+            }
+            None => {
+                exit(1);
+            }
+            _ => {}
+        };
     }
 
     let contents = fs::read_to_string(&args.input)?;
