@@ -12,6 +12,13 @@ load("//rules:object.bzl", "ObjectInfo")
 load("//toolchains:rules.bzl", "LdToolchainInfo")
 
 
+ElfInfo = provider(
+    fields={
+        "elf": provider_field(Artifact),
+    },
+)
+
+
 def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
     out = ctx.attrs.out
 
@@ -86,7 +93,12 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
     )
 
     return [
-        DefaultInfo(default_output=out),
+        DefaultInfo(
+            default_output=out,
+        ),
+        ElfInfo(
+            elf=out,
+        ),
     ]
 
 
