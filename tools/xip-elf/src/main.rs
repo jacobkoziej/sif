@@ -4,6 +4,7 @@
 // Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 use clap::Parser;
+use clap_num::maybe_hex;
 use elf::ElfStream;
 use elf::endian::{AnyEndian, EndianParse};
 use elf::file::FileHeader;
@@ -28,11 +29,11 @@ struct Args {
     output: Option<PathBuf>,
 
     /// Address to place ELF header (default: prepend to segment(s))
-    #[arg(long)]
+    #[arg(long, value_parser=maybe_hex::<u64>)]
     header_address: Option<u64>,
 
     /// Address to place ELF program header(s) (default: append to segment(s))
-    #[arg(long)]
+    #[arg(long, value_parser=maybe_hex::<u64>)]
     program_headers_address: Option<u64>,
 }
 
