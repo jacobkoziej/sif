@@ -27,7 +27,7 @@ _object_field_attrs: dict[str, Attr] = {
 
 _object_attrs: dict[str, Attr] = {
     "src": attrs.source(),
-    "out": attrs.option(attrs.source(), default=None),
+    "out": attrs.option(attrs.string(), default=None),
     "flags": attrs.list(attrs.string(), default=[]),
     "includes": attrs.list(attrs.dep(providers=[IncludeInfo]), default=[]),
 }

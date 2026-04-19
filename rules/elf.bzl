@@ -105,7 +105,7 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
 elf = rule(
     impl=_elf_impl,
     attrs={
-        "out": attrs.option(attrs.source(), default=None),
+        "out": attrs.option(attrs.string(), default=None),
         "script": attrs.source(),
         "includes": attrs.list(attrs.dep(providers=[IncludeInfo]), default=[]),
         "objects": attrs.list(attrs.dep(providers=[ObjectInfo]), default=[]),

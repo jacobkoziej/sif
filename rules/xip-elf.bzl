@@ -49,7 +49,7 @@ xip_elf = rule(
     impl=_xip_elf_impl,
     attrs={
         "elf": attrs.dep(providers=[ElfInfo]),
-        "out": attrs.option(attrs.source(), default=None),
+        "out": attrs.option(attrs.string(), default=None),
         "header_address": attrs.option(attrs.int(), default=None),
         "program_headers_address": attrs.option(attrs.int(), default=None),
         "xip_elf": attrs.default_only(
