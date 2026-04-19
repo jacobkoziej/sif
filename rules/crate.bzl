@@ -142,7 +142,7 @@ crate = rule(
         "srcs": attrs.list(attrs.source(), default=[]),
         "out_name": attrs.option(attrs.string(), default=None),
         "type": attrs.enum(_crate_type.keys(), default="rlib"),
-        "emit": attrs.list(attrs.enum(_emit.keys()), default=["obj"]),
+        "emit": attrs.list(attrs.enum(_emit.keys()), default=[]),
         "flags": attrs.list(attrs.string(), default=[]),
         "includes": attrs.list(attrs.dep(providers=[IncludeInfo]), default=[]),
         "rustc": attrs.toolchain_dep(default="//toolchains:rustc"),
