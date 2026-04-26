@@ -19,7 +19,7 @@ def _llvm_impl(ctx: AnalysisContext) -> list[Provider]:
 
     tool = ctx.attrs.tool[RunInfo].args
 
-    cmd = cmd_args(tool, arch, cpu, attributes)
+    cmd = cmd_args(tool, "--color=true", arch, cpu, attributes)
 
     return [
         DefaultInfo(),

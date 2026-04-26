@@ -10,7 +10,7 @@ load("//tools/llvm/flags.bzl", "opt_level")
 def _llvm_impl(ctx: AnalysisContext) -> list[Provider]:
     tool = ctx.attrs.tool[RunInfo].args
 
-    cmd = cmd_args(tool)
+    cmd = cmd_args(tool, "--color-diagnostics=always")
 
     opt_level = ctx.attrs.opt_level
 
