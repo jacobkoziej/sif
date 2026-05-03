@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//rules:elf.bzl", "elf")
+load(
+    "//rules:hex.bzl",
+    "hex_cat",
+    "to_hex",
+)
+load("//rules:xip-elf.bzl", "xip_elf")
+
+elf(
+    name="sif.elf",
+    script="//kernel/mcu/raspberry-pi/rp2350a:vmsif.ld",
+    objects=[
+        "//kernel:kernel[obj]",
+    ],
+    includes=[
+        "//kernel:ld-include",
+    ],
+)
+
+to_hex(
+    name="sif.hex",
+    input=":sif.elf",
+)
+
+xip_elf(
+    name="sif-elf.hex",
+    elf=":sif.elf",
+)
+
+hex_cat(
+    name="vmsif",
+    hexes=[
+        ":sif-elf.hex",
+        ":sif.hex",
+    ],
+)
