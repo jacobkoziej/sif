@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//rules:crate.bzl", "crate")
+
+crate(
+    name="kernel",
+    emit=["obj"],
+    root="lib.rs",
+    srcs=glob(["**/*.rs"]),
+)
