@@ -49,6 +49,7 @@ rustc = rule(
             key=attrs.string(),
             value=attrs.one_of(attrs.string(), attrs.list(attrs.string())),
             default={
+                "debuginfo": "full",
                 "target-cpu": cpu(),
                 "target-feature": attributes(),
             },
