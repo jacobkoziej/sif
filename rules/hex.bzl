@@ -1,9 +1,15 @@
 # SPDX-License-Identifier: MPL-2.0
 #
-# hex-cat.bzl -- hex_cat rule
+# hex.bzl -- hex rules
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-load("//rules:types.bzl", "HexInfo")
+load("//rules:elf.bzl", "ElfInfo")
+
+HexInfo = provider(
+    fields={
+        "hex": provider_field(Artifact),
+    },
+)
 
 
 def _hex_cat_impl(ctx: AnalysisContext) -> list[Provider]:
@@ -48,6 +54,53 @@ hex_cat = rule(
             attrs.exec_dep(
                 providers=[RunInfo],
                 default="//tools:srec_cat",
+            ),
+        ),
+    },
+)
+
+
+def _to_hex_impl(ctx: AnalysisContext) -> list[Provider]:
+    out = ctx.attrs.out
+
+    if out == None:
+        out = ctx.label.name
+
+        if not out.endswith(".hex"):
+            out += ".hex"
+
+    out = ctx.actions.declare_output(out)
+
+    objcopy = ctx.attrs.objcopy[RunInfo].args
+
+    cmd = cmd_args(
+        objcopy,
+        "--output-target=ihex",
+        ctx.attrs.input[ElfInfo].elf,
+        out.as_output(),
+    )
+
+    ctx.actions.run(cmd, category="to_hex")
+
+    return [
+        DefaultInfo(
+            default_output=out,
+        ),
+        HexInfo(
+            hex=out,
+        ),
+    ]
+
+
+to_hex = rule(
+    impl=_to_hex_impl,
+    attrs={
+        "input": attrs.dep(providers=[ElfInfo]),
+        "out": attrs.option(attrs.string(), default=None),
+        "objcopy": attrs.default_only(
+            attrs.exec_dep(
+                providers=[RunInfo],
+                default="//tools/llvm:objcopy",
             ),
         ),
     },

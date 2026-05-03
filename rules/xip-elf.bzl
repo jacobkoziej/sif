@@ -4,7 +4,7 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load("//rules:elf.bzl", "ElfInfo")
-load("//rules:types.bzl", "HexInfo")
+load("//rules:hex.bzl", "HexInfo")
 
 
 def _xip_elf_impl(ctx: AnalysisContext) -> list[Provider]:
