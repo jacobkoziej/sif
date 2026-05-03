@@ -27,6 +27,7 @@ def _llvm_impl(ctx: AnalysisContext) -> list[Provider]:
             elf_flags=[
                 "--gc-sections",
                 "--nostdlib",
+                "--orphan-handling=error",
             ],
             script_flag="--script=",
             dep_file_flag="--dependency-file=",
