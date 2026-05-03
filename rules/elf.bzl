@@ -6,10 +6,11 @@
 load(
     "//rules:include.bzl",
     "IncludeInfo",
-    "IncludeTSet",
+    "get_include",
 )
 load("//rules:object.bzl", "ObjectInfo")
 load("//toolchains:rules.bzl", "LdToolchainInfo")
+load("//utils:provider.bzl", "get_provider")
 
 
 ElfInfo = provider(
@@ -30,18 +31,18 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
 
     out = ctx.actions.declare_output(out)
 
-    include_paths = [include[IncludeInfo].paths for include in ctx.attrs.includes]
-    objects = [object[ObjectInfo].object for object in ctx.attrs.objects]
-
     linker = ctx.attrs.linker[LdToolchainInfo]
 
-    include_prefix = linker.include_prefix
-
-    if len(include_paths) and not include_prefix:
+    if len(ctx.attrs.includes) and not linker.include_prefix:
         fail("include paths specified but target doesn't specify an include prefix")
 
-    include_paths = ctx.actions.tset(IncludeTSet, children=include_paths)
-    include_flags = include_paths.project_as_args(include_prefix, ordering="postorder")
+    include = get_include(
+        actions=ctx.actions,
+        includes=get_provider(ctx.attrs.includes, IncludeInfo),
+        prefix=linker.include_prefix,
+    )
+
+    objects = cmd_args([object[ObjectInfo].object for object in ctx.attrs.objects])
 
     tool = ctx.attrs.linker[RunInfo].args
     script = ctx.attrs.script
@@ -49,7 +50,10 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
     cmd = cmd_args(
         tool,
         linker.elf_flags,
+        hidden=include.files,
     )
+
+    include_flags = include.flags
 
     dep_files = {}
 
@@ -71,7 +75,7 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
 
         script = deps_tag.tag_artifacts(script)
         include_flags = deps_tag.tag_artifacts(include_flags)
-        objects = [deps_tag.tag_artifacts(object) for object in objects]
+        objects = deps_tag.tag_artifacts(objects)
         dep_file = deps_tag.tag_artifacts(dep_file)
 
         cmd.add(cmd_args(dep_file, format=linker.dep_file_flag + "{}"))

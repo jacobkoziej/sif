@@ -5,7 +5,7 @@
 
 
 def _prefix_projection(prefix: str) -> typing.Callable[[Artifact], cmd_args]:
-    def projection(path: Artifact | cmd_args) -> cmd_args:
+    def projection(path: Artifact | CellPath | cmd_args) -> cmd_args:
         return cmd_args(path, format=prefix + "{}")
 
     return projection
@@ -25,17 +25,38 @@ IncludeTSet = transitive_set(
 IncludeInfo = provider(
     fields={
         "paths": provider_field(TransitiveSet),
+        "files": provider_field(list[Artifact]),
     },
 )
 
 
-def _include_impl(ctx: AnalysisContext) -> list[Provider]:
-    children = [ctx.actions.tset(IncludeTSet, value=path) for path in ctx.attrs.paths]
+Include = record(
+    flags=TransitiveSetArgsProjection,
+    files=cmd_args,
+)
 
+
+def get_include(
+    actions: AnalysisActions,
+    includes: list[IncludeInfo],
+    prefix: str,
+    ordering: str = "postorder",
+) -> Include:
+    return Include(
+        flags=actions.tset(
+            IncludeTSet,
+            children=[include.paths for include in includes],
+        ).project_as_args(prefix, ordering=ordering),
+        files=cmd_args([include.files for include in includes]),
+    )
+
+
+def _include_impl(ctx: AnalysisContext) -> list[Provider]:
     return [
         DefaultInfo(),
         IncludeInfo(
-            paths=ctx.actions.tset(IncludeTSet, children=children),
+            paths=ctx.actions.tset(IncludeTSet, value=ctx.label.path),
+            files=ctx.attrs.files,
         ),
     ]
 
@@ -43,6 +64,6 @@ def _include_impl(ctx: AnalysisContext) -> list[Provider]:
 include = rule(
     impl=_include_impl,
     attrs={
-        "paths": attrs.list(attrs.source(allow_directory=True)),
+        "files": attrs.list(attrs.source()),
     },
 )

@@ -7,8 +7,10 @@ load(
     "//rules:include.bzl",
     "IncludeInfo",
     "IncludeTSet",
+    "get_include",
 )
 load("//rules:object.bzl", "ObjectInfo")
+load("//utils:provider.bzl", "get_provider")
 
 _crate_type: dict[str, str] = {
     "bin": ".elf",
@@ -52,18 +54,13 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         emit: ctx.actions.declare_output(name + _emit[emit]) for emit in ctx.attrs.emit
     }
 
-    dep_tag = ctx.actions.artifact_tag()
+    dep_info = ctx.actions.artifact_tag()
 
-    include_paths = ctx.actions.tset(
-        IncludeTSet,
-        children=[include[IncludeInfo].paths for include in ctx.attrs.includes],
+    include = get_include(
+        actions=ctx.actions,
+        includes=get_provider(ctx.attrs.includes, IncludeInfo),
+        prefix="-L",
     )
-    include_flags = dep_tag.tag_artifacts(
-        include_paths.project_as_args("-L", ordering="postorder")
-    )
-
-    crate_root = dep_tag.tag_artifacts(ctx.attrs.root)
-    srcs = map(dep_tag.tag_artifacts, ctx.attrs.srcs)
 
     dep_file = ctx.actions.declare_output(name + ".d").as_output()
 
@@ -73,12 +70,12 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
     cmd = cmd_args(
         dep_wrapper,
         "--input",
-        dep_tag.tag_artifacts(dep_file),
+        dep_info.tag_artifacts(dep_file),
         "--target",
         out.as_output(),
         "--",
         rustc,
-        include_flags,
+        include.flags,
         cmd_args(name, format="--crate-name={}"),
         cmd_args(crate_type, format="--crate-type={}"),
         cmd_args(dep_file, format="--emit=dep-info={}"),
@@ -92,15 +89,15 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         cmd_args(out.as_output(), format="--emit=link"),
         "-o",
         out.as_output(),
-        crate_root,
-        hidden=srcs,
+        dep_info.tag_artifacts(ctx.attrs.root),
+        hidden=dep_info.tag_artifacts(cmd_args(ctx.attrs.srcs, include.files)),
     )
 
     ctx.actions.run(
         cmd,
         category="crate",
         dep_files={
-            "deps": dep_tag,
+            "dep-info": dep_info,
         },
     )
 
@@ -131,6 +128,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
                 IncludeTSet,
                 value=cmd_args(out.as_output(), parent=1),
             ),
+            files=outputs.values(),
         ),
     ]
 
