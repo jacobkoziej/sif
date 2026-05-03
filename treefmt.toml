@@ -81,6 +81,7 @@ includes = [
 [global]
 excludes = [
   "*.gitignore",
+  "*.ld",
   "*.lock",
   ".buckconfig",
   ".editorconfig",
