@@ -24,6 +24,13 @@ tool(
 )
 
 tool(
+    name="objcopy",
+    binary="llvm-objcopy",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+)
+
+tool(
     name="objdump",
     binary="llvm-objdump",
     flake="nixpkgs",
