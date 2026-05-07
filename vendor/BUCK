@@ -9,14 +9,26 @@ src(
     derivation=["packages", "rust-bin"],
     path="lib/rustlib/src/rust/library",
     sub_paths=[
+        "compiler-builtins/compiler-builtins/src/lib.rs",
         "core/src/lib.rs",
     ],
+)
+
+crate(
+    name="compiler_builtins",
+    root=":rustlib[compiler-builtins/compiler-builtins/src/lib.rs]",
+    src_deps=[":rustlib"],
+    deps=[":core"],
+    features=[
+        "arch",
+        "compiler-builtins",
+    ],
+    visibility=["PUBLIC"],
 )
 
 crate(
     name="core",
     root=":rustlib[core/src/lib.rs]",
     src_deps=[":rustlib"],
-    type="rlib",
     visibility=["PUBLIC"],
 )
