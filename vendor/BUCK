@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("//rules:crate.bzl", "crate")
+load("//vendor:rules.bzl", "src")
+
+src(
+    name="rustlib",
+    flake=".",
+    derivation=["packages", "rust-bin"],
+    path="lib/rustlib/src/rust/library",
+    sub_paths=[
+        "core/src/lib.rs",
+    ],
+)
+
+crate(
+    name="core",
+    emit=["obj"],
+    root=":rustlib[core/src/lib.rs]",
+    src_deps=[":rustlib"],
+    type="rlib",
+    visibility=["PUBLIC"],
+)
