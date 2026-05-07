@@ -37,6 +37,7 @@ _emit: dict[str, str] = {
 
 CrateInfo = provider(
     fields={
+        "name": provider_field(str),
         "type": provider_field(CrateType),
         "metadata": provider_field(Artifact),
         "out": provider_field(Artifact),
@@ -143,6 +144,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             sub_targets=sub_targets,
         ),
         CrateInfo(
+            name=name,
             type=CrateType(crate_type),
             metadata=rmeta,
             out=out,
