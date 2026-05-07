@@ -15,7 +15,6 @@ src(
 
 crate(
     name="core",
-    emit=["obj"],
     root=":rustlib[core/src/lib.rs]",
     src_deps=[":rustlib"],
     type="rlib",

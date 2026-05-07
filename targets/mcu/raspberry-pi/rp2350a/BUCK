@@ -12,7 +12,7 @@ elf(
     name="sif.elf",
     script="//kernel/mcu/raspberry-pi/rp2350a:vmsif.ld",
     objects=[
-        "//kernel:kernel[obj]",
+        "//kernel:kernel",
     ],
     includes=[
         "//kernel:ld-include",

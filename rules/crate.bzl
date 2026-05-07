@@ -32,7 +32,6 @@ _emit: dict[str, str] = {
     "llvm-bc": ".bc",
     "llvm-ir": ".ll",
     "mir": ".mir",
-    "obj": ".o",
 }
 
 CrateInfo = provider(
@@ -52,10 +51,9 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 
     out = ctx.actions.declare_output(name + _crate_type[crate_type])
     rmeta = ctx.actions.declare_output(name + ".rmeta")
+    obj = ctx.actions.declare_output(name + ".o")
 
-    outputs: dict[str, Artifact] = {
-        "metadata": rmeta,
-    } | {
+    outputs: dict[str, Artifact] = {"metadata": rmeta, "obj": obj} | {
         emit: ctx.actions.declare_output(name + _emit[emit]) for emit in ctx.attrs.emit
     }
 
@@ -128,16 +126,6 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         for target, output in outputs.items()
     }
 
-    if "obj" in outputs:
-        sub_targets["obj"].append(
-            ObjectInfo(
-                objects=ctx.actions.tset(
-                    ObjectTSet,
-                    value=outputs["obj"],
-                ),
-            ),
-        )
-
     return [
         DefaultInfo(
             default_output=out,
@@ -148,6 +136,12 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             type=CrateType(crate_type),
             metadata=rmeta,
             out=out,
+        ),
+        ObjectInfo(
+            objects=ctx.actions.tset(
+                ObjectTSet,
+                value=obj,
+            ),
         ),
         IncludeInfo(
             paths=ctx.actions.tset(

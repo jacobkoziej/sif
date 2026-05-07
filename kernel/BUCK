@@ -5,7 +5,6 @@ load("//rules:include.bzl", "include")
 
 crate(
     name="kernel",
-    emit=["obj"],
     root="lib.rs",
     srcs=glob(["**/*.rs"]),
 )
