@@ -3,7 +3,11 @@
 # rules.bzl -- tool rules
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-load("//nix/rules.bzl", "derivation_output_path")
+load(
+    "//nix/rules.bzl",
+    "derivation_output_path",
+    "get_system",
+)
 
 
 def _tool_path_impl(ctx: AnalysisContext) -> list[Provider]:
@@ -38,23 +42,7 @@ def tool(
         tool_path(name=name, path=path)
         return
 
-    system = (
-        select(
-            {
-                "//constraints:arch[aarch64]": "aarch64",
-                "//constraints:arch[x86_64]": "x86_64",
-            }
-        )
-        + "-"
-        + select(
-            {
-                "//constraints:os[linux]": "linux",
-                "//constraints:os[macos]": "darwin",
-            }
-        )
-        if set_system
-        else None
-    )
+    system = get_system() if set_system else None
 
     derivation_output_path(
         name=name,

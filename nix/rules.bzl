@@ -15,6 +15,24 @@ _common_attrs: dict[str, Attr] = {
 }
 
 
+def get_system() -> Select:
+    return (
+        select(
+            {
+                "//constraints:arch[aarch64]": "aarch64",
+                "//constraints:arch[x86_64]": "x86_64",
+            }
+        )
+        + "-"
+        + select(
+            {
+                "//constraints:os[linux]": "linux",
+                "//constraints:os[macos]": "darwin",
+            }
+        )
+    )
+
+
 def _derivation_copy_impl(ctx: AnalysisContext) -> list[Provider]:
     output = ctx.actions.anon_target(
         derivation_output,
