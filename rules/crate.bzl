@@ -87,6 +87,10 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         "--",
         rustc,
         include.flags,
+        [
+            cmd_args(feature, format='--cfg=feature="{}"')
+            for feature in ctx.attrs.features
+        ],
         cmd_args(name, format="--crate-name={}"),
         cmd_args(crate_type, format="--crate-type={}"),
         cmd_args(dep_file, format="--emit=dep-info={}"),
@@ -162,6 +166,7 @@ crate = rule(
         "out_name": attrs.option(attrs.string(), default=None),
         "type": attrs.enum(_crate_type.keys(), default="rlib"),
         "emit": attrs.list(attrs.enum(_emit.keys()), default=[]),
+        "features": attrs.list(attrs.string(), default=[]),
         "flags": attrs.list(attrs.string(), default=[]),
         "includes": attrs.list(attrs.dep(providers=[IncludeInfo]), default=[]),
         "rustc": attrs.toolchain_dep(default="//toolchains:rustc"),
