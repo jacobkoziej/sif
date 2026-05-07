@@ -45,9 +45,13 @@ CrateInfo = provider(
 
 
 def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
-    name = ctx.attrs.out_name or ctx.label.name
+    crate_name = ctx.attrs.out_name or ctx.label.name
 
     crate_type = ctx.attrs.type
+
+    name = (
+        crate_name if ctx.attrs.out_name or crate_type == "bin" else "lib" + crate_name
+    )
 
     out = ctx.actions.declare_output(name + _crate_type[crate_type])
     rmeta = ctx.actions.declare_output(name + ".rmeta")
@@ -132,7 +136,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             sub_targets=sub_targets,
         ),
         CrateInfo(
-            name=name,
+            name=crate_name,
             type=CrateType(crate_type),
             metadata=rmeta,
             out=out,
