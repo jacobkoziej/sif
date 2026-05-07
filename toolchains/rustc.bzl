@@ -29,7 +29,14 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
 
     tool = ctx.attrs.tool[RunInfo].args
 
-    cmd = cmd_args(tool, "--color=always", edition, target, codegen_options)
+    cmd = cmd_args(
+        tool,
+        "--color=always",
+        "--sysroot=/dev/null",
+        edition,
+        target,
+        codegen_options,
+    )
 
     return [
         DefaultInfo(),
