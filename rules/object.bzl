@@ -32,9 +32,15 @@ _object_attrs: dict[str, Attr] = {
     "includes": attrs.list(attrs.dep(providers=[IncludeInfo]), default=[]),
 }
 
+ObjectTSet = transitive_set(
+    args_projections={
+        "args": lambda x: cmd_args(x),
+    },
+)
+
 ObjectInfo = provider(
     fields={
-        "object": provider_field(Artifact),
+        "objects": provider_field(TransitiveSet),
     },
 )
 
@@ -132,7 +138,7 @@ def _object_impl(ctx: AnalysisContext) -> list[Provider]:
             default_output=out,
         ),
         ObjectInfo(
-            object=out,
+            object=ctx.actions.tset(ObjectTSet, value=out),
         ),
     ]
 

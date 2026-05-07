@@ -9,7 +9,11 @@ load(
     "IncludeTSet",
     "get_include",
 )
-load("//rules:object.bzl", "ObjectInfo")
+load(
+    "//rules:object.bzl",
+    "ObjectInfo",
+    "ObjectTSet",
+)
 load("//utils:provider.bzl", "get_provider")
 
 _crate_type: dict[str, str] = {
@@ -122,7 +126,10 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
     if "obj" in outputs:
         sub_targets["obj"].append(
             ObjectInfo(
-                object=outputs["obj"],
+                objects=ctx.actions.tset(
+                    ObjectTSet,
+                    value=outputs["obj"],
+                ),
             ),
         )
 

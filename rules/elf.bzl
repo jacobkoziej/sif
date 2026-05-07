@@ -42,7 +42,12 @@ def _elf_impl(ctx: AnalysisContext) -> list[Provider]:
         prefix=linker.include_prefix,
     )
 
-    objects = cmd_args([object[ObjectInfo].object for object in ctx.attrs.objects])
+    objects = cmd_args(
+        [
+            object[ObjectInfo].objects.project_as_args("args")
+            for object in ctx.attrs.objects
+        ],
+    )
 
     tool = ctx.attrs.linker[RunInfo].args
     script = ctx.attrs.script
