@@ -15,6 +15,41 @@ _common_attrs: dict[str, Attr] = {
 }
 
 
+def _derivation_copy_impl(ctx: AnalysisContext) -> list[Provider]:
+    output = ctx.actions.anon_target(
+        derivation_output,
+        {key: getattr(ctx.attrs, key) for key in _common_attrs.keys()},
+    ).artifact("output")
+
+    out = ctx.actions.declare_output(ctx.label.name, dir=True)
+
+    ctx.actions.run(
+        [
+            "cp",
+            "-R",
+            "-L",
+            cmd_args(output, ctx.attrs.path, delimiter="/", format="{}/."),
+            out.as_output(),
+        ],
+        category="cp",
+    )
+
+    return [
+        DefaultInfo(
+            default_output=out,
+        ),
+    ]
+
+
+derivation_copy = rule(
+    impl=_derivation_copy_impl,
+    attrs=_common_attrs
+    | {
+        "path": attrs.string(),
+    },
+)
+
+
 def _derivation_output_impl(ctx: AnalysisContext) -> list[Provider]:
     derivation = ctx.attrs.derivation
 
