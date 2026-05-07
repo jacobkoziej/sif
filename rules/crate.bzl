@@ -62,6 +62,13 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         prefix="-L",
     )
 
+    src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
+
+    root = ctx.attrs.root
+
+    if isinstance(root, Dependency):
+        root = root[DefaultInfo].default_outputs[0]
+
     dep_file = ctx.actions.declare_output(name + ".d").as_output()
 
     dep_wrapper = ctx.attrs.dep_wrapper[RunInfo].args
@@ -89,8 +96,14 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         cmd_args(out.as_output(), format="--emit=link"),
         "-o",
         out.as_output(),
-        dep_info.tag_artifacts(ctx.attrs.root),
-        hidden=dep_info.tag_artifacts(cmd_args(ctx.attrs.srcs, include.files)),
+        dep_info.tag_artifacts(root),
+        hidden=dep_info.tag_artifacts(
+            cmd_args(
+                ctx.attrs.srcs,
+                src_deps,
+                include.files,
+            )
+        ),
     )
 
     ctx.actions.run(
@@ -136,8 +149,9 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 crate = rule(
     impl=_crate_impl,
     attrs={
-        "root": attrs.source(),
+        "root": attrs.one_of(attrs.source(), attrs.dep()),
         "srcs": attrs.list(attrs.source(), default=[]),
+        "src_deps": attrs.list(attrs.dep(), default=[]),
         "out_name": attrs.option(attrs.string(), default=None),
         "type": attrs.enum(_crate_type.keys(), default="rlib"),
         "emit": attrs.list(attrs.enum(_emit.keys()), default=[]),
