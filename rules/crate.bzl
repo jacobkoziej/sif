@@ -63,13 +63,21 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 
     dep_info = ctx.actions.artifact_tag()
 
+    src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
+
+    externs = [
+        cmd_args(dep[CrateInfo].name, dep[CrateInfo].metadata, delimiter="=")
+        for dep in ctx.attrs.deps
+    ] + [
+        cmd_args(name, dep[CrateInfo].metadata, delimiter="=")
+        for name, dep in ctx.attrs.aliased_deps.items()
+    ]
+
     include = get_include(
         actions=ctx.actions,
         includes=get_provider(ctx.attrs.includes, IncludeInfo),
         prefix="-L",
     )
-
-    src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
 
     root = ctx.attrs.root
 
@@ -90,6 +98,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         "--",
         rustc,
         include.flags,
+        [cmd_args(extern, format="--extern={}") for extern in externs],
         [
             cmd_args(feature, format='--cfg=feature="{}"')
             for feature in ctx.attrs.features
@@ -145,6 +154,10 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             objects=ctx.actions.tset(
                 ObjectTSet,
                 value=obj,
+                children=[
+                    dep[ObjectInfo].objects
+                    for dep in (ctx.attrs.deps + ctx.attrs.aliased_deps.values())
+                ],
             ),
         ),
         IncludeInfo(
@@ -163,6 +176,12 @@ crate = rule(
         "root": attrs.one_of(attrs.source(), attrs.dep()),
         "srcs": attrs.list(attrs.source(), default=[]),
         "src_deps": attrs.list(attrs.dep(), default=[]),
+        "deps": attrs.list(attrs.dep(providers=[CrateInfo]), default=[]),
+        "aliased_deps": attrs.dict(
+            key=attrs.string(),
+            value=attrs.dep(providers=[CrateInfo]),
+            default={},
+        ),
         "out_name": attrs.option(attrs.string(), default=None),
         "type": attrs.enum(_crate_type.keys(), default="rlib"),
         "emit": attrs.list(attrs.enum(_emit.keys()), default=[]),
