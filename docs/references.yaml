@@ -38,3 +38,14 @@ rpi-rp2350-datasheet:
   serial-number:
     rpi: RP-008373-DS-2
   language: en-US
+
+tis-elf:
+  type: reference
+  title: Tool Interface Standard (TIS) Executable and Linking Format (ELF) Specification
+  date: 1995-05
+  publisher: TIS Committee
+  organization: Linux Foundation
+  edition: 1.2
+  page-total: 106
+  url: https://refspecs.linuxfoundation.org/elf/elf.pdf
+  language: en-US
