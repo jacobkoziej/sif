@@ -2,6 +2,17 @@
 
 # yamllint disable rule:line-length
 
+aaelf32:
+  type: reference
+  title: ELF for the Arm Architecture
+  date: 2026-01-23
+  publisher: Arm Limited
+  organization: Arm Limited
+  edition: 2025Q4
+  url: https://github.com/ARM-software/abi-aa/blob/2025Q4/aaelf32/aaelf32.rst
+  language: en-US
+  note: daa7a94ca55973736c0e434a67a6e4bbcd35d7fa
+
 armv8m-rm:
   type: reference
   title: Armv8-M Architecture Reference Manual
