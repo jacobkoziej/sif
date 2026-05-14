@@ -123,6 +123,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         dep_files={
             "dep-info": dep_info,
         },
+        no_outputs_cleanup=ctx.attrs.incremental,
     )
 
     sub_targets: dict[str, list[Provider]] = {
@@ -179,6 +180,14 @@ crate = rule(
         "cfg": attrs.list(attrs.string(), default=[]),
         "features": attrs.list(attrs.string(), default=[]),
         "flags": attrs.list(attrs.string(), default=[]),
+        "incremental": attrs.bool(
+            default=select(
+                {
+                    "//constraints:opt-level[0]": True,
+                    "DEFAULT": False,
+                },
+            ),
+        ),
         "rustc": attrs.toolchain_dep(default="//toolchains:rustc"),
         "dep_wrapper": attrs.default_only(
             attrs.exec_dep(
