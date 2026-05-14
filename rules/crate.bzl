@@ -7,14 +7,12 @@ load(
     "//rules:include.bzl",
     "IncludeInfo",
     "IncludeTSet",
-    "get_include",
 )
 load(
     "//rules:object.bzl",
     "ObjectInfo",
     "ObjectTSet",
 )
-load("//utils:provider.bzl", "get_provider")
 
 _crate_type: dict[str, str] = {
     "bin": ".elf",
@@ -73,12 +71,6 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         for name, dep in ctx.attrs.aliased_deps.items()
     ]
 
-    include = get_include(
-        actions=ctx.actions,
-        includes=get_provider(ctx.attrs.includes, IncludeInfo),
-        prefix="-L",
-    )
-
     root = ctx.attrs.root
 
     if isinstance(root, Dependency):
@@ -97,7 +89,6 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         out.as_output(),
         "--",
         rustc,
-        include.flags,
         [cmd_args(extern, format="--extern={}") for extern in externs],
         [
             cmd_args(feature, format='--cfg=feature="{}"')
@@ -121,7 +112,6 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             cmd_args(
                 ctx.attrs.srcs,
                 src_deps,
-                include.files,
             )
         ),
     )
@@ -187,7 +177,6 @@ crate = rule(
         "emit": attrs.list(attrs.enum(_emit.keys()), default=[]),
         "features": attrs.list(attrs.string(), default=[]),
         "flags": attrs.list(attrs.string(), default=[]),
-        "includes": attrs.list(attrs.dep(providers=[IncludeInfo]), default=[]),
         "rustc": attrs.toolchain_dep(default="//toolchains:rustc"),
         "dep_wrapper": attrs.default_only(
             attrs.exec_dep(
