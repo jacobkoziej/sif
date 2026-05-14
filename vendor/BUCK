@@ -30,5 +30,8 @@ crate(
     name="core",
     root=":rustlib[core/src/lib.rs]",
     src_deps=[":rustlib"],
+    cfg=[
+        "no_fp_fmt_parse",
+    ],
     visibility=["PUBLIC"],
 )
