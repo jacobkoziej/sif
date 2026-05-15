@@ -7,15 +7,15 @@
 SECTIONS {
 	.rodata.ehdr : {
 		. += ELF_HEADER_SIZE;
-	} > ro_lm
+	} > ro_lm =0xFF
 
 	.rodata.phdrs : {
 		. += ELF_PROGRAM_HEADERS_ALLOCATION;
-	} > ro_lm
+	} > ro_lm =0xFF
 
 	.text._start : {
 		*(.text._start)
-	} > ro_lm AT> ro_lm
+	} > ro_lm AT> ro_lm =0xFF
 
 	ASSERT(ADDR(.text._start) == LOADADDR(.text._start), ".text._start must be XIP")
 
@@ -29,15 +29,15 @@ SECTIONS {
 
 	.text : {
 		*(.text*)
-	} > ro_vm AT> ro_lm
+	} > ro_vm AT> ro_lm =0xFF
 
 	.rodata : {
 		*(.rodata*)
-	} > ro_vm AT> ro_lm
+	} > ro_vm AT> ro_lm =0xFF
 
 	.data : {
 		*(.data*)
-	} > rw_vm AT> ro_lm
+	} > rw_vm AT> ro_lm =0xFF
 
 	.bss (NOLOAD) : {
 		*(.bss*)

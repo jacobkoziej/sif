@@ -7,7 +7,7 @@
 SECTIONS {
 	.ARM.exidx : {
 		*(.ARM.exidx*)
-	} > ro_vm AT> ro_lm
+	} > ro_vm AT> ro_lm =0xFF
 
 	.ARM.attributes 0 : { *(.ARM.attributes) }
 }
