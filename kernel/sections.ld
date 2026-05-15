@@ -5,6 +5,14 @@
  */
 
 SECTIONS {
+	.rodata.ehdr : {
+		. += ELF_HEADER_SIZE;
+	} > ro_lm
+
+	.rodata.phdrs : {
+		. += ELF_PROGRAM_HEADERS_ALLOCATION;
+	} > ro_lm
+
 	.text._start : {
 		*(.text._start)
 	} > ro_lm AT> ro_lm

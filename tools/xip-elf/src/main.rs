@@ -4,16 +4,13 @@
 // Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 use clap::Parser;
-use clap_num::maybe_hex;
 use elf::ElfStream;
 use elf::endian::{AnyEndian, EndianParse};
 use elf::file::FileHeader;
-use ihex::Record;
 use std::convert::From;
 use std::error::Error;
-use std::fs::File;
-use std::io;
-use std::io::Write;
+use std::fs::{File, OpenOptions, copy};
+use std::io::{Seek, SeekFrom, Write};
 use std::mem::size_of;
 use std::path::PathBuf;
 
@@ -21,20 +18,20 @@ use std::path::PathBuf;
 #[derive(Parser)]
 #[command(about, version)]
 struct Args {
-    /// Path to input ELF
-    input: PathBuf,
+    /// Path to ELF
+    elf: PathBuf,
 
-    /// Path to output Intel HEX
+    /// Section to place ELF header
+    #[arg(long, default_value = ".rodata.ehdr")]
+    ehdr: String,
+
+    /// Section to place program header(s)
+    #[arg(long, default_value = ".rodata.phdrs")]
+    phdrs: String,
+
+    /// Path to output modified ELF instead of operating in-place
     #[arg(short, long)]
     output: Option<PathBuf>,
-
-    /// Address to place ELF header (default: prepend to segment(s))
-    #[arg(long, value_parser=maybe_hex::<u64>)]
-    header_address: Option<u64>,
-
-    /// Address to place ELF program header(s) (default: append to segment(s))
-    #[arg(long, value_parser=maybe_hex::<u64>)]
-    program_headers_address: Option<u64>,
 }
 
 struct Header<E: EndianParse>(FileHeader<E>);
@@ -151,29 +148,19 @@ impl<E: EndianParse> From<ProgramHeader<E>> for Vec<u8> {
     }
 }
 
-fn bytes_to_ihex(address: u32, data: &[u8]) -> Vec<Record> {
-    let mut records = Vec::<Record>::new();
+fn vma2lma(phdrs: &[elf::segment::ProgramHeader], addr: u64) -> Option<u64> {
+    for phdr in phdrs {
+        let p_vaddr = phdr.p_vaddr;
+        let p_memsz = phdr.p_memsz;
 
-    let mut address = address;
+        if (addr >= p_vaddr) && (addr < p_vaddr + p_memsz) {
+            let offset = addr - p_vaddr;
 
-    for chunk in data.chunks(16 * 1024) {
-        records.push(Record::ExtendedLinearAddress((address >> 16) as u16));
-
-        let mut offset = (address & 0xFFFF) as u16;
-
-        for bytes in chunk.chunks(16) {
-            records.push(Record::Data {
-                offset,
-                value: bytes.to_vec(),
-            });
-
-            offset = offset.wrapping_add(16);
+            return Some(phdr.p_paddr + offset);
         }
-
-        address = address.wrapping_add(16 * 1024);
     }
 
-    records
+    None
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -181,7 +168,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut p_types = vec![elf::abi::PT_LOAD];
 
-    let file = ElfStream::<AnyEndian, _>::open_stream(File::open(&args.input)?)?;
+    let mut file = ElfStream::<AnyEndian, _>::open_stream(File::open(&args.elf)?)?;
 
     let mut ehdr = file.ehdr;
 
@@ -203,91 +190,79 @@ fn main() -> Result<(), Box<dyn Error>> {
         .copied()
         .collect();
 
-    let header_address = match args.header_address {
-        Some(address) => address,
-        None => {
-            let mut address = u64::MAX;
+    let ehdr_shdr = *file.section_header_by_name(&args.ehdr)?.ok_or(format!(
+        "ELF header output section `{}` not found",
+        args.ehdr
+    ))?;
 
-            for phdr in &phdrs {
-                address = address.min(phdr.p_paddr);
-            }
-
-            address.wrapping_sub(match ehdr.class {
-                elf::file::Class::ELF32 => size_of::<elf::file::Elf32_Ehdr>(),
-                elf::file::Class::ELF64 => size_of::<elf::file::Elf64_Ehdr>(),
-            } as u64)
-        }
+    let Some(ehdr_addr) = vma2lma(&phdrs, ehdr_shdr.sh_addr) else {
+        return Err(format!("ELF header output section must be allocatable").into());
     };
 
-    let program_headers_address = match args.program_headers_address {
-        Some(address) => address,
-        None => {
-            let mut address = u64::MIN;
-
-            for phdr in &phdrs {
-                let end = phdr.p_paddr.wrapping_add(phdr.p_memsz);
-
-                address = address.max(end);
-            }
-
-            address
-        }
-    };
-
-    for phdr in &mut phdrs {
-        phdr.p_offset = phdr.p_paddr.wrapping_sub(header_address);
+    if ehdr_addr != ehdr_shdr.sh_addr {
+        return Err(format!("ELF header output section must be XIP").into());
     }
 
-    ehdr.e_phoff = program_headers_address.wrapping_sub(header_address);
+    let phdrs_shdr = *file.section_header_by_name(&args.phdrs)?.ok_or(format!(
+        "Program header(s) output section `{}` not found",
+        args.phdrs
+    ))?;
+
+    let Some(phdrs_addr) = vma2lma(&phdrs, phdrs_shdr.sh_addr) else {
+        return Err(format!("Program header(s) output section must be allocatable").into());
+    };
+
+    if phdrs_addr != phdrs_shdr.sh_addr {
+        return Err(format!("Program header(s) output section must be XIP").into());
+    }
+
+    for phdr in &mut phdrs {
+        phdr.p_offset = phdr.p_paddr.wrapping_sub(ehdr_addr);
+    }
+
+    ehdr.e_phoff = phdrs_addr.wrapping_sub(phdrs_addr);
     ehdr.e_shoff = 0;
     ehdr.e_phnum = phdrs.len() as u16;
     ehdr.e_shnum = elf::abi::SHN_UNDEF;
 
-    let header = Header(ehdr);
-    let program_headers = phdrs.into_iter().map(|header| ProgramHeader {
-        class: ehdr.class,
-        endianness: ehdr.endianness,
-        header,
-    });
+    let header = Vec::from(Header(ehdr));
 
-    let mut records = Vec::<Record>::new();
-
-    if header_address > u32::MAX.into() {
-        eprintln!(
-            "warning: header address, 0x{:016x}, exceeds 32b address space.",
-            header_address
-        );
+    if header.len() > ehdr_shdr.sh_size as usize {
+        return Err(format!("ELF header cannot fit in output section").into());
     }
 
-    if program_headers_address > u32::MAX.into() {
-        eprintln!(
-            "warning: program header address, 0x{:016x}, exceeds 32b address space.",
-            program_headers_address
-        );
+    let program_headers: Vec<_> = phdrs
+        .into_iter()
+        .map(|header| {
+            Vec::from(ProgramHeader {
+                class: ehdr.class,
+                endianness: ehdr.endianness,
+                header,
+            })
+        })
+        .flatten()
+        .collect();
+
+    if program_headers.len() > phdrs_shdr.sh_size as usize {
+        return Err(format!("Program header(s) cannot fit in output section").into());
     }
 
-    records.append(&mut bytes_to_ihex(
-        header_address as u32,
-        &Vec::from(header),
-    ));
-    records.append(&mut bytes_to_ihex(
-        program_headers_address as u32,
-        &program_headers
-            .into_iter()
-            .map(|header| Vec::from(header))
-            .flatten()
-            .collect::<Vec<u8>>(),
-    ));
-    records.push(Record::EndOfFile);
+    let path = match args.output {
+        Some(path) => {
+            copy(&args.elf, &path)?;
 
-    let output = ihex::create_object_file_representation(&records).unwrap();
-
-    let mut writer: Box<dyn Write> = match args.output {
-        Some(path) => Box::new(File::create(path)?),
-        None => Box::new(io::stdout()),
+            path
+        }
+        None => args.elf,
     };
 
-    writer.write_all(output.as_bytes())?;
+    let mut file = OpenOptions::new().write(true).open(path)?;
+
+    file.seek(SeekFrom::Start(ehdr_shdr.sh_offset))?;
+    file.write_all(&header)?;
+
+    file.seek(SeekFrom::Start(phdrs_shdr.sh_offset))?;
+    file.write_all(&program_headers)?;
 
     Ok(())
 }
