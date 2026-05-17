@@ -1,0 +1,13 @@
+diff --git a/app/buck2_common/src/legacy_configs/parser.rs b/app/buck2_common/src/legacy_configs/parser.rs
+index aa008463f5..ae4dfc2cef 100644
+--- a/app/buck2_common/src/legacy_configs/parser.rs
++++ b/app/buck2_common/src/legacy_configs/parser.rs
+@@ -136,7 +136,7 @@ impl LegacyConfigParser {
+         config_pair: &ResolvedConfigFlag,
+         current_cell: &CellRootPath,
+     ) -> buck2_error::Result<()> {
+-        for banned_section in ["repositories", "cells"] {
++        for banned_section in ["repositories"] {
+             if config_pair.section == banned_section {
+                 return Err(
+                     ConfigArgumentParseError::CellOverrideViaCliConfig(banned_section).into(),

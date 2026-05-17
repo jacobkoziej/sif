@@ -3,6 +3,7 @@
     {
       lib,
       pkgs,
+      self',
       ...
     }:
 
@@ -17,7 +18,7 @@
 
           buck2 = pkgs.writeShellScriptBin "buck2" ''
             exec \
-              "${getExe pkgs.buck2}" \
+              "${getExe self'.packages.buck2}" \
               ${"$"}{BUCK2FLAGS:+"$BUCK2FLAGS"} \
               ${"$"}{@:+"$@"} \
               ;
