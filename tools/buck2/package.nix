@@ -48,6 +48,7 @@
 
           patches = [
             ./cli-cell-override.patch
+            ./dynamic-cell-resolution.patch
             ./test_copy_file.patch
           ];
 
