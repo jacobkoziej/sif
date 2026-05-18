@@ -33,6 +33,7 @@
             mdformat
             pre-commit
             rustfmt
+            statix
             toml-sort
             treefmt
             yamlfmt
