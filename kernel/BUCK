@@ -6,10 +6,6 @@ load("//rules:include.bzl", "include")
 crate(
     name="kernel",
     root="lib.rs",
-    deps=[
-        "//vendor:compiler_builtins",
-        "//vendor:core",
-    ],
     srcs=glob(["**/*.rs"]),
 )
 

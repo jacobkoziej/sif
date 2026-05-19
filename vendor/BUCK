@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//rules:crate.bzl", "crate")
+load("//rules:crate.bzl", "crate_unwrapped")
 load("//vendor:rules.bzl", "src")
 
 src(
@@ -14,7 +14,7 @@ src(
     ],
 )
 
-crate(
+crate_unwrapped(
     name="compiler_builtins",
     root=":rustlib[compiler-builtins/compiler-builtins/src/lib.rs]",
     src_deps=[":rustlib"],
@@ -26,7 +26,7 @@ crate(
     visibility=["PUBLIC"],
 )
 
-crate(
+crate_unwrapped(
     name="core",
     root=":rustlib[core/src/lib.rs]",
     src_deps=[":rustlib"],

@@ -162,7 +162,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
     ]
 
 
-crate = rule(
+crate_unwrapped = rule(
     impl=_crate_impl,
     attrs={
         "root": attrs.one_of(attrs.source(), attrs.dep()),
@@ -197,3 +197,12 @@ crate = rule(
         ),
     },
 )
+
+
+def crate(**kwargs: dict[str, typing.Any]) -> None:
+    kwargs["deps"] = [
+        "//vendor:core",
+        "//vendor:compiler_builtins",
+    ] + kwargs.get("deps", [])
+
+    crate_unwrapped(**kwargs)
