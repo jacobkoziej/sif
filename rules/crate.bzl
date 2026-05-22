@@ -7,12 +7,14 @@ load(
     "//rules:include.bzl",
     "IncludeInfo",
     "IncludeTSet",
+    "get_include",
 )
 load(
     "//rules:object.bzl",
     "ObjectInfo",
     "ObjectTSet",
 )
+load("//utils:provider.bzl", "get_provider")
 
 _crate_type: dict[str, str] = {
     "bin": ".elf",
@@ -61,6 +63,14 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 
     src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
 
+    crate_deps = ctx.attrs.deps + ctx.attrs.aliased_deps.values()
+
+    search_paths = get_include(
+        actions=ctx.actions,
+        includes=get_provider(crate_deps, IncludeInfo),
+        prefix="-L",
+    )
+
     externs = [
         cmd_args(dep[CrateInfo].name, dep[CrateInfo].metadata, delimiter="=")
         for dep in ctx.attrs.deps
@@ -87,6 +97,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         out.as_output(),
         "--",
         rustc,
+        search_paths.flags,
         [cmd_args(extern, format="--extern={}") for extern in externs],
         [cmd_args(cfg, format="--cfg={}") for cfg in ctx.attrs.cfg],
         [
@@ -144,10 +155,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             objects=ctx.actions.tset(
                 ObjectTSet,
                 value=obj,
-                children=[
-                    dep[ObjectInfo].objects
-                    for dep in (ctx.attrs.deps + ctx.attrs.aliased_deps.values())
-                ],
+                children=[dep[ObjectInfo].objects for dep in crate_deps],
             ),
         ),
         IncludeInfo(
@@ -166,10 +174,25 @@ crate_unwrapped = rule(
         "root": attrs.one_of(attrs.source(), attrs.dep()),
         "srcs": attrs.list(attrs.source(), default=[]),
         "src_deps": attrs.list(attrs.dep(), default=[]),
-        "deps": attrs.list(attrs.dep(providers=[CrateInfo]), default=[]),
+        "deps": attrs.list(
+            attrs.dep(
+                providers=[
+                    CrateInfo,
+                    IncludeInfo,
+                    ObjectInfo,
+                ],
+            ),
+            default=[],
+        ),
         "aliased_deps": attrs.dict(
             key=attrs.string(),
-            value=attrs.dep(providers=[CrateInfo]),
+            value=attrs.dep(
+                providers=[
+                    CrateInfo,
+                    IncludeInfo,
+                    ObjectInfo,
+                ],
+            ),
             default={},
         ),
         "out_name": attrs.option(attrs.string(), default=None),
