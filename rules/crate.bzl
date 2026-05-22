@@ -47,9 +47,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 
     crate_type = ctx.attrs.type
 
-    name = (
-        crate_name if ctx.attrs.out_name or crate_type == "bin" else "lib" + crate_name
-    )
+    name = crate_name if crate_type == "bin" else "lib" + crate_name
 
     out = ctx.actions.declare_output(name + _crate_type[crate_type])
     rmeta = ctx.actions.declare_output(name + ".rmeta")
@@ -95,7 +93,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             cmd_args(feature, format='--cfg=feature="{}"')
             for feature in ctx.attrs.features
         ],
-        cmd_args(name, format="--crate-name={}"),
+        cmd_args(crate_name, format="--crate-name={}"),
         cmd_args(crate_type, format="--crate-type={}"),
         cmd_args(dep_file, format="--emit=dep-info={}"),
         [
