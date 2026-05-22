@@ -59,6 +59,15 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         emit: ctx.actions.declare_output(name + _emit[emit]) for emit in ctx.attrs.emit
     }
 
+    incremental = (
+        cmd_args(
+            ctx.actions.declare_output("incremental", dir=True).as_output(),
+            format="--codegen=incremental={}",
+        )
+        if ctx.attrs.incremental
+        else []
+    )
+
     dep_info = ctx.actions.artifact_tag()
 
     src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
@@ -104,6 +113,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             cmd_args(feature, format='--cfg=feature="{}"')
             for feature in ctx.attrs.features
         ],
+        incremental,
         cmd_args(crate_name, format="--crate-name={}"),
         cmd_args(crate_type, format="--crate-type={}"),
         cmd_args(dep_file, format="--emit=dep-info={}"),
