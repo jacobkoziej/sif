@@ -6,12 +6,14 @@
 #![no_std]
 #![no_main]
 
-pub mod arch;
-
 use core::panic::PanicInfo;
+use sif_arch::Arch;
+use sif_core::ArchInit;
 
 #[unsafe(no_mangle)]
 pub(crate) extern "C" fn main() {
+    Arch::init();
+
     loop {}
 }
 

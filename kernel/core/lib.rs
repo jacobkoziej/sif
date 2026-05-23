@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 //
-// mod.rs -- Arm architecture module
+// lib.rs -- sif core
 // Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-mod start;
+#![no_std]
+
+pub trait ArchInit {
+    fn init();
+}

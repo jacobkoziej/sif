@@ -4,9 +4,27 @@ load("//rules:crate.bzl", "crate")
 load("//rules:include.bzl", "include")
 
 crate(
+    name="core",
+    out_name="sif_core",
+    root="core/lib.rs",
+    srcs=glob(["core/**/*.rs"]),
+)
+
+crate(
     name="kernel",
-    root="lib.rs",
-    srcs=glob(["**/*.rs"]),
+    out_name="sif",
+    root="kernel/lib.rs",
+    srcs=glob(["kernel/**/*.rs"]),
+    deps=[
+        ":core",
+    ],
+    aliased_deps={
+        "sif_arch": select(
+            {
+                "//constraints:arch[arm]": "//kernel/arch:arm",
+            },
+        ),
+    },
 )
 
 include(
