@@ -3,7 +3,7 @@
 # xip-elf.bzl -- XIP ELF rule
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-load("//rules:elf.bzl", "ElfInfo")
+load("@sif//rules:elf.bzl", "ElfInfo")
 
 
 def _xip_elf_impl(ctx: AnalysisContext) -> list[Provider]:
@@ -54,7 +54,7 @@ xip_elf = rule(
         "xip_elf": attrs.default_only(
             attrs.exec_dep(
                 providers=[RunInfo],
-                default="//tools:xip-elf",
+                default="sif//tools:xip-elf",
             ),
         ),
     },

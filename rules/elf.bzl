@@ -4,13 +4,13 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(
-    "//rules:include.bzl",
+    "@sif//rules:include.bzl",
     "IncludeInfo",
     "get_include",
 )
-load("//rules:object.bzl", "ObjectInfo")
-load("//toolchains:rules.bzl", "LdToolchainInfo")
-load("//utils:provider.bzl", "get_provider")
+load("@sif//rules:object.bzl", "ObjectInfo")
+load("@sif//toolchains:rules.bzl", "LdToolchainInfo")
+load("@sif//utils:provider.bzl", "get_provider")
 
 
 ElfInfo = provider(
@@ -120,12 +120,12 @@ elf = rule(
         "objects": attrs.list(attrs.dep(providers=[ObjectInfo]), default=[]),
         "linker": attrs.toolchain_dep(
             providers=[LdToolchainInfo],
-            default="//toolchains:ld",
+            default="sif//toolchains:ld",
         ),
         "dep_wrapper": attrs.default_only(
             attrs.exec_dep(
                 providers=[RunInfo],
-                default="//tools:buck2-dep-format",
+                default="sif//tools:buck2-dep-format",
             ),
         ),
     },

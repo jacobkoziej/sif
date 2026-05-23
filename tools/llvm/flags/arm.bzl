@@ -3,7 +3,7 @@
 # arm.bzl -- llvm arm constraint flags
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-load("//utils:select.bzl", "nested_select")
+load("@sif//utils:select.bzl", "nested_select")
 
 
 def _bin_attr(constraint: str, flag: str) -> Select:
@@ -23,7 +23,7 @@ def _bin_attr(constraint: str, flag: str) -> Select:
 
 
 def _constraint(c: str) -> str:
-    return "//constraints/arch/arm{}".format(c)
+    return "sif//constraints/arch/arm{}".format(c)
 
 
 def features() -> Select:

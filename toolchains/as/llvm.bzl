@@ -3,9 +3,9 @@
 # llvm.bzl -- llvm-mc assembler toolchain
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-load("//toolchains/rules.bzl", "AsToolchainInfo")
+load("@sif//toolchains/rules.bzl", "AsToolchainInfo")
 load(
-    "//tools/llvm/flags.bzl",
+    "@sif//tools/llvm/flags.bzl",
     "arch",
     "attributes",
     "cpu",
@@ -38,7 +38,7 @@ llvm = rule(
     impl=_llvm_impl,
     is_toolchain_rule=True,
     attrs={
-        "tool": attrs.exec_dep(providers=[RunInfo], default="//tools/llvm:mc"),
+        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools/llvm:mc"),
         "arch": attrs.string(default=arch()),
         "cpu": attrs.string(default=cpu()),
         "attributes": attrs.list(attrs.string(), default=attributes()),

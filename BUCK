@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//utils/rules.bzl", "export_path")
+load("@sif//utils/rules.bzl", "export_path")
 
 export_path(
     "flake.lock",

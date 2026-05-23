@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//rules:crate.bzl", "crate_unwrapped")
-load("//vendor:rules.bzl", "src")
+load("@sif//rules:crate.bzl", "crate_unwrapped")
+load("@sif//vendor:rules.bzl", "src")
 
 src(
     name="rustlib",

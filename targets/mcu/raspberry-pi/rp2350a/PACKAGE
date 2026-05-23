@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//cfg/modifiers.bzl", "set_cfg_modifiers")
+load("@sif//cfg/modifiers.bzl", "set_cfg_modifiers")
 
 set_cfg_modifiers(
-    "//cfg/mcu/raspberry-pi:rp2350a",
+    "sif//cfg/mcu/raspberry-pi:rp2350a",
 )

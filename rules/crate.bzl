@@ -4,17 +4,17 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(
-    "//rules:include.bzl",
+    "@sif//rules:include.bzl",
     "IncludeInfo",
     "IncludeTSet",
     "get_include",
 )
 load(
-    "//rules:object.bzl",
+    "@sif//rules:object.bzl",
     "ObjectInfo",
     "ObjectTSet",
 )
-load("//utils:provider.bzl", "get_provider")
+load("@sif//utils:provider.bzl", "get_provider")
 
 _crate_type: dict[str, str] = {
     "bin": ".elf",
@@ -214,16 +214,16 @@ crate_unwrapped = rule(
         "incremental": attrs.bool(
             default=select(
                 {
-                    "//constraints:opt-level[0]": True,
+                    "sif//constraints:opt-level[0]": True,
                     "DEFAULT": False,
                 },
             ),
         ),
-        "rustc": attrs.toolchain_dep(default="//toolchains:rustc"),
+        "rustc": attrs.toolchain_dep(default="sif//toolchains:rustc"),
         "dep_wrapper": attrs.default_only(
             attrs.exec_dep(
                 providers=[RunInfo],
-                default="//tools:buck2-dep-format",
+                default="sif//tools:buck2-dep-format",
             ),
         ),
     },
@@ -232,8 +232,8 @@ crate_unwrapped = rule(
 
 def crate(**kwargs: dict[str, typing.Any]) -> None:
     kwargs["deps"] = [
-        "//vendor:core",
-        "//vendor:compiler_builtins",
+        "sif//vendor:core",
+        "sif//vendor:compiler_builtins",
     ] + kwargs.get("deps", [])
 
     crate_unwrapped(**kwargs)

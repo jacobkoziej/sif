@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//constraints:rules.bzl", "constraint")
+load("@sif//constraints:rules.bzl", "constraint")
 
 constraint(
     name="cpu",

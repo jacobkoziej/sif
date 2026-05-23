@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 load(
-    "//constraints:rules.bzl",
+    "@sif//constraints:rules.bzl",
     "binary_constraint",
     "constraint",
 )

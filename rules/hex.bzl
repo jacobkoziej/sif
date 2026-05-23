@@ -3,7 +3,7 @@
 # hex.bzl -- hex rules
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-load("//rules:elf.bzl", "ElfInfo")
+load("@sif//rules:elf.bzl", "ElfInfo")
 
 HexInfo = provider(
     fields={
@@ -53,7 +53,7 @@ hex_cat = rule(
         "srec_cat": attrs.default_only(
             attrs.exec_dep(
                 providers=[RunInfo],
-                default="//tools:srec_cat",
+                default="sif//tools:srec_cat",
             ),
         ),
     },
@@ -100,7 +100,7 @@ to_hex = rule(
         "objcopy": attrs.default_only(
             attrs.exec_dep(
                 providers=[RunInfo],
-                default="//tools/llvm:objcopy",
+                default="sif//tools/llvm:objcopy",
             ),
         ),
     },

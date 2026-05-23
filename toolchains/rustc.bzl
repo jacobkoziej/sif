@@ -4,11 +4,11 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(
-    "//tools/llvm/flags.bzl",
+    "@sif//tools/llvm/flags.bzl",
     "attributes",
     "cpu",
 )
-load("//tools/rustc:flags.bzl", "target")
+load("@sif//tools/rustc:flags.bzl", "target")
 
 rust_edition: str = "2024"
 
@@ -50,7 +50,7 @@ rustc = rule(
     impl=_rustc_impl,
     is_toolchain_rule=True,
     attrs={
-        "tool": attrs.exec_dep(providers=[RunInfo], default="//tools:rustc"),
+        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools:rustc"),
         "target": attrs.string(default=target()),
         "codegen_options": attrs.dict(
             key=attrs.string(),

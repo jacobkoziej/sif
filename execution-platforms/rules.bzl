@@ -10,18 +10,18 @@ def get_host_constraints() -> list[str]:
     arch = host_info().arch
 
     if arch.is_aarch64:
-        constraints += ["//constraints:arch[aarch64]"]
+        constraints += ["sif//constraints:arch[aarch64]"]
 
     if arch.is_x86_64:
-        constraints += ["//constraints:arch[x86_64]"]
+        constraints += ["sif//constraints:arch[x86_64]"]
 
     os = host_info().os
 
     if os.is_linux:
-        constraints += ["//constraints:os[linux]"]
+        constraints += ["sif//constraints:os[linux]"]
 
     if os.is_macos:
-        constraints += ["//constraints:os[macos]"]
+        constraints += ["sif//constraints:os[macos]"]
 
     return constraints
 

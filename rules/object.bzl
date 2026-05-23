@@ -4,19 +4,19 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(
-    "//rules:include.bzl",
+    "@sif//rules:include.bzl",
     "IncludeInfo",
     "IncludeTSet",
 )
-load("//toolchains:rules.bzl", "AsToolchainInfo")
-load("//utils:dict.bzl", "obj_to_dict")
+load("@sif//toolchains:rules.bzl", "AsToolchainInfo")
+load("@sif//utils:dict.bzl", "obj_to_dict")
 
 _object_providers: list[typing.Any] = [
     AsToolchainInfo,
 ]
 
 object_toolchains: dict[str, str] = {
-    ".s": "//toolchains:as",
+    ".s": "sif//toolchains:as",
 }
 
 _object_field_attrs: dict[str, Attr] = {

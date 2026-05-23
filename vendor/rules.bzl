@@ -4,11 +4,11 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(
-    "//nix/rules.bzl",
+    "@sif//nix/rules.bzl",
     "derivation_copy",
     "get_system",
 )
-load("//utils/rules.bzl", "export_path")
+load("@sif//utils/rules.bzl", "export_path")
 
 
 def src(

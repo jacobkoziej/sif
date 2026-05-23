@@ -4,7 +4,7 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(
-    "//nix/rules.bzl",
+    "@sif//nix/rules.bzl",
     "derivation_output_path",
     "get_system",
 )

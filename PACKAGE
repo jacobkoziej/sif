@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 load(
-    "//cfg:modifiers.bzl",
+    "@sif//cfg:modifiers.bzl",
     "apply_modifiers",
     "gather_modifiers",
     "set_cfg_modifiers",
@@ -15,5 +15,5 @@ set_cfg_constructor(
 )
 
 set_cfg_modifiers(
-    "//constraints:opt-level[default]",
+    "sif//constraints:opt-level[default]",
 )

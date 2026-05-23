@@ -6,9 +6,9 @@
 # Inspired by the original work of Meta Platforms, Inc. and affiliates.
 # <https://github.com/facebook/buck2-prelude/tree/8c031a1936f91633c0321e8c3c894e35c9066b9b/cfg/modifier>
 
-load("//cfg/rules.bzl", "is_subset")
+load("@sif//cfg/rules.bzl", "is_subset")
 load(
-    "//utils/graph.bzl",
+    "@sif//utils/graph.bzl",
     "fill_empty_edges",
     "post_order_traversal",
 )

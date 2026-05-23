@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//toolchains:rules.bzl", "toolchain_alias")
-load("//toolchains:rustc.bzl", "rustc")
+load("@sif//toolchains:rules.bzl", "toolchain_alias")
+load("@sif//toolchains:rustc.bzl", "rustc")
 
 toolchain_alias(
     name="as",
     actual=select(
         {
-            "//constraints:toolchain[llvm]": "//toolchains/as:llvm",
+            "sif//constraints:toolchain[llvm]": "sif//toolchains/as:llvm",
         }
     ),
 )
@@ -16,7 +16,7 @@ toolchain_alias(
     name="ld",
     actual=select(
         {
-            "//constraints:toolchain[llvm]": "//toolchains/ld:llvm",
+            "sif//constraints:toolchain[llvm]": "sif//toolchains/ld:llvm",
         }
     ),
 )

@@ -11,7 +11,7 @@ _common_attrs: dict[str, Attr] = {
     "system": attrs.option(attrs.string(), default=None),
     "derivation": attrs.list(attrs.string()),
     "output": attrs.string(default="out"),
-    "flake_lock": attrs.source(allow_directory=True, default="//:flake.lock"),
+    "flake_lock": attrs.source(allow_directory=True, default="sif//:flake.lock"),
 }
 
 
@@ -19,15 +19,15 @@ def get_system() -> Select:
     return (
         select(
             {
-                "//constraints:arch[aarch64]": "aarch64",
-                "//constraints:arch[x86_64]": "x86_64",
+                "sif//constraints:arch[aarch64]": "aarch64",
+                "sif//constraints:arch[x86_64]": "x86_64",
             }
         )
         + "-"
         + select(
             {
-                "//constraints:os[linux]": "linux",
-                "//constraints:os[macos]": "darwin",
+                "sif//constraints:os[linux]": "linux",
+                "sif//constraints:os[macos]": "darwin",
             }
         )
     )

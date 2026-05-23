@@ -1,16 +1,16 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//rules:elf.bzl", "elf")
-load("//rules:xip-elf.bzl", "xip_elf")
+load("@sif//rules:elf.bzl", "elf")
+load("@sif//rules:xip-elf.bzl", "xip_elf")
 
 elf(
     name="_vmsif.elf",
-    script="//kernel/mcu/raspberry-pi/rp2350a:vmsif.ld",
+    script="sif//kernel/mcu/raspberry-pi/rp2350a:vmsif.ld",
     objects=[
-        "//kernel:kernel",
+        "sif//kernel:kernel",
     ],
     includes=[
-        "//kernel:ld-include",
+        "sif//kernel:ld-include",
     ],
 )
 

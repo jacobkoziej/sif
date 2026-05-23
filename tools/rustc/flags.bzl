@@ -4,7 +4,7 @@
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(
-    "//tools/llvm/flags:arm.bzl",
+    "@sif//tools/llvm/flags:arm.bzl",
     arm_profile="profile",
     arm_version="version",
 )
@@ -14,15 +14,15 @@ def target() -> Select:
     def arm() -> Select:
         instruction_set = select(
             {
-                "//constraints/arch/arm:profile[m]": "thumb",
+                "sif//constraints/arch/arm:profile[m]": "thumb",
                 "DEFAULT": "arm",
             }
         )
 
         eabi = select(
             {
-                "//constraints:eabihf[true]": "eabihf",
-                "//constraints:eabihf[false]": "eabi",
+                "sif//constraints:eabihf[true]": "eabihf",
+                "sif//constraints:eabihf[false]": "eabi",
             }
         )
 
@@ -30,6 +30,6 @@ def target() -> Select:
 
     return select(
         {
-            "//constraints:arch[arm]": arm(),
+            "sif//constraints:arch[arm]": arm(),
         }
     )

@@ -3,8 +3,8 @@
 # llvm.bzl -- lld linker toolchain
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-load("//toolchains/rules.bzl", "LdToolchainInfo")
-load("//tools/llvm/flags.bzl", "opt_level")
+load("@sif//toolchains/rules.bzl", "LdToolchainInfo")
+load("@sif//tools/llvm/flags.bzl", "opt_level")
 
 
 def _llvm_impl(ctx: AnalysisContext) -> list[Provider]:
@@ -39,7 +39,7 @@ llvm = rule(
     impl=_llvm_impl,
     is_toolchain_rule=True,
     attrs={
-        "tool": attrs.exec_dep(providers=[RunInfo], default="//tools/llvm:lld"),
+        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools/llvm:lld"),
         "opt_level": attrs.string(default=opt_level()),
     },
 )

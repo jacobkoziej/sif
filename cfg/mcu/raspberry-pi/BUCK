@@ -1,22 +1,22 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("//cfg:rules.bzl", "cfg")
+load("@sif//cfg:rules.bzl", "cfg")
 
 # #cite(<rpi-rp2350-datasheet>)
 # 3.7.2 :: Configuration
 cfg(
     name="rp2350a",
     constraints=[
-        "//constraints:arch[arm]",
-        "//constraints/arch/arm:version[8]",
-        "//constraints/arch/arm:profile[m]",
-        "//constraints/arch/arm:cpu[cortex-m33]",
-        "//constraints/arch/arm/version/8/m/extension:debug[true]",
-        "//constraints/arch/arm/version/8/m/extension:dsp[true]",
-        "//constraints/arch/arm/version/8/m/extension:floating-point[true]",
-        "//constraints/arch/arm/version/8/m/extension:main[true]",
-        "//constraints/arch/arm/version/8/m/extension:mpu[true]",
-        "//constraints/arch/arm/version/8/m/extension:security[true]",
-        "//constraints/arch/arm/version/8/m/extension:systick[true]",
+        "sif//constraints:arch[arm]",
+        "sif//constraints/arch/arm:version[8]",
+        "sif//constraints/arch/arm:profile[m]",
+        "sif//constraints/arch/arm:cpu[cortex-m33]",
+        "sif//constraints/arch/arm/version/8/m/extension:debug[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:dsp[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:floating-point[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:main[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:mpu[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:security[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:systick[true]",
     ],
 )
