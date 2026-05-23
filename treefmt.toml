@@ -83,6 +83,7 @@ excludes = [
   "*.gitignore",
   "*.ld",
   "*.lock",
+  "*.patch",
   ".buckconfig",
   ".editorconfig",
   "LICENSE",
