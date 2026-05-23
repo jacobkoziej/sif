@@ -6,8 +6,8 @@ load("//vendor:rules.bzl", "src")
 src(
     name="rustlib",
     flake=".",
-    derivation=["packages", "rust-bin"],
-    path="lib/rustlib/src/rust/library",
+    derivation=["packages", "rust-src"],
+    path=".",
     sub_paths=[
         "compiler-builtins/compiler-builtins/src/lib.rs",
         "core/src/lib.rs",

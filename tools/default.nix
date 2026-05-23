@@ -2,6 +2,7 @@
   imports = [
     ./buck2-dep-format/package.nix
     ./buck2/package.nix
+    ./rustc/package.nix
     ./xip-elf/package.nix
   ];
 
