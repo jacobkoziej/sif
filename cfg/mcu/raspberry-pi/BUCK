@@ -18,5 +18,7 @@ cfg(
         "sif//constraints/arch/arm/version/8/m/extension:mpu[true]",
         "sif//constraints/arch/arm/version/8/m/extension:security[true]",
         "sif//constraints/arch/arm/version/8/m/extension:systick[true]",
+        "sif//constraints:vendor[raspberry-pi]",
+        "sif//constraints/vendor/raspberry-pi:mcu[rp2350a]",
     ],
 )

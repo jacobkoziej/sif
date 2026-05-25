@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//constraints:rules.bzl", "constraint")
+
+constraint(
+    name="mcu",
+    values=[
+        "rp2350a",
+    ],
+)

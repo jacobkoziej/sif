@@ -43,3 +43,11 @@ constraint(
     nullable=False,
     default="llvm",
 )
+
+constraint(
+    name="vendor",
+    values=[
+        "raspberry-pi",
+    ],
+    nullable=True,
+)
