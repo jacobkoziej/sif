@@ -13,6 +13,22 @@ load("@sif//tools/rustc:flags.bzl", "target")
 rust_edition: str = "2024"
 
 
+# `rustc` does not currently export all target features specified with codegen
+# options. To get around this we re-export these features with `--cfg`.
+def generate_target_feature_cfgs(target_features: list[str]) -> list[str]:
+    def not_disabled(target_feature: str) -> bool:
+        return not target_feature.startswith("-")
+
+    target_features = [t for t in target_features if not_disabled(t)]
+
+    def map_to_cfg(target_feature: str) -> str:
+        target_feature = target_feature.removeprefix("+")
+
+        return '--cfg=target_feature="' + target_feature + '"'
+
+    return ["-A", "explicit_builtin_cfgs_in_flags"] + map(map_to_cfg, target_features)
+
+
 def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     edition = "--edition=" + rust_edition
     target = "--target=" + ctx.attrs.target
@@ -26,6 +42,9 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
         return "--codegen=" + option + "=" + value
 
     codegen_options = map(map_codegen_option, ctx.attrs.codegen_options.items())
+    target_feature_cfgs = generate_target_feature_cfgs(
+        ctx.attrs.codegen_options.get("target-feature", []),
+    )
 
     tool = ctx.attrs.tool[RunInfo].args
 
@@ -36,6 +55,7 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
         edition,
         target,
         codegen_options,
+        target_feature_cfgs,
     )
 
     return [
