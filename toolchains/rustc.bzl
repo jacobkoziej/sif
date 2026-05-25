@@ -46,6 +46,11 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
         ctx.attrs.codegen_options.get("target-feature", []),
     )
 
+    # `rustc` does not export codegen option `target-cpu` for conditional compilation
+    # <https://github.com/rust-lang/rust/issues/44036>
+    target_cpu = ctx.attrs.codegen_options.get("target-cpu")
+    target_cpu = '--cfg=target_cpu="{}"'.format(target_cpu) if target_cpu else []
+
     tool = ctx.attrs.tool[RunInfo].args
 
     cmd = cmd_args(
@@ -56,6 +61,7 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
         target,
         codegen_options,
         target_feature_cfgs,
+        target_cpu,
     )
 
     return [
