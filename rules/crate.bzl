@@ -45,7 +45,7 @@ CrateInfo = provider(
 
 
 def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
-    crate_name = ctx.attrs.out_name or ctx.label.name
+    crate_name = ctx.attrs.crate_name or ctx.label.name
 
     crate_type = ctx.attrs.type
 
@@ -205,7 +205,7 @@ crate_unwrapped = rule(
             ),
             default={},
         ),
-        "out_name": attrs.option(attrs.string(), default=None),
+        "crate_name": attrs.option(attrs.string(), default=None),
         "type": attrs.enum(_crate_type.keys(), default="rlib"),
         "emit": attrs.list(attrs.enum(_emit.keys()), default=[]),
         "cfg": attrs.list(attrs.string(), default=[]),

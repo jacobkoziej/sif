@@ -5,14 +5,14 @@ load("@sif//rules:include.bzl", "include")
 
 crate(
     name="core",
-    out_name="sif_core",
+    crate_name="sif_core",
     root="core/lib.rs",
     srcs=glob(["core/**/*.rs"]),
 )
 
 crate(
     name="kernel",
-    out_name="sif",
+    crate_name="sif",
     root="kernel/lib.rs",
     srcs=glob(["kernel/**/*.rs"]),
     deps=[
