@@ -3,9 +3,9 @@
 load("@sif//rules:crate.bzl", "crate")
 
 crate(
-    name="arm",
-    root="arm/lib.rs",
-    srcs=glob(["arm/**/*.rs"]),
+    name="sif_arch",
+    root="lib.rs",
+    srcs=glob(["**/*.rs"]),
     deps=[
         "sif//kernel:core",
     ],

@@ -7,12 +7,12 @@
 #![no_main]
 
 use core::panic::PanicInfo;
-use sif_arch::Arch;
-use sif_core::ArchInit;
+use sif_core::McuInit;
+use sif_mcu::Mcu;
 
 #[unsafe(no_mangle)]
 pub(crate) extern "C" fn main() {
-    Arch::init();
+    Mcu::init();
 
     loop {}
 }

@@ -7,14 +7,8 @@
 
 const _: () = assert!(cfg!(target_arch = "arm"));
 
-use sif_core::ArchInit;
-
 pub mod start;
 
 pub struct Arm;
 
 pub type Arch = Arm;
-
-impl ArchInit for Arm {
-    fn init() {}
-}

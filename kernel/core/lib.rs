@@ -5,6 +5,6 @@
 
 #![no_std]
 
-pub trait ArchInit {
+pub trait McuInit: Default {
     fn init();
 }

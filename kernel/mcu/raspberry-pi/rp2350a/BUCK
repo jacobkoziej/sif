@@ -1,8 +1,15 @@
 # SPDX-License-Identifier: MPL-2.0
 
+load("@sif//rules:crate.bzl", "crate")
 load("@sif//utils/rules.bzl", "export_path")
 
-export_path(
-    "vmsif.ld",
-    visibility=["PUBLIC"],
+crate(
+    name="sif_mcu",
+    root="lib.rs",
+    srcs=glob(["**/*.rs"]),
+    deps=[
+        "sif//kernel:core",
+    ],
 )
+
+export_path("vmsif.ld")
