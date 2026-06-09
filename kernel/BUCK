@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
+load("@sif//kernel/arch:select.bzl", "select_arch")
+load("@sif//kernel/mcu:select.bzl", "select_mcu")
 load("@sif//rules:crate.bzl", "crate")
 load("@sif//rules:include.bzl", "include")
 
@@ -17,20 +19,8 @@ crate(
     srcs=glob(["kernel/**/*.rs"]),
     deps=[
         ":core",
-        select(
-            {
-                "sif//constraints:arch[arm]": "sif//kernel/arch/arm:sif_arch",
-            },
-        ),
-        select(
-            {
-                "sif//constraints:vendor[raspberry-pi]": select(
-                    {
-                        "sif//constraints/vendor/raspberry-pi:mcu[rp2350a]": "sif//kernel/mcu/raspberry-pi/rp2350a:sif_mcu",
-                    },
-                ),
-            },
-        ),
+        select_arch(),
+        select_mcu(),
     ],
 )
 
