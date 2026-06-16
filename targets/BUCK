@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: MPL-2.0
 
+load("@sif//kernel/mcu:select.bzl", "select_linker_script")
 load("@sif//rules:elf.bzl", "elf")
 load("@sif//rules:xip-elf.bzl", "xip_elf")
 
 elf(
     name="_vmsif.elf",
-    script="sif//kernel/mcu/raspberry-pi/rp2350a:vmsif.ld",
+    script=select_linker_script(),
     objects=[
         "sif//kernel:kernel",
     ],
