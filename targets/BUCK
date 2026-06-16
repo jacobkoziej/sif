@@ -13,6 +13,7 @@ elf(
     includes=[
         "sif//kernel:ld-include",
     ],
+    visibility=[],
 )
 
 xip_elf(

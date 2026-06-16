@@ -349,6 +349,20 @@ def apply_modifiers(
     )
 
 
+def get_buckconfig_cfg_modifiers(
+    section: str = "cfg_modifiers",
+    key: str = "modifiers",
+) -> list[RawModifier]:
+    raw_modifiers = read_root_config(section, key, "")
+
+    if not raw_modifiers:
+        return []
+
+    return [
+        modifier.strip() for modifier in raw_modifiers.split(",") if modifier.strip()
+    ]
+
+
 def set_cfg_modifiers(*modifiers: tuple[Modifier, ...]) -> None:
     parent_modifiers = get_parent_modifiers() or []
 
