@@ -220,7 +220,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         phdr.p_offset = phdr.p_paddr.wrapping_sub(ehdr_addr);
     }
 
-    ehdr.e_phoff = phdrs_addr.wrapping_sub(phdrs_addr);
+    ehdr.e_phoff = phdrs_addr.wrapping_sub(ehdr_addr);
     ehdr.e_shoff = 0;
     ehdr.e_phnum = phdrs.len() as u16;
     ehdr.e_shnum = elf::abi::SHN_UNDEF;
