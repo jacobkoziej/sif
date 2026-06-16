@@ -5,6 +5,8 @@
 
 #![no_std]
 
+pub mod elf;
+
 pub trait McuInit: Default {
     fn init();
 }

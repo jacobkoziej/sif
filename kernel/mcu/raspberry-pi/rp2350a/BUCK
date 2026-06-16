@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 
+load("@sif//kernel/arch:select.bzl", "select_arch")
 load("@sif//rules:crate.bzl", "crate")
 load("@sif//utils/rules.bzl", "export_path")
 
@@ -9,6 +10,7 @@ crate(
     srcs=glob(["**/*.rs"]),
     deps=[
         "sif//kernel:core",
+        select_arch(),
     ],
 )
 

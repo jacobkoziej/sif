@@ -5,14 +5,6 @@
  */
 
 SECTIONS {
-	.rodata.ehdr : {
-		. += ELF_HEADER_SIZE;
-	} > ro_lm =0xFF
-
-	.rodata.phdrs : {
-		. += ELF_PROGRAM_HEADERS_ALLOCATION;
-	} > ro_lm =0xFF
-
 	.text._start : {
 		*(.text._start)
 	} > ro_lm AT> ro_lm =0xFF
@@ -31,9 +23,21 @@ SECTIONS {
 		*(.text*)
 	} > ro_vm AT> ro_lm =0xFF
 
+	.rodata.ehdr : ALIGN(WORD_ALIGN) {
+		. += ELF_HEADER_SIZE;
+	} > ro_lm =0xFF
+
+	.rodata.phdrs : ALIGN(WORD_ALIGN) {
+		. += ELF_PROGRAM_HEADERS_ALLOCATION;
+	} > ro_lm =0xFF
+
 	.rodata : {
 		*(.rodata*)
 	} > ro_vm AT> ro_lm =0xFF
+
+	.bss.swapper_stack (NOLOAD) : ALIGN(STACK_ALIGN) {
+		. += SWAPPER_STACK_SIZE;
+	} > rw_vm
 
 	.data : {
 		*(.data*)

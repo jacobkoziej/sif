@@ -7,7 +7,9 @@
 
 const _: () = assert!(cfg!(target_arch = "arm"));
 
-pub mod start;
+mod start;
+
+pub mod scs;
 
 pub struct Arm;
 

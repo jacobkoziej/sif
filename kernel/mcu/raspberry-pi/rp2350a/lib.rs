@@ -11,6 +11,7 @@ const _: () = assert!(cfg!(target_feature = "v8m.main"));
 const _: () = assert!(cfg!(target_feature = "dsp"));
 const _: () = assert!(cfg!(target_feature = "8msecext"));
 
+use sif_arch::scs::scb::{VectorTable, default_handler};
 use sif_core::McuInit;
 
 #[derive(Default)]
@@ -21,3 +22,11 @@ pub type Mcu = Rp2350a;
 impl McuInit for Rp2350a {
     fn init() {}
 }
+
+#[unsafe(no_mangle)]
+#[unsafe(link_section = ".data.vector_table")]
+pub(crate) static vector_table: VectorTable<52> = VectorTable {
+    msp: 0,
+    exceptions: [Some(default_handler); 15],
+    interrupts: [Some(default_handler); 52],
+};

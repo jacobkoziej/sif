@@ -11,5 +11,11 @@ REGION_ALIAS("ro_vm", KERNEL_SRAM)
 REGION_ALIAS("rw_vm", KERNEL_SRAM)
 
 INCLUDE "entry.ld"
-INCLUDE "sections.ld"
+
+INCLUDE "arch/arm/constants.ld"
+INCLUDE "constants.ld"
+
 INCLUDE "arch/arm/sections.ld"
+INCLUDE "sections.ld"
+
+INCLUDE "symbols.ld"
