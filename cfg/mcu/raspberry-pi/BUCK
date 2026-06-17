@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//cfg:rules.bzl", "cfg")
+
+# #cite(<rpi-rp2350-datasheet>)
+# 3.7.2 :: Configuration
+cfg(
+    name="rp2350a",
+    constraints=[
+        "sif//constraints:arch[arm]",
+        "sif//constraints/arch/arm:version[8]",
+        "sif//constraints/arch/arm:profile[m]",
+        "sif//constraints/arch/arm:cpu[cortex-m33]",
+        "sif//constraints/arch/arm/version/8/m/extension:debug[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:dsp[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:floating-point[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:main[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:mpu[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:security[true]",
+        "sif//constraints/arch/arm/version/8/m/extension:systick[true]",
+        "sif//constraints:vendor[raspberry-pi]",
+        "sif//constraints/vendor/raspberry-pi:mcu[rp2350a]",
+    ],
+)

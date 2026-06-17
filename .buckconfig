@@ -1,0 +1,9 @@
+[cells]
+root = .
+sif = .
+
+[project]
+ignore = .git
+
+[build]
+execution_platforms = sif//execution-platforms:default

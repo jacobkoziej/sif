@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load(
+    "@sif//constraints:rules.bzl",
+    "binary_constraint",
+    "constraint",
+)
+
+constraint(
+    name="arch",
+    values=[
+        "aarch64",
+        "arm",
+        "x86_64",
+        "unknown",
+    ],
+    default="unknown",
+)
+
+binary_constraint("eabihf")
+
+constraint(
+    name="os",
+    values=[
+        "linux",
+        "macos",
+        "sif",
+    ],
+)
+
+constraint(
+    name="opt-level",
+    values=["0", "1", "2", "3", "s", "z"],
+    nullable=False,
+    default="0",
+)
+
+constraint(
+    name="toolchain",
+    values=[
+        "llvm",
+    ],
+    nullable=False,
+    default="llvm",
+)
+
+constraint(
+    name="vendor",
+    values=[
+        "raspberry-pi",
+    ],
+    nullable=True,
+)

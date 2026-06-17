@@ -1,0 +1,11 @@
+[dependencies]
+clap = {version = "4.5.60", features = ["derive"]}
+elf = "0.8.0"
+
+[package]
+name = "xip-elf"
+version = "0.0.0"
+edition = "2024"
+description = "generate ELF headers suitable for XIP"
+homepage = "https://github.com/jacobkoziej/sif/tree/master/tools/xip-elf"
+license = "MPL-2.0"

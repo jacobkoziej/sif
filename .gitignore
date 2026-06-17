@@ -1,6 +1,4 @@
-*.egg-info
-.direnv
-.ruff_cache
-.venv
-__pycache__
-demo
+/.buckconfig.local
+/.direnv
+/.envrc.local
+/buck-out

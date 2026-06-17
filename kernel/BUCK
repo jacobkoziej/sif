@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//kernel/arch:select.bzl", "select_arch")
+load("@sif//kernel/mcu:select.bzl", "select_mcu")
+load("@sif//rules:crate.bzl", "crate")
+load("@sif//rules:include.bzl", "include")
+
+crate(
+    name="core",
+    crate_name="sif_core",
+    root="core/lib.rs",
+    srcs=glob(["core/**/*.rs"]),
+)
+
+crate(
+    name="kernel",
+    crate_name="sif",
+    root="kernel/lib.rs",
+    srcs=glob(["kernel/**/*.rs"]),
+    deps=[
+        ":core",
+        select_arch(),
+        select_mcu(),
+    ],
+)
+
+include(
+    name="ld-include",
+    files=glob(["**/*.ld"]),
+)

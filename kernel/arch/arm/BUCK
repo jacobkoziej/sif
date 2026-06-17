@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//rules:crate.bzl", "crate")
+
+crate(
+    name="sif_arch",
+    root="lib.rs",
+    srcs=glob(["**/*.rs"]),
+    deps=[
+        "sif//kernel:core",
+    ],
+)

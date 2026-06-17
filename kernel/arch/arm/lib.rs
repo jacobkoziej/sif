@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: MPL-2.0
+//
+// lib.rs -- Arm architecture
+// Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
+
+#![no_std]
+
+const _: () = assert!(cfg!(target_arch = "arm"));
+
+mod start;
+
+pub mod scs;
+
+pub struct Arm;
+
+pub type Arch = Arm;

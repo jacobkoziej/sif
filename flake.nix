@@ -1,30 +1,50 @@
+# SPDX-License-Identifier: MPL-2.0
+
 {
-  description = "sif";
+  description = "a preemptive rtos";
 
   inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
+  outputs =
+    inputs:
 
-        llvm = pkgs.llvmPackages_latest;
-        python = pkgs.python312;
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "aarch64-darwin"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "x86_64-linux"
+      ];
 
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          packages = [
-            llvm.clang-unwrapped
-            pkgs.nixpkgs-fmt
-            python
-          ];
+      imports = [
+        ./nix
+        ./tools
+      ];
+
+      perSystem =
+        {
+          pkgs,
+          system,
+          ...
+        }:
+
+        {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+
+            overlays = [
+              inputs.rust-overlay.overlays.default
+            ];
+          };
+
+          formatter = pkgs.nixfmt-rfc-style;
         };
-      }
-    );
+    };
 }

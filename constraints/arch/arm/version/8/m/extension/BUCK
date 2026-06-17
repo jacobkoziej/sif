@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//constraints:rules.bzl", "binary_constraint")
+
+# #cite(<armv8m-rm>)
+# A1.4.1 :: CDE - The Custom Datapath Extension
+binary_constraint("cde")
+
+# #cite(<armv8m-rm>)
+# A1.4.2 :: Debug
+binary_constraint("debug")
+
+# #cite(<armv8m-rm>)
+# A1.4.3 :: DSP - The Digital Signal Processing Extension
+binary_constraint("dsp")
+
+# #cite(<armv8m-rm>)
+# A1.4.5 :: The Floating-point Extension
+binary_constraint("floating-point")
+
+# #cite(<armv8m-rm>)
+# A1.4.6 :: The Main Extension
+binary_constraint("main")
+
+# #cite(<armv8m-rm>)
+# A1.4.7 :: MPU model
+binary_constraint("mpu")
+
+# #cite(<armv8m-rm>)
+# A1.4.12 :: Security Extension
+binary_constraint("security")
+
+# #cite(<armv8m-rm>)
+# A1.4.13 :: The System Timer Extension
+binary_constraint("systick")

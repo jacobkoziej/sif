@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//kernel/mcu:select.bzl", "select_linker_script")
+load("@sif//rules:elf.bzl", "elf")
+load("@sif//rules:xip-elf.bzl", "xip_elf")
+
+elf(
+    name="_vmsif.elf",
+    script=select_linker_script(),
+    objects=[
+        "sif//kernel:kernel",
+    ],
+    includes=[
+        "sif//kernel:ld-include",
+    ],
+    visibility=[],
+)
+
+xip_elf(
+    name="vmsif.elf",
+    elf=":_vmsif.elf",
+)

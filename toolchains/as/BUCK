@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//toolchains/as/llvm.bzl", "llvm")
+
+llvm(
+    name="llvm",
+    visibility=["sif//toolchains:"],
+)

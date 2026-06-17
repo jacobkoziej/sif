@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//constraints:rules.bzl", "binary_constraint")
+
+# #cite(<armv8m-rm>)
+# A1.4.1 :: CDE - The Custom Datapath Extension
+binary_constraint("cde")
+
+# #cite(<armv8m-rm>)
+# A1.4.2 :: Debug
+binary_constraint("debug")
+
+# #cite(<armv8m-rm>)
+# A1.4.3 :: DSP - The Digital Signal Processing Extension
+binary_constraint("dsp")
+
+# #cite(<armv8m-rm>)
+# A1.4.4 :: The DSP Debug Extension
+binary_constraint("dsp-debug")
+
+# #cite(<armv8m-rm>)
+# A1.4.5 :: The Floating-point Extension
+binary_constraint("floating-point")
+
+# #cite(<armv8m-rm>)
+# A1.4.6 :: The Main Extension
+binary_constraint("main")
+
+# #cite(<armv8m-rm>)
+# A1.4.7 :: MPU model
+binary_constraint("mpu")
+
+# #cite(<armv8m-rm>)
+# A1.4.8 :: M-Profile Vector Extension, MVE
+binary_constraint("mve-i")
+binary_constraint("mve-f")
+
+# #cite(<armv8m-rm>)
+# A1.4.9 :: Pointer Authentication and Branch Target Identification Extension
+binary_constraint("pacbti")
+
+# #cite(<armv8m-rm>)
+# A1.4.10 :: Perfomance Monitors Extension
+binary_constraint("pmu")
+
+# #cite(<armv8m-rm>)
+# A1.4.11 :: Reliability, Availability, and Serviceability
+binary_constraint("ras")
+
+# #cite(<armv8m-rm>)
+# A1.4.12 :: Security Extension
+binary_constraint("security")
+
+# #cite(<armv8m-rm>)
+# A1.4.13 :: The System Timer Extension
+binary_constraint("systick")

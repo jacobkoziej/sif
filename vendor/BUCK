@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//rules:crate.bzl", "crate_unwrapped")
+load("@sif//vendor:rules.bzl", "src")
+
+src(
+    name="rustlib",
+    flake=".",
+    derivation=["packages", "rust-src"],
+    path=".",
+    sub_paths=[
+        "compiler-builtins/compiler-builtins/src/lib.rs",
+        "core/src/lib.rs",
+    ],
+)
+
+crate_unwrapped(
+    name="compiler_builtins",
+    root=":rustlib[compiler-builtins/compiler-builtins/src/lib.rs]",
+    src_deps=[":rustlib"],
+    deps=[":core"],
+    features=[
+        "arch",
+        "compiler-builtins",
+    ],
+    visibility=["PUBLIC"],
+)
+
+crate_unwrapped(
+    name="core",
+    root=":rustlib[core/src/lib.rs]",
+    src_deps=[":rustlib"],
+    cfg=[
+        "no_fp_fmt_parse",
+    ],
+    visibility=["PUBLIC"],
+)

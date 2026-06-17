@@ -1,0 +1,90 @@
+[formatter.black]
+command = "black"
+includes = [
+  "**/BUCK",
+  "**/PACKAGE",
+  "*.bzl",
+  "*.py",
+  "BUCK",
+  "PACKAGE",
+]
+
+[formatter.buck2-starlark-lint]
+command = "buck2"
+options = [
+  "starlark",
+  "lint",
+  "--no-interactive-console",
+]
+includes = [
+  "**/BUCK",
+  "**/PACKAGE",
+  "*.bzl",
+  "BUCK",
+  "PACKAGE",
+]
+
+[formatter.buck2-starlark-typecheck]
+command = "buck2"
+options = [
+  "starlark",
+  "typecheck",
+  "--no-interactive-console",
+]
+includes = [
+  "**/BUCK",
+  "**/PACKAGE",
+  "*.bzl",
+  "BUCK",
+  "PACKAGE",
+]
+
+[formatter.mdformat]
+command = "mdformat"
+includes = [
+  "*.md",
+]
+
+[formatter.nix]
+command = "nix"
+options = [
+  "fmt",
+]
+includes = [
+  "*.nix",
+]
+
+[formatter.rustfmt]
+command = "rustfmt"
+includes = [
+  "*.rs",
+]
+
+[formatter.toml-sort]
+command = "toml-sort"
+includes = [
+  "*.toml",
+]
+
+[formatter.yamlfmt]
+command = "yamlfmt"
+includes = [
+  "*.yaml",
+]
+
+[formatter.yamllint]
+command = "yamllint"
+includes = [
+  "*.yaml",
+]
+
+[global]
+excludes = [
+  "*.gitignore",
+  "*.ld",
+  "*.lock",
+  "*.patch",
+  ".buckconfig",
+  ".editorconfig",
+  "LICENSE",
+]

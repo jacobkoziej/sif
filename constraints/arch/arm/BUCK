@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//constraints:rules.bzl", "constraint")
+
+constraint(
+    name="cpu",
+    values=[
+        "cortex-m33",
+    ],
+)
+
+constraint(
+    name="profile",
+    values=[
+        "m",
+    ],
+)
+
+constraint(
+    name="version",
+    values=[
+        "8",
+        "8.1",
+    ],
+)

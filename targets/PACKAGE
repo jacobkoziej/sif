@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load(
+    "@sif//cfg:modifiers.bzl",
+    "set_cfg_modifiers",
+    "get_buckconfig_cfg_modifiers",
+)
+
+package(
+    visibility=["PUBLIC"],
+)
+
+set_cfg_modifiers(
+    *get_buckconfig_cfg_modifiers(),
+)

@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//tools/rules.bzl", "tool")
+
+tool(
+    name="buck2-dep-format",
+    flake=".",
+    derivation=["packages", "buck2-dep-format"],
+)
+
+tool(
+    name="cargo",
+    flake="nixpkgs",
+    derivation=["legacyPackages", "cargo"],
+)
+
+tool(
+    name="hayagriva",
+    flake="nixpkgs",
+    derivation=["legacyPackages", "hayagriva"],
+)
+
+tool(
+    name="rustc",
+    flake=".",
+    derivation=["packages", "rustc"],
+)
+
+tool(
+    name="rustc-bin",
+    binary="rustc",
+    flake=".",
+    derivation=["packages", "rust-bin"],
+)
+
+tool(
+    name="srec_cat",
+    flake="nixpkgs",
+    derivation=["legacyPackages", "srecord"],
+)
+
+tool(
+    name="xip-elf",
+    flake=".",
+    derivation=["packages", "xip-elf"],
+)

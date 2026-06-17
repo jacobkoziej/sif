@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load(
+    "@sif//execution-platforms:rules.bzl",
+    "execution_platform",
+    "execution_platforms",
+    "get_host_constraints",
+)
+
+execution_platform(
+    name="localhost",
+    constraints=get_host_constraints(),
+    execution="local",
+)
+
+execution_platforms(
+    name="default",
+    platforms=[
+        ":localhost",
+    ],
+)

@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//tools/rules.bzl", "tool")
+
+llvmPackages = "llvmPackages_latest"
+
+tool(
+    name="lld",
+    binary=select(
+        {
+            "sif//constraints:os[linux]": "ld.lld",
+            "sif//constraints:os[macos]": "ld64.lld",
+        }
+    ),
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "lld"],
+)
+
+tool(
+    name="mc",
+    binary="llvm-mc",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+)
+
+tool(
+    name="objcopy",
+    binary="llvm-objcopy",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+)
+
+tool(
+    name="objdump",
+    binary="llvm-objdump",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+)
+
+tool(
+    name="readelf",
+    binary="llvm-readelf",
+    flake="nixpkgs",
+    derivation=["legacyPackages", llvmPackages, "llvm"],
+)

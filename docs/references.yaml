@@ -1,0 +1,51 @@
+---
+
+# yamllint disable rule:line-length
+
+aaelf32:
+  type: reference
+  title: ELF for the Arm Architecture
+  date: 2026-01-23
+  publisher: Arm Limited
+  organization: Arm Limited
+  edition: 2025Q4
+  url: https://github.com/ARM-software/abi-aa/blob/2025Q4/aaelf32/aaelf32.rst
+  language: en-US
+  note: daa7a94ca55973736c0e434a67a6e4bbcd35d7fa
+
+armv8m-rm:
+  type: reference
+  title: Armv8-M Architecture Reference Manual
+  date: 2024-08-09
+  publisher: Arm Limited
+  organization: Arm Limited
+  edition: ID09082024
+  page-total: 2149
+  url: https://developer.arm.com/documentation/ddi0553/by/
+  serial-number:
+    arm: DDI0553B.y
+  language: en-US
+
+rpi-rp2350-datasheet:
+  type: reference
+  title: 'RP2350 Datasheet: A microcontroller by Raspberry Pi'
+  date: 2025-07-29
+  publisher: Raspberry Pi Limited
+  organization: Raspberry Pi Limited
+  edition: d126e9e-clean
+  page-total: 1380
+  url: https://pip-assets.raspberrypi.com/categories/1214-rp2350/documents/RP-008373-DS-2-rp2350-datasheet.pdf
+  serial-number:
+    rpi: RP-008373-DS-2
+  language: en-US
+
+tis-elf:
+  type: reference
+  title: Tool Interface Standard (TIS) Executable and Linking Format (ELF) Specification
+  date: 1995-05
+  publisher: TIS Committee
+  organization: Linux Foundation
+  edition: 1.2
+  page-total: 106
+  url: https://refspecs.linuxfoundation.org/elf/elf.pdf
+  language: en-US
