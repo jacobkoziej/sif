@@ -23,7 +23,7 @@
 
       src = fetchurl {
         url = "https://static.rust-lang.org/dist/${version}/rustc-nightly-src.tar.gz";
-        hash = "sha256-8QwZSxvDQunIbrbWHj2SzL/o5zMHPfKSN1lG1GRjdpg=";
+        hash = "sha256-pkhYkFtR/GQiUAHWWUuejMZabhbffphMEbt+aBVfvYk=";
         passthru.isReleaseTarball = true;
       };
 

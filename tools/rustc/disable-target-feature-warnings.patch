@@ -1,5 +1,5 @@
 diff --git a/compiler/rustc_codegen_ssa/src/errors.rs b/compiler/rustc_codegen_ssa/src/errors.rs
-index cceda09c701..a8696bc1318 100644
+index 1fe52c34e89..c5247ae4f03 100644
 --- a/compiler/rustc_codegen_ssa/src/errors.rs
 +++ b/compiler/rustc_codegen_ssa/src/errors.rs
 @@ -1,5 +1,7 @@
@@ -11,10 +11,10 @@ index cceda09c701..a8696bc1318 100644
  use std::ffi::OsString;
  use std::io::Error;
 diff --git a/compiler/rustc_codegen_ssa/src/target_features.rs b/compiler/rustc_codegen_ssa/src/target_features.rs
-index 2572d216082..36227b2afee 100644
+index 3c771f0eb7e..fc0329e0515 100644
 --- a/compiler/rustc_codegen_ssa/src/target_features.rs
 +++ b/compiler/rustc_codegen_ssa/src/target_features.rs
-@@ -229,7 +229,7 @@ fn parse_rust_feature_list<'a>(
+@@ -244,7 +244,7 @@ fn parse_rust_feature_list<'a>(
  /// We do not have to worry about RUSTC_SPECIFIC_FEATURES here, those are handled elsewhere.
  pub fn cfg_target_feature<'a, const N: usize>(
      sess: &Session,
@@ -23,7 +23,7 @@ index 2572d216082..36227b2afee 100644
      mut target_base_has_feature: impl FnMut(&str) -> bool,
  ) -> (Vec<Symbol>, Vec<Symbol>) {
      let known_features = sess.target.rust_target_features();
-@@ -281,32 +281,7 @@ pub fn cfg_target_feature<'a, const N: usize>(
+@@ -296,32 +296,7 @@ pub fn cfg_target_feature<'a, const N: usize>(
              // Check feature validity.
              let feature_state = known_features.iter().find(|&&(v, _, _)| v == base_feature);
              match feature_state {
@@ -55,12 +55,12 @@ index 2572d216082..36227b2afee 100644
 -                }
 +                None => {}
                  Some((_, stability, _)) => {
-                     if let Err(reason) = stability.toggle_allowed() {
-                         sess.dcx().emit_warn(errors::ForbiddenCTargetFeature {
-@@ -314,19 +289,6 @@ pub fn cfg_target_feature<'a, const N: usize>(
-                             enabled: if enable { "enabled" } else { "disabled" },
-                             reason,
-                         });
+                     if let Stability::Forbidden { reason, hard_error } = stability {
+                         let diag = errors::ForbiddenCTargetFeature {
+@@ -336,19 +311,6 @@ pub fn cfg_target_feature<'a, const N: usize>(
+                         } else {
+                             sess.dcx().emit_warn(diag);
+                         }
 -                    } else if stability.requires_nightly(/* in_cfg */ false).is_some() {
 -                        // An unstable feature. Warn about using it. It makes little sense
 -                        // to hard-error here since we just warn about fully unknown
