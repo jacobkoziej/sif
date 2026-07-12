@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//constraints:rules.bzl", "binary_constraint")
+
+binary_constraint("disable-sysroot", default=True)

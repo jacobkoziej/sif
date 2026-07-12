@@ -33,6 +33,9 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     edition = "--edition=" + rust_edition
     target = "--target=" + ctx.attrs.target
 
+    sysroot = ctx.attrs.sysroot
+    sysroot = "--sysroot={}".format(sysroot) if sysroot else []
+
     def map_codegen_option(x: tuple) -> str:
         option, value = x
 
@@ -56,7 +59,7 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     cmd = cmd_args(
         tool,
         "--color=always",
-        "--sysroot=/dev/null",
+        sysroot,
         edition,
         target,
         codegen_options,
@@ -78,6 +81,14 @@ rustc = rule(
     attrs={
         "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools:rustc"),
         "target": attrs.string(default=target()),
+        "sysroot": attrs.string(
+            default=select(
+                {
+                    "sif//constraints/rustc:disable-sysroot[true]": "/dev/null",
+                    "DEFAULT": "",
+                }
+            ),
+        ),
         "codegen_options": attrs.dict(
             key=attrs.string(),
             value=attrs.one_of(attrs.string(), attrs.list(attrs.string())),
