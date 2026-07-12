@@ -11,6 +11,16 @@ load(
 
 
 def target() -> Select:
+    def os() -> Select:
+        return select(
+            {
+                "sif//constraints:os[linux]": "linux-gnu",
+                "sif//constraints:os[macos]": "macos-gnu",
+                "sif//constraints:os[sif]": "none",
+                "DEFAULT": "none",
+            }
+        )
+
     def arm() -> Select:
         instruction_set = select(
             {
@@ -26,10 +36,12 @@ def target() -> Select:
             }
         )
 
-        return instruction_set + arm_version() + arm_profile() + "-none-" + eabi
+        return instruction_set + arm_version() + arm_profile() + "-" + os() + "-" + eabi
 
     return select(
         {
+            "sif//constraints:arch[aarch64]": "aarch64-unknown-" + os(),
             "sif//constraints:arch[arm]": arm(),
+            "sif//constraints:arch[x86_64]": "x86_64-unknown-" + os(),
         }
     )
