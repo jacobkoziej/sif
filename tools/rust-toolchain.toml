@@ -1,8 +1,9 @@
 [toolchain]
 channel = "nightly-2026-07-12"
 components = [
-  "rustc",
+  "miri",
   "rust-src",
+  "rustc",
 ]
 targets = [
   "aarch64-unknown-linux-gnu",
