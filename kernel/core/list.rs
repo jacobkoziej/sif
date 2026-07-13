@@ -25,6 +25,27 @@ impl<T, Role> Node<T, Role> {
             _marker: PhantomData,
         }
     }
+
+    fn to_raw_node(self: Pin<&mut Self>) -> NonNull<RawNode> {
+        let node = unsafe { &mut self.get_unchecked_mut().node };
+
+        assert!(node.is_some());
+
+        *node = Some(RawNode {
+            prev: NonNull::dangling(),
+            next: NonNull::dangling(),
+            _pin: PhantomPinned,
+        });
+
+        let node = node.as_mut().unwrap();
+
+        let ptr = NonNull::from(&mut *node);
+
+        node.prev = ptr;
+        node.next = ptr;
+
+        ptr
+    }
 }
 
 pub unsafe trait Linked<Role>
