@@ -31,7 +31,7 @@ pub unsafe trait Linked<Role>
 where
     Self: Sized,
 {
-    fn to_node(self: Pin<&mut Self>) -> NonNull<Node<Self, Role>>;
+    fn to_node(self: Pin<&mut Self>) -> Pin<&mut Node<Self, Role>>;
     unsafe fn from_node<'a>(node: NonNull<Node<Self, Role>>) -> Pin<&'a mut Self>;
 }
 
