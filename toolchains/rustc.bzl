@@ -79,7 +79,7 @@ rustc = rule(
     impl=_rustc_impl,
     is_toolchain_rule=True,
     attrs={
-        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools:rustc"),
+        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools/rustc:rustc"),
         "target": attrs.string(default=target()),
         "sysroot": attrs.string(
             default=select(
