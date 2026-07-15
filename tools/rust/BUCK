@@ -4,7 +4,6 @@ load("@sif//tools/rules.bzl", "tool")
 
 tool(
     name="miri",
-    binary="miri",
     flake=".",
     derivation=["packages", "rustup"],
 )
@@ -13,6 +12,12 @@ tool(
     name="rustc",
     flake=".",
     derivation=["packages", "rustc"],
+)
+
+tool(
+    name="rustdoc",
+    flake=".",
+    derivation=["packages", "rustup"],
 )
 
 tool(
