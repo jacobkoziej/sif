@@ -8,7 +8,7 @@ load(
     "attributes",
     "cpu",
 )
-load("@sif//tools/rustc:flags.bzl", "target")
+load("@sif//tools/rust:flags.bzl", "target")
 
 rust_edition: str = "2024"
 
@@ -79,12 +79,12 @@ rustc = rule(
     impl=_rustc_impl,
     is_toolchain_rule=True,
     attrs={
-        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools/rustc:rustc"),
+        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools/rust:rustc"),
         "target": attrs.string(default=target()),
         "sysroot": attrs.string(
             default=select(
                 {
-                    "sif//constraints/rustc:disable-sysroot[true]": "/dev/null",
+                    "sif//constraints/rust:disable-sysroot[true]": "/dev/null",
                     "DEFAULT": "",
                 }
             ),

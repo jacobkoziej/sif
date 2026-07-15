@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
 #
-# flags.bzl -- rustc constraint flags
+# flags.bzl -- rust constraint flags
 # Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 load(

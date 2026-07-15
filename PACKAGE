@@ -15,6 +15,6 @@ set_cfg_constructor(
 )
 
 set_cfg_modifiers(
-    "sif//constraints/rustc:disable-sysroot[default]",
+    "sif//constraints/rust:disable-sysroot[default]",
     "sif//constraints:opt-level[default]",
 )

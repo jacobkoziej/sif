@@ -16,7 +16,7 @@
       inherit (pkgs) stdenv;
       inherit (pkgs) stdenvNoCC;
 
-      rustToolchain = importTOML ../rust-toolchain.toml;
+      rustToolchain = importTOML ./toolchain.toml;
 
       version = removePrefix "nightly-" rustToolchain.toolchain.channel;
       targets = rustToolchain.targets or [ ];
@@ -84,6 +84,8 @@
                 "--set=build.rustfmt=${bootstrapToolchain}/bin/rustfmt"
               ];
             });
+
+        rustup = pkgs.rust-bin.fromRustupToolchainFile ./toolchain.toml;
       };
     };
 }

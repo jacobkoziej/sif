@@ -231,7 +231,7 @@ crate_unwrapped = rule(
 
 
 def crate(**kwargs: dict[str, typing.Any]) -> None:
-    disable_sysroot = "sif//constraints/rustc:disable-sysroot"
+    disable_sysroot = "sif//constraints/rust:disable-sysroot"
 
     kwargs["deps"] = select(
         {

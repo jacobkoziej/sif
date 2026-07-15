@@ -6,7 +6,7 @@ tool(
     name="miri",
     binary="miri",
     flake=".",
-    derivation=["packages", "rust-bin"],
+    derivation=["packages", "rustup"],
 )
 
 tool(
@@ -19,5 +19,5 @@ tool(
     name="rustc-bin",
     binary="rustc",
     flake=".",
-    derivation=["packages", "rust-bin"],
+    derivation=["packages", "rustup"],
 )
