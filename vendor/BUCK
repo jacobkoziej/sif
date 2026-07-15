@@ -1,5 +1,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
+load("@sif//execution-platforms:rules.bzl", "get_host_constraints")
+load(
+    "@sif//nix/rules.bzl",
+    "derivation_output_path",
+    "get_system",
+)
 load("@sif//rules:crate.bzl", "crate_unwrapped")
 load("@sif//vendor:rules.bzl", "src")
 
@@ -34,4 +40,13 @@ crate_unwrapped(
         "no_fp_fmt_parse",
     ],
     visibility=["PUBLIC"],
+)
+
+derivation_output_path(
+    name="miri-sysroot",
+    flake=".",
+    derivation=["packages", "miri-sysroot"],
+    system=get_system(),
+    path=[],
+    target_compatible_with=get_host_constraints(),
 )
