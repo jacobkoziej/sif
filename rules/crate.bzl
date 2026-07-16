@@ -121,31 +121,25 @@ def _crate_flags(
     )
 
 
-def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
-    crate_name = _crate_name(ctx)
-    crate_type = ctx.attrs.type
-    crate_deps = _crate_deps(ctx)
-
-    name = _output_name(crate_name, crate_type)
-
-    out = ctx.actions.declare_output(name + _crate_type[crate_type])
-    rmeta = ctx.actions.declare_output(name + ".rmeta")
-    obj = ctx.actions.declare_output(name + ".o")
-
-    outputs: dict[str, Artifact] = {"metadata": rmeta, "obj": obj} | {
-        emit: ctx.actions.declare_output(name + _emit[emit]) for emit in ctx.attrs.emit
-    }
-
+def _run_tool(
+    ctx: AnalysisContext,
+    *,
+    category: str,
+    name: str,
+    type: str,
+    out: Artifact,
+    deps: list[Dependency],
+    emits: dict[str, Artifact],
+    incremental: str | None,
+    extra_args: cmd_args = cmd_args(),
+) -> None:
     dep_info = ctx.actions.artifact_tag()
+    dep_file = ctx.actions.declare_output(name + ".d").as_output()
 
     src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
 
-    dep_file = ctx.actions.declare_output(name + ".d").as_output()
-
-    dep_wrapper = ctx.attrs.dep_wrapper[RunInfo].args
-
     cmd = cmd_args(
-        dep_wrapper,
+        ctx.attrs.dep_wrapper[RunInfo].args,
         "--input",
         dep_info.tag_artifacts(dep_file),
         "--target",
@@ -154,10 +148,10 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         _rust_toolchain(ctx).args,
         _crate_flags(
             ctx,
-            name=crate_name,
-            type=crate_type,
-            deps=crate_deps,
-            incremental="incremental" if ctx.attrs.incremental else None,
+            name=name,
+            type=type,
+            deps=deps,
+            incremental=incremental,
         ),
         cmd_args(dep_file, format="--emit=dep-info={}"),
         [
@@ -165,12 +159,13 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
                 cmd_args(emit, out.as_output(), delimiter="="),
                 format="--emit={}",
             )
-            for (emit, out) in outputs.items()
+            for (emit, out) in emits.items()
         ],
         cmd_args(out.as_output(), format="--emit=link"),
         "-o",
         out.as_output(),
         dep_info.tag_artifacts(_resolve_root(ctx)),
+        extra_args,
         hidden=dep_info.tag_artifacts(
             cmd_args(
                 ctx.attrs.srcs,
@@ -181,16 +176,60 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 
     ctx.actions.run(
         cmd,
-        category="crate",
+        category=category,
         dep_files={
             "dep-info": dep_info,
         },
         no_outputs_cleanup=ctx.attrs.incremental,
     )
 
+
+def _rlib(
+    ctx: AnalysisContext,
+    *,
+    name: str,
+    type: str,
+    deps: list[Dependency],
+) -> (Artifact, dict[str, Artifact]):
+    out_name = _output_name(name, type)
+
+    out = ctx.actions.declare_output(out_name + _crate_type[type])
+    rmeta = ctx.actions.declare_output(out_name + ".rmeta")
+    obj = ctx.actions.declare_output(out_name + ".o")
+
+    emits: dict[str, Artifact] = {"metadata": rmeta, "obj": obj} | {
+        emit: ctx.actions.declare_output(out_name + _emit[emit])
+        for emit in ctx.attrs.emit
+    }
+
+    _run_tool(
+        ctx,
+        category="crate",
+        name=name,
+        type=type,
+        out=out,
+        deps=deps,
+        emits=emits,
+        incremental="incremental" if ctx.attrs.incremental else None,
+    )
+
+    return out, emits
+
+
+def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
+    crate_name = _crate_name(ctx)
+    crate_type = ctx.attrs.type
+    crate_deps = _crate_deps(ctx)
+
+    out, emits = _rlib(
+        ctx,
+        name=crate_name,
+        type=crate_type,
+        deps=crate_deps,
+    )
+
     sub_targets: dict[str, list[Provider]] = {
-        target: [DefaultInfo(default_output=output)]
-        for target, output in outputs.items()
+        target: [DefaultInfo(default_output=output)] for target, output in emits.items()
     }
 
     return [
@@ -201,13 +240,13 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         CrateInfo(
             name=crate_name,
             type=CrateType(crate_type),
-            metadata=rmeta,
+            metadata=emits["metadata"],
             out=out,
         ),
         ObjectInfo(
             objects=ctx.actions.tset(
                 ObjectTSet,
-                value=obj,
+                value=emits["obj"],
                 children=[dep[ObjectInfo].objects for dep in crate_deps],
             ),
         ),
@@ -216,7 +255,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
                 IncludeTSet,
                 value=cmd_args(out.as_output(), parent=1),
             ),
-            files=outputs.values(),
+            files=emits.values(),
         ),
     ]
 
