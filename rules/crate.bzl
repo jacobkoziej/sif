@@ -44,12 +44,88 @@ CrateInfo = provider(
 )
 
 
+def _crate_name(ctx: AnalysisContext) -> str:
+    return ctx.attrs.crate_name or ctx.label.name
+
+
+def _output_name(crate_name: str, crate_type: str) -> str:
+    if crate_type == "bin":
+        return crate_name
+
+    return "lib" + crate_name
+
+
+def _resolve_root(ctx: AnalysisContext) -> Artifact:
+    root = ctx.attrs.root
+
+    if isinstance(root, Dependency):
+        root = root[DefaultInfo].default_outputs[0]
+
+    return root
+
+
+def _crate_deps(ctx: AnalysisContext) -> list[Dependency]:
+    return ctx.attrs.deps + ctx.attrs.aliased_deps.values()
+
+
+def _externs(ctx: AnalysisContext) -> list[cmd_args]:
+    return [
+        cmd_args(dep[CrateInfo].name, dep[CrateInfo].metadata, delimiter="=")
+        for dep in ctx.attrs.deps
+    ] + [
+        cmd_args(name, dep[CrateInfo].metadata, delimiter="=")
+        for name, dep in ctx.attrs.aliased_deps.items()
+    ]
+
+
+def _incremental_arg(actions: AnalysisActions, name: str | None) -> cmd_args:
+    if name == None:
+        return cmd_args()
+
+    return cmd_args(
+        actions.declare_output(name, dir=True).as_output(),
+        format="--codegen=incremental={}",
+    )
+
+
+def _rust_toolchain(ctx: AnalysisContext) -> RunInfo:
+    return ctx.attrs.rustc[RunInfo]
+
+
+def _crate_flags(
+    ctx: AnalysisContext,
+    *,
+    name: str,
+    type: str | None,
+    deps: list[Dependency],
+    incremental: str | None,
+) -> cmd_args:
+    search_paths = get_include(
+        actions=ctx.actions,
+        includes=get_provider(deps, IncludeInfo),
+        prefix="-L",
+    )
+
+    return cmd_args(
+        search_paths.flags,
+        [cmd_args(extern, format="--extern={}") for extern in _externs(ctx)],
+        [cmd_args(cfg, format="--cfg={}") for cfg in ctx.attrs.cfg],
+        [
+            cmd_args(feature, format='--cfg=feature="{}"')
+            for feature in ctx.attrs.features
+        ],
+        _incremental_arg(ctx.actions, incremental),
+        cmd_args(name, format="--crate-name={}"),
+        cmd_args(type, format="--crate-type={}") if type else cmd_args(),
+    )
+
+
 def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
-    crate_name = ctx.attrs.crate_name or ctx.label.name
-
+    crate_name = _crate_name(ctx)
     crate_type = ctx.attrs.type
+    crate_deps = _crate_deps(ctx)
 
-    name = crate_name if crate_type == "bin" else "lib" + crate_name
+    name = _output_name(crate_name, crate_type)
 
     out = ctx.actions.declare_output(name + _crate_type[crate_type])
     rmeta = ctx.actions.declare_output(name + ".rmeta")
@@ -59,44 +135,13 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         emit: ctx.actions.declare_output(name + _emit[emit]) for emit in ctx.attrs.emit
     }
 
-    incremental = (
-        cmd_args(
-            ctx.actions.declare_output("incremental", dir=True).as_output(),
-            format="--codegen=incremental={}",
-        )
-        if ctx.attrs.incremental
-        else []
-    )
-
     dep_info = ctx.actions.artifact_tag()
 
     src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
 
-    crate_deps = ctx.attrs.deps + ctx.attrs.aliased_deps.values()
-
-    search_paths = get_include(
-        actions=ctx.actions,
-        includes=get_provider(crate_deps, IncludeInfo),
-        prefix="-L",
-    )
-
-    externs = [
-        cmd_args(dep[CrateInfo].name, dep[CrateInfo].metadata, delimiter="=")
-        for dep in ctx.attrs.deps
-    ] + [
-        cmd_args(name, dep[CrateInfo].metadata, delimiter="=")
-        for name, dep in ctx.attrs.aliased_deps.items()
-    ]
-
-    root = ctx.attrs.root
-
-    if isinstance(root, Dependency):
-        root = root[DefaultInfo].default_outputs[0]
-
     dep_file = ctx.actions.declare_output(name + ".d").as_output()
 
     dep_wrapper = ctx.attrs.dep_wrapper[RunInfo].args
-    rustc = ctx.attrs.rustc[RunInfo].args
 
     cmd = cmd_args(
         dep_wrapper,
@@ -105,17 +150,14 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         "--target",
         out.as_output(),
         "--",
-        rustc,
-        search_paths.flags,
-        [cmd_args(extern, format="--extern={}") for extern in externs],
-        [cmd_args(cfg, format="--cfg={}") for cfg in ctx.attrs.cfg],
-        [
-            cmd_args(feature, format='--cfg=feature="{}"')
-            for feature in ctx.attrs.features
-        ],
-        incremental,
-        cmd_args(crate_name, format="--crate-name={}"),
-        cmd_args(crate_type, format="--crate-type={}"),
+        _rust_toolchain(ctx).args,
+        _crate_flags(
+            ctx,
+            name=crate_name,
+            type=crate_type,
+            deps=crate_deps,
+            incremental="incremental" if ctx.attrs.incremental else None,
+        ),
         cmd_args(dep_file, format="--emit=dep-info={}"),
         [
             cmd_args(
@@ -127,7 +169,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         cmd_args(out.as_output(), format="--emit=link"),
         "-o",
         out.as_output(),
-        dep_info.tag_artifacts(root),
+        dep_info.tag_artifacts(_resolve_root(ctx)),
         hidden=dep_info.tag_artifacts(
             cmd_args(
                 ctx.attrs.srcs,
