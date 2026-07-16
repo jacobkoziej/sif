@@ -98,12 +98,11 @@ def _crate_flags(
     *,
     name: str,
     type: str | None,
-    deps: list[Dependency],
     incremental: str | None,
 ) -> cmd_args:
     search_paths = get_include(
         actions=ctx.actions,
-        includes=get_provider(deps, IncludeInfo),
+        includes=get_provider(_crate_deps(ctx), IncludeInfo),
         prefix="-L",
     )
 
@@ -126,15 +125,14 @@ def _run_tool(
     *,
     category: str,
     name: str,
-    type: str,
+    type: str | None,
     out: Artifact,
-    deps: list[Dependency],
     emits: dict[str, Artifact],
     incremental: str | None,
     extra_args: cmd_args = cmd_args(),
 ) -> None:
     dep_info = ctx.actions.artifact_tag()
-    dep_file = ctx.actions.declare_output(name + ".d").as_output()
+    dep_file = ctx.actions.declare_output(category + ".d").as_output()
 
     src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
 
@@ -150,7 +148,6 @@ def _run_tool(
             ctx,
             name=name,
             type=type,
-            deps=deps,
             incremental=incremental,
         ),
         cmd_args(dep_file, format="--emit=dep-info={}"),
@@ -189,7 +186,6 @@ def _rlib(
     *,
     name: str,
     type: str,
-    deps: list[Dependency],
 ) -> (Artifact, dict[str, Artifact]):
     out_name = _output_name(name, type)
 
@@ -208,12 +204,45 @@ def _rlib(
         name=name,
         type=type,
         out=out,
-        deps=deps,
         emits=emits,
         incremental="incremental" if ctx.attrs.incremental else None,
     )
 
     return out, emits
+
+
+def _tests(
+    ctx: AnalysisContext,
+    *,
+    name: str,
+) -> list[Provider]:
+    out = ctx.actions.declare_output(name + "-tests")
+
+    _run_tool(
+        ctx,
+        category="crate_test",
+        name=name,
+        type=None,
+        out=out,
+        emits={},
+        incremental="test-incremental" if ctx.attrs.incremental else None,
+        extra_args=cmd_args(
+            "--test",
+        ),
+    )
+
+    return [
+        DefaultInfo(
+            default_output=out,
+        ),
+        RunInfo(
+            args=cmd_args(out),
+        ),
+        ExternalRunnerTestInfo(
+            type="rust",
+            command=[out],
+        ),
+    ]
 
 
 def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
@@ -225,12 +254,17 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         ctx,
         name=crate_name,
         type=crate_type,
-        deps=crate_deps,
     )
 
     sub_targets: dict[str, list[Provider]] = {
         target: [DefaultInfo(default_output=output)] for target, output in emits.items()
     }
+
+    if ctx.attrs.unit_tests:
+        sub_targets["tests"] = _tests(
+            ctx,
+            name=crate_name,
+        )
 
     return [
         DefaultInfo(
@@ -299,6 +333,14 @@ crate_unwrapped = rule(
                     "sif//constraints:opt-level[0]": True,
                     "DEFAULT": False,
                 },
+            ),
+        ),
+        "unit_tests": attrs.bool(
+            default=select(
+                {
+                    "sif//constraints:os[sif]": False,
+                    "DEFAULT": True,
+                }
             ),
         ),
         "rustc": attrs.toolchain_dep(
