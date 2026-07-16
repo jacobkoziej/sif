@@ -1,5 +1,18 @@
 # SPDX-License-Identifier: MPL-2.0
 
-load("@sif//constraints:rules.bzl", "binary_constraint")
+load(
+    "@sif//constraints:rules.bzl",
+    "binary_constraint",
+    "constraint",
+)
 
 binary_constraint("disable-sysroot", default=True)
+
+constraint(
+    name="driver",
+    values=[
+        "miri",
+        "rustc",
+    ],
+    default="rustc",
+)

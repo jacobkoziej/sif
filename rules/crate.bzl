@@ -14,6 +14,7 @@ load(
     "ObjectInfo",
     "ObjectTSet",
 )
+load("@sif//toolchains:rustc.bzl", "RustcToolchainInfo")
 load("@sif//utils:provider.bzl", "get_provider")
 
 _crate_type: dict[str, str] = {
@@ -261,7 +262,10 @@ crate_unwrapped = rule(
                 },
             ),
         ),
-        "rustc": attrs.toolchain_dep(default="sif//toolchains:rustc"),
+        "rustc": attrs.toolchain_dep(
+            providers=[RunInfo, RustcToolchainInfo],
+            default="sif//toolchains:rustc",
+        ),
         "dep_wrapper": attrs.default_only(
             attrs.exec_dep(
                 providers=[RunInfo],

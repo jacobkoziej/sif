@@ -12,6 +12,16 @@ load("@sif//tools/rust:flags.bzl", "target")
 
 rust_edition: str = "2024"
 
+RustcDriver = enum("rustc", "miri")
+
+RustcToolchainInfo = provider(
+    fields={
+        "driver": provider_field(RustcDriver),
+        "sysroot": provider_field(Artifact | str | None, default=None),
+        "rustdoc": provider_field(RunInfo),
+    },
+)
+
 
 # `rustc` does not currently export all target features specified with codegen
 # options. To get around this we re-export these features with `--cfg`.
@@ -33,8 +43,16 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     edition = "--edition=" + rust_edition
     target = "--target=" + ctx.attrs.target
 
-    sysroot = ctx.attrs.sysroot
-    sysroot = "--sysroot={}".format(sysroot) if sysroot else []
+    sysroot_artifact = ctx.attrs.sysroot
+
+    if sysroot_artifact != None:
+        if not isinstance(sysroot_artifact, str):
+            sysroot_artifact = sysroot_artifact[DefaultInfo].default_outputs[0]
+
+        sysroot = cmd_args(sysroot_artifact, format="--sysroot={}")
+
+    else:
+        sysroot = cmd_args()
 
     def map_codegen_option(x: tuple) -> str:
         option, value = x
@@ -54,10 +72,7 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     target_cpu = ctx.attrs.codegen_options.get("target-cpu")
     target_cpu = '--cfg=target_cpu="{}"'.format(target_cpu) if target_cpu else []
 
-    tool = ctx.attrs.tool[RunInfo].args
-
-    cmd = cmd_args(
-        tool,
+    common_flags = cmd_args(
         "--color=always",
         sysroot,
         edition,
@@ -67,10 +82,27 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
         target_cpu,
     )
 
+    rustc_cmd = cmd_args(
+        ctx.attrs.tool[RunInfo].args,
+        common_flags,
+    )
+
+    rustdoc_cmd = cmd_args(
+        ctx.attrs.rustdoc[RunInfo].args,
+        common_flags,
+    )
+
     return [
         DefaultInfo(),
         RunInfo(
-            args=cmd,
+            args=rustc_cmd,
+        ),
+        RustcToolchainInfo(
+            driver=RustcDriver(ctx.attrs.driver),
+            sysroot=sysroot_artifact,
+            rustdoc=RunInfo(
+                args=rustdoc_cmd,
+            ),
         ),
     ]
 
@@ -79,13 +111,34 @@ rustc = rule(
     impl=_rustc_impl,
     is_toolchain_rule=True,
     attrs={
-        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools/rust:rustc"),
+        "tool": attrs.exec_dep(
+            providers=[RunInfo],
+            default="sif//tools/rust:rustc",
+        ),
+        "rustdoc": attrs.exec_dep(
+            providers=[RunInfo],
+            default="sif//tools/rust:rustdoc",
+        ),
+        "driver": attrs.enum(
+            RustcDriver.values(),
+            default=select(
+                {
+                    "sif//constraints/rust:driver[rustc]": "rustc",
+                    "sif//constraints/rust:driver[miri]": "miri",
+                }
+            ),
+        ),
         "target": attrs.string(default=target()),
-        "sysroot": attrs.string(
+        "sysroot": attrs.option(
+            attrs.one_of(
+                attrs.dep(),
+                attrs.string(),
+            ),
             default=select(
                 {
                     "sif//constraints/rust:disable-sysroot[true]": "/dev/null",
-                    "DEFAULT": "",
+                    "sif//constraints/rust:driver[miri]": "sif//toolchains:miri-sysroot",
+                    "DEFAULT": None,
                 }
             ),
         ),
