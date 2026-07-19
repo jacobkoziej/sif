@@ -4,6 +4,7 @@
 // Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 #![no_std]
+#![feature(negative_impls)]
 
 pub mod elf;
 pub mod list;

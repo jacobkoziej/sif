@@ -48,6 +48,8 @@ impl<T, Role> Node<T, Role> {
     }
 }
 
+impl<T, Role> !Sync for Node<T, Role> {}
+
 pub unsafe trait Linked<Role>
 where
     Self: Sized,
@@ -75,3 +77,5 @@ where
         }
     }
 }
+
+impl<T, Role> !Sync for List<T, Role> {}
