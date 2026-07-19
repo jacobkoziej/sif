@@ -14,7 +14,11 @@ load(
     "ObjectInfo",
     "ObjectTSet",
 )
-load("@sif//toolchains:rustc.bzl", "RustcToolchainInfo")
+load(
+    "@sif//toolchains:rustc.bzl",
+    "RustcDriver",
+    "RustcToolchainInfo",
+)
 load("@sif//utils:provider.bzl", "get_provider")
 
 _crate_type: dict[str, str] = {
@@ -131,17 +135,17 @@ def _run_tool(
         "--target",
         out.as_output(),
         "--",
-        ctx.attrs.rustc[RunInfo].args,
+        ctx.attrs.rustc[RustcToolchainInfo].tool.args,
         _crate_flags(ctx),
         _incremental_arg(ctx, category),
         cmd_args(type, format="--crate-type={}") if type else cmd_args(),
         cmd_args(dep_file, format="--emit=dep-info={}"),
         [
             cmd_args(
-                cmd_args(emit, out.as_output(), delimiter="="),
+                cmd_args(emit, artifact.as_output(), delimiter="="),
                 format="--emit={}",
             )
-            for (emit, out) in emits.items()
+            for (emit, artifact) in emits.items()
         ],
         cmd_args(out.as_output(), format="--emit=link"),
         "-o",
@@ -156,28 +160,52 @@ def _run_tool(
         ),
     )
 
+    toolchain = ctx.attrs.rustc[RustcToolchainInfo]
+
+    env: dict[str, typing.Any] = {}
+
+    if toolchain.driver == RustcDriver("miri"):
+        env.update(
+            MIRI_SYSROOT=toolchain.sysroot,
+            MIRI_BE_RUSTC="target",
+        )
+
     ctx.actions.run(
         cmd,
         category=category,
         dep_files={
             "dep-info": dep_info,
         },
+        env=env,
         no_outputs_cleanup=ctx.attrs.incremental,
     )
+
+
+def _default_emits(ctx: AnalysisContext, out_name: str) -> dict[str, Artifact]:
+    emits: dict[str, Artifact] = {
+        "metadata": ctx.actions.declare_output(out_name + ".rmeta"),
+    }
+
+    if ctx.attrs.rustc[RustcToolchainInfo].driver != RustcDriver("miri"):
+        emits["obj"] = ctx.actions.declare_output(out_name + ".o")
+
+    return emits | {
+        emit: ctx.actions.declare_output(out_name + _emit[emit])
+        for emit in ctx.attrs.emit
+    }
 
 
 def _rlib(ctx: AnalysisContext) -> (Artifact, dict[str, Artifact]):
     out_name = _output_name(ctx)
     crate_type = ctx.attrs.type
 
-    out = ctx.actions.declare_output(out_name + _crate_type[crate_type])
-    rmeta = ctx.actions.declare_output(out_name + ".rmeta")
-    obj = ctx.actions.declare_output(out_name + ".o")
+    is_miri = ctx.attrs.rustc[RustcToolchainInfo].driver == RustcDriver("miri")
 
-    emits: dict[str, Artifact] = {"metadata": rmeta, "obj": obj} | {
-        emit: ctx.actions.declare_output(out_name + _emit[emit])
-        for emit in ctx.attrs.emit
-    }
+    if is_miri and crate_type != "rlib":
+        fail("miri driver can only build rlib crates")
+
+    out = ctx.actions.declare_output(out_name + _crate_type[crate_type])
+    emits = _default_emits(ctx, out_name)
 
     _run_tool(
         ctx,
@@ -218,7 +246,46 @@ def _docs(ctx: AnalysisContext) -> list[Provider]:
     ]
 
 
+def _miri_tests(ctx: AnalysisContext) -> list[Provider]:
+    toolchain = ctx.attrs.rustc[RustcToolchainInfo]
+    src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
+
+    cmd = cmd_args(
+        toolchain.tool.args,
+        _crate_flags(ctx),
+        "--test",
+        _resolve_root(ctx),
+        hidden=cmd_args(
+            ctx.attrs.srcs,
+            src_deps,
+        ),
+    )
+
+    env = {
+        "MIRI_SYSROOT": toolchain.sysroot,
+    }
+
+    return [
+        DefaultInfo(),
+        RunInfo(
+            args=cmd_args(
+                "env",
+                [cmd_args(value, format=name + "={}") for name, value in env.items()],
+                cmd,
+            ),
+        ),
+        ExternalRunnerTestInfo(
+            type="rust",
+            command=[cmd],
+            env=env,
+        ),
+    ]
+
+
 def _tests(ctx: AnalysisContext) -> list[Provider]:
+    if ctx.attrs.rustc[RustcToolchainInfo].driver == RustcDriver("miri"):
+        return _miri_tests(ctx)
+
     out = ctx.actions.declare_output(_crate_name(ctx) + "-tests")
 
     _run_tool(
@@ -261,6 +328,21 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
     if ctx.attrs.unit_tests:
         sub_targets["tests"] = _tests(ctx)
 
+    object_children = [dep[ObjectInfo].objects for dep in crate_deps]
+
+    if "obj" in emits:
+        objects = ctx.actions.tset(
+            ObjectTSet,
+            value=emits["obj"],
+            children=object_children,
+        )
+
+    else:
+        objects = ctx.actions.tset(
+            ObjectTSet,
+            children=object_children,
+        )
+
     return [
         DefaultInfo(
             default_output=out,
@@ -273,11 +355,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
             out=out,
         ),
         ObjectInfo(
-            objects=ctx.actions.tset(
-                ObjectTSet,
-                value=emits["obj"],
-                children=[dep[ObjectInfo].objects for dep in crate_deps],
-            ),
+            objects=objects,
         ),
         IncludeInfo(
             paths=ctx.actions.tset(
@@ -339,7 +417,7 @@ crate_unwrapped = rule(
             ),
         ),
         "rustc": attrs.toolchain_dep(
-            providers=[RunInfo, RustcToolchainInfo],
+            providers=[RustcToolchainInfo],
             default="sif//toolchains:rustc",
         ),
         "dep_wrapper": attrs.default_only(

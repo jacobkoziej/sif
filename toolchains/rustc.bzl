@@ -16,6 +16,7 @@ RustcDriver = enum("rustc", "miri")
 
 RustcToolchainInfo = provider(
     fields={
+        "tool": provider_field(RunInfo),
         "driver": provider_field(RustcDriver),
         "sysroot": provider_field(Artifact | str | None, default=None),
         "rustdoc": provider_field(RunInfo),
@@ -98,6 +99,9 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
             args=rustc_cmd,
         ),
         RustcToolchainInfo(
+            tool=RunInfo(
+                args=rustc_cmd,
+            ),
             driver=RustcDriver(ctx.attrs.driver),
             sysroot=sysroot_artifact,
             rustdoc=RunInfo(
@@ -113,7 +117,12 @@ rustc = rule(
     attrs={
         "tool": attrs.exec_dep(
             providers=[RunInfo],
-            default="sif//tools/rust:rustc",
+            default=select(
+                {
+                    "sif//constraints/rust:driver[rustc]": "sif//tools/rust:rustc",
+                    "sif//constraints/rust:driver[miri]": "sif//tools/rust:miri",
+                }
+            ),
         ),
         "rustdoc": attrs.exec_dep(
             providers=[RunInfo],
@@ -137,7 +146,7 @@ rustc = rule(
             default=select(
                 {
                     "sif//constraints/rust:disable-sysroot[true]": "/dev/null",
-                    "sif//constraints/rust:driver[miri]": "sif//toolchains:miri-sysroot",
+                    "sif//constraints/rust:driver[miri]": "sif//vendor:miri-sysroot",
                     "DEFAULT": None,
                 }
             ),

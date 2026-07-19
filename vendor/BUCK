@@ -18,6 +18,7 @@ src(
         "compiler-builtins/compiler-builtins/src/lib.rs",
         "core/src/lib.rs",
     ],
+    visibility=[],
 )
 
 crate_unwrapped(
@@ -29,7 +30,6 @@ crate_unwrapped(
         "arch",
         "compiler-builtins",
     ],
-    visibility=["PUBLIC"],
 )
 
 crate_unwrapped(
@@ -39,7 +39,6 @@ crate_unwrapped(
     cfg=[
         "no_fp_fmt_parse",
     ],
-    visibility=["PUBLIC"],
 )
 
 derivation_output_path(
