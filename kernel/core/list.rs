@@ -29,7 +29,7 @@ impl<T, Role> Node<T, Role> {
     fn to_raw_node(self: Pin<&mut Self>) -> NonNull<RawNode> {
         let node = unsafe { &mut self.get_unchecked_mut().node };
 
-        assert!(node.is_some());
+        debug_assert!(node.is_some());
 
         *node = Some(RawNode {
             prev: NonNull::dangling(),
