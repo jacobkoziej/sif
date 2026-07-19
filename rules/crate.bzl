@@ -49,8 +49,10 @@ def _crate_name(ctx: AnalysisContext) -> str:
     return ctx.attrs.crate_name or ctx.label.name
 
 
-def _output_name(crate_name: str, crate_type: str) -> str:
-    if crate_type == "bin":
+def _output_name(ctx: AnalysisContext) -> str:
+    crate_name = _crate_name(ctx)
+
+    if ctx.attrs.type == "bin":
         return crate_name
 
     return "lib" + crate_name
@@ -79,27 +81,17 @@ def _externs(ctx: AnalysisContext) -> list[cmd_args]:
     ]
 
 
-def _incremental_arg(actions: AnalysisActions, name: str | None) -> cmd_args:
-    if name == None:
+def _incremental_arg(ctx: AnalysisContext, category: str) -> cmd_args:
+    if not ctx.attrs.incremental:
         return cmd_args()
 
     return cmd_args(
-        actions.declare_output(name, dir=True).as_output(),
+        ctx.actions.declare_output(category + "-incremental", dir=True).as_output(),
         format="--codegen=incremental={}",
     )
 
 
-def _rust_toolchain(ctx: AnalysisContext) -> RunInfo:
-    return ctx.attrs.rustc[RunInfo]
-
-
-def _crate_flags(
-    ctx: AnalysisContext,
-    *,
-    name: str,
-    type: str | None,
-    incremental: str | None,
-) -> cmd_args:
+def _crate_flags(ctx: AnalysisContext) -> cmd_args:
     search_paths = get_include(
         actions=ctx.actions,
         includes=get_provider(_crate_deps(ctx), IncludeInfo),
@@ -114,9 +106,7 @@ def _crate_flags(
             cmd_args(feature, format='--cfg=feature="{}"')
             for feature in ctx.attrs.features
         ],
-        _incremental_arg(ctx.actions, incremental),
-        cmd_args(name, format="--crate-name={}"),
-        cmd_args(type, format="--crate-type={}") if type else cmd_args(),
+        cmd_args(_crate_name(ctx), format="--crate-name={}"),
     )
 
 
@@ -124,11 +114,9 @@ def _run_tool(
     ctx: AnalysisContext,
     *,
     category: str,
-    name: str,
     type: str | None,
     out: Artifact,
     emits: dict[str, Artifact],
-    incremental: str | None,
     extra_args: cmd_args = cmd_args(),
 ) -> None:
     dep_info = ctx.actions.artifact_tag()
@@ -143,13 +131,10 @@ def _run_tool(
         "--target",
         out.as_output(),
         "--",
-        _rust_toolchain(ctx).args,
-        _crate_flags(
-            ctx,
-            name=name,
-            type=type,
-            incremental=incremental,
-        ),
+        ctx.attrs.rustc[RunInfo].args,
+        _crate_flags(ctx),
+        _incremental_arg(ctx, category),
+        cmd_args(type, format="--crate-type={}") if type else cmd_args(),
         cmd_args(dep_file, format="--emit=dep-info={}"),
         [
             cmd_args(
@@ -181,15 +166,11 @@ def _run_tool(
     )
 
 
-def _rlib(
-    ctx: AnalysisContext,
-    *,
-    name: str,
-    type: str,
-) -> (Artifact, dict[str, Artifact]):
-    out_name = _output_name(name, type)
+def _rlib(ctx: AnalysisContext) -> (Artifact, dict[str, Artifact]):
+    out_name = _output_name(ctx)
+    crate_type = ctx.attrs.type
 
-    out = ctx.actions.declare_output(out_name + _crate_type[type])
+    out = ctx.actions.declare_output(out_name + _crate_type[crate_type])
     rmeta = ctx.actions.declare_output(out_name + ".rmeta")
     obj = ctx.actions.declare_output(out_name + ".o")
 
@@ -201,31 +182,51 @@ def _rlib(
     _run_tool(
         ctx,
         category="crate",
-        name=name,
-        type=type,
+        type=crate_type,
         out=out,
         emits=emits,
-        incremental="incremental" if ctx.attrs.incremental else None,
     )
 
     return out, emits
 
 
-def _tests(
-    ctx: AnalysisContext,
-    *,
-    name: str,
-) -> list[Provider]:
-    out = ctx.actions.declare_output(name + "-tests")
+def _docs(ctx: AnalysisContext) -> list[Provider]:
+    out = ctx.actions.declare_output("docs", dir=True)
+
+    src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
+
+    cmd = cmd_args(
+        ctx.attrs.rustc[RustcToolchainInfo].rustdoc.args,
+        _crate_flags(ctx),
+        cmd_args(out.as_output(), format="--out-dir={}"),
+        _resolve_root(ctx),
+        hidden=cmd_args(
+            ctx.attrs.srcs,
+            src_deps,
+        ),
+    )
+
+    ctx.actions.run(
+        cmd,
+        category="crate_docs",
+    )
+
+    return [
+        DefaultInfo(
+            default_output=out,
+        ),
+    ]
+
+
+def _tests(ctx: AnalysisContext) -> list[Provider]:
+    out = ctx.actions.declare_output(_crate_name(ctx) + "-tests")
 
     _run_tool(
         ctx,
         category="crate_test",
-        name=name,
         type=None,
         out=out,
         emits={},
-        incremental="test-incremental" if ctx.attrs.incremental else None,
         extra_args=cmd_args(
             "--test",
         ),
@@ -247,24 +248,18 @@ def _tests(
 
 def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
     crate_name = _crate_name(ctx)
-    crate_type = ctx.attrs.type
     crate_deps = _crate_deps(ctx)
 
-    out, emits = _rlib(
-        ctx,
-        name=crate_name,
-        type=crate_type,
-    )
+    out, emits = _rlib(ctx)
 
     sub_targets: dict[str, list[Provider]] = {
         target: [DefaultInfo(default_output=output)] for target, output in emits.items()
     }
 
+    sub_targets["docs"] = _docs(ctx)
+
     if ctx.attrs.unit_tests:
-        sub_targets["tests"] = _tests(
-            ctx,
-            name=crate_name,
-        )
+        sub_targets["tests"] = _tests(ctx)
 
     return [
         DefaultInfo(
@@ -273,7 +268,7 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         ),
         CrateInfo(
             name=crate_name,
-            type=CrateType(crate_type),
+            type=CrateType(ctx.attrs.type),
             metadata=emits["metadata"],
             out=out,
         ),
