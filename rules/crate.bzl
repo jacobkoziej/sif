@@ -313,6 +313,36 @@ def _tests(ctx: AnalysisContext) -> list[Provider]:
     ]
 
 
+def _doctests(ctx: AnalysisContext, rlib: Artifact) -> list[Provider]:
+    src_deps = [dep[DefaultInfo].default_outputs[0] for dep in ctx.attrs.src_deps]
+
+    cmd = cmd_args(
+        ctx.attrs.rustc[RustcToolchainInfo].rustdoc.args,
+        _crate_flags(ctx),
+        "--test",
+        cmd_args(
+            cmd_args(_crate_name(ctx), rlib, delimiter="="),
+            format="--extern={}",
+        ),
+        _resolve_root(ctx),
+        hidden=cmd_args(
+            ctx.attrs.srcs,
+            src_deps,
+        ),
+    )
+
+    return [
+        DefaultInfo(),
+        RunInfo(
+            args=cmd,
+        ),
+        ExternalRunnerTestInfo(
+            type="rustdoc",
+            command=[cmd],
+        ),
+    ]
+
+
 def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
     crate_name = _crate_name(ctx)
     crate_deps = _crate_deps(ctx)
@@ -327,6 +357,12 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
 
     if ctx.attrs.unit_tests:
         sub_targets["tests"] = _tests(ctx)
+
+    if ctx.attrs.doctests:
+        if ctx.attrs.rustc[RustcToolchainInfo].driver == RustcDriver("miri"):
+            fail("doctests are not supported under the miri driver")
+
+        sub_targets["doctests"] = _doctests(ctx, out)
 
     object_children = [dep[ObjectInfo].objects for dep in crate_deps]
 
@@ -412,6 +448,15 @@ crate_unwrapped = rule(
             default=select(
                 {
                     "sif//constraints:os[sif]": False,
+                    "DEFAULT": True,
+                }
+            ),
+        ),
+        "doctests": attrs.bool(
+            default=select(
+                {
+                    "sif//constraints:os[sif]": False,
+                    "sif//constraints/rust:driver[miri]": False,
                     "DEFAULT": True,
                 }
             ),
