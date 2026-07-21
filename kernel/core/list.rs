@@ -14,37 +14,38 @@ struct RawNode {
 }
 
 pub struct Node<T, Role> {
-    node: Option<RawNode>,
+    node: RawNode,
+    linked: bool,
     _marker: PhantomData<fn() -> (T, Role)>,
 }
 
 impl<T, Role> Node<T, Role> {
     pub unsafe fn new() -> Self {
         Self {
-            node: None,
+            node: RawNode {
+                prev: NonNull::dangling(),
+                next: NonNull::dangling(),
+                _pin: PhantomPinned,
+            },
+            linked: false,
             _marker: PhantomData,
         }
     }
 
-    fn to_raw_node(self: Pin<&mut Self>) -> NonNull<RawNode> {
-        let node = unsafe { &mut self.get_unchecked_mut().node };
+    fn to_raw_node(self: Pin<&mut Self>) -> Option<NonNull<RawNode>> {
+        let this = unsafe { self.get_unchecked_mut() };
 
-        debug_assert!(node.is_some());
+        if this.linked {
+            return None;
+        }
 
-        *node = Some(RawNode {
-            prev: NonNull::dangling(),
-            next: NonNull::dangling(),
-            _pin: PhantomPinned,
-        });
+        let ptr = NonNull::from(&mut this.node);
 
-        let node = node.as_mut().unwrap();
+        this.node.prev = ptr;
+        this.node.next = ptr;
+        this.linked = true;
 
-        let ptr = NonNull::from(&mut *node);
-
-        node.prev = ptr;
-        node.next = ptr;
-
-        ptr
+        Some(ptr)
     }
 }
 
