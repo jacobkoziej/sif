@@ -4,6 +4,7 @@
 // Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
 use core::marker::{PhantomData, PhantomPinned};
+use core::mem::offset_of;
 use core::pin::Pin;
 use core::ptr::NonNull;
 
@@ -46,6 +47,14 @@ impl<T, Role> Node<T, Role> {
         this.linked = true;
 
         Some(ptr)
+    }
+
+    unsafe fn from_raw_node<'a>(node: NonNull<RawNode>) -> Pin<&'a mut Self> {
+        unsafe {
+            let node = node.byte_sub(offset_of!(Self, node)).cast::<Self>();
+
+            Pin::new_unchecked(&mut *node.as_ptr())
+        }
     }
 }
 
