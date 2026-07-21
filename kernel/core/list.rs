@@ -3,6 +3,8 @@
 // list.rs -- Intrusive Doubly-linked List
 // Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
+use core::error;
+use core::fmt;
 use core::marker::{PhantomData, PhantomPinned};
 use core::mem::offset_of;
 use core::pin::Pin;
@@ -79,6 +81,23 @@ where
     _marker: PhantomData<fn() -> (T, Role)>,
 }
 
+#[derive(Debug)]
+pub enum Error {
+    AlreadyInserted,
+}
+
+impl fmt::Display for Error {
+    fn fmt(self: &Self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use Error::*;
+
+        match self {
+            AlreadyInserted => write!(f, "already inserted"),
+        }
+    }
+}
+
+impl error::Error for Error {}
+
 impl<T, Role> List<T, Role>
 where
     T: Linked<Role>,
@@ -88,6 +107,32 @@ where
             list: None,
             _marker: PhantomData,
         }
+    }
+
+    pub fn append(self: &mut Self, node: Pin<&mut Node<T, Role>>) -> Result<(), Error> {
+        let Some(mut node) = node.to_raw_node() else {
+            return Err(Error::AlreadyInserted);
+        };
+
+        let list = &mut self.list;
+
+        if list.is_none() {
+            *list = Some(node);
+            return Ok(());
+        }
+
+        unsafe {
+            let head = list.as_mut().unwrap();
+            let mut tail = head.as_mut().prev;
+
+            node.as_mut().next = *head;
+            node.as_mut().prev = tail;
+
+            head.as_mut().prev = node;
+            tail.as_mut().next = node;
+        }
+
+        Ok(())
     }
 }
 
