@@ -6,7 +6,7 @@
 use core::marker::{PhantomData, PhantomPinned};
 use core::mem::offset_of;
 use core::pin::Pin;
-use core::ptr::NonNull;
+use core::ptr::{self, NonNull};
 
 struct RawNode {
     prev: NonNull<RawNode>,
@@ -40,11 +40,14 @@ impl<T, Role> Node<T, Role> {
             return None;
         }
 
-        let ptr = NonNull::from(&mut this.node);
+        let this = ptr::from_mut(this);
+        let ptr = unsafe { NonNull::new_unchecked(&raw mut (*this).node) };
 
-        this.node.prev = ptr;
-        this.node.next = ptr;
-        this.linked = true;
+        unsafe {
+            (*ptr.as_ptr()).prev = ptr;
+            (*ptr.as_ptr()).next = ptr;
+            (*this).linked = true;
+        }
 
         Some(ptr)
     }
