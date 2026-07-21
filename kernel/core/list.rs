@@ -16,6 +16,14 @@ struct RawNode {
     _pin: PhantomPinned,
 }
 
+impl RawNode {
+    fn is_singleton(self: &Self) -> bool {
+        let ptr = NonNull::from(self);
+
+        self.prev == ptr && self.next == ptr
+    }
+}
+
 pub struct Node<T, Role> {
     node: RawNode,
     linked: bool,
@@ -60,6 +68,14 @@ impl<T, Role> Node<T, Role> {
 
             Pin::new_unchecked(&mut *node.as_ptr())
         }
+    }
+
+    fn unlink(self: Pin<&mut Self>) {
+        let this = unsafe { self.get_unchecked_mut() };
+
+        this.node.prev = NonNull::dangling();
+        this.node.next = NonNull::dangling();
+        this.linked = false;
     }
 }
 
@@ -133,6 +149,33 @@ where
         }
 
         Ok(())
+    }
+
+    pub fn pop_back<'a>(self: &mut Self) -> Option<Pin<&'a mut Node<T, Role>>> {
+        let list = &mut self.list;
+
+        let Some(mut head) = *list else {
+            return None;
+        };
+
+        let mut node = unsafe {
+            let mut tail = head.as_mut().prev;
+
+            if tail.as_ref().is_singleton() {
+                *list = None;
+            } else {
+                let mut prev = tail.as_mut().prev;
+
+                head.as_mut().prev = prev;
+                prev.as_mut().next = head;
+            }
+
+            Node::from_raw_node(tail)
+        };
+
+        node.as_mut().unlink();
+
+        Some(node)
     }
 }
 
