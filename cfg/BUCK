@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//cfg:rules.bzl", "cfg")
+load("@sif//execution-platforms:rules.bzl", "get_host_constraints")
+
+cfg(
+    name="host",
+    constraints=get_host_constraints()
+    + [
+        "sif//constraints/rust:disable-sysroot[false]",
+    ],
+)
