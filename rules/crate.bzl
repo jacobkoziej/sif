@@ -353,7 +353,8 @@ def _crate_impl(ctx: AnalysisContext) -> list[Provider]:
         target: [DefaultInfo(default_output=output)] for target, output in emits.items()
     }
 
-    sub_targets["docs"] = _docs(ctx)
+    if ctx.attrs.rustc[RustcToolchainInfo].driver != RustcDriver("miri"):
+        sub_targets["docs"] = _docs(ctx)
 
     if ctx.attrs.unit_tests:
         sub_targets["tests"] = _tests(ctx)

@@ -73,6 +73,13 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     target_cpu = ctx.attrs.codegen_options.get("target-cpu")
     target_cpu = '--cfg=target_cpu="{}"'.format(target_cpu) if target_cpu else []
 
+    def map_unstable_option(x: tuple) -> str:
+        option, value = x
+
+        return "-Z" + option + "=" + value
+
+    unstable_options = map(map_unstable_option, ctx.attrs.unstable_options.items())
+
     common_flags = cmd_args(
         "--color=always",
         sysroot,
@@ -81,6 +88,7 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
         codegen_options,
         target_feature_cfgs,
         target_cpu,
+        unstable_options,
     )
 
     rustc_cmd = cmd_args(
@@ -159,6 +167,18 @@ rustc = rule(
                 "target-cpu": cpu(),
                 "target-feature": attributes(),
             },
+        ),
+        "unstable_options": attrs.dict(
+            key=attrs.string(),
+            value=attrs.string(),
+            default=select(
+                {
+                    "sif//constraints/rust:driver[miri]": {
+                        "miri-backtrace": "full",
+                    },
+                    "DEFAULT": {},
+                }
+            ),
         ),
     },
 )
