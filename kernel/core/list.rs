@@ -17,6 +17,15 @@ struct RawNode {
 }
 
 impl RawNode {
+    fn insert(mut prev: NonNull<RawNode>, mut node: NonNull<RawNode>, mut next: NonNull<RawNode>) {
+        unsafe {
+            prev.as_mut().next = node;
+            node.as_mut().prev = prev;
+            node.as_mut().next = next;
+            next.as_mut().prev = node;
+        }
+    }
+
     fn is_singleton(self: &Self) -> bool {
         let ptr = NonNull::from(self);
 
@@ -119,26 +128,18 @@ where
     T: Linked<Role>,
 {
     pub fn append(self: &mut Self, node: Pin<&mut Node<T, Role>>) -> Result<(), Error> {
-        let Some(mut node) = node.to_raw_node() else {
-            return Err(Error::AlreadyInserted);
+        let node = node.to_raw_node().ok_or(Error::AlreadyInserted)?;
+
+        let &mut Some(list) = &mut self.list else {
+            self.list = Some(node);
+            return Ok(());
         };
 
-        let list = &mut self.list;
-
-        if list.is_none() {
-            *list = Some(node);
-            return Ok(());
-        }
-
         unsafe {
-            let head = list.as_mut().unwrap();
-            let mut tail = head.as_mut().prev;
+            let head = list;
+            let tail = head.as_ref().prev;
 
-            node.as_mut().next = *head;
-            node.as_mut().prev = tail;
-
-            head.as_mut().prev = node;
-            tail.as_mut().next = node;
+            RawNode::insert(tail, node, head);
         }
 
         Ok(())
