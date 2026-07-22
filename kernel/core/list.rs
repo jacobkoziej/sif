@@ -178,6 +178,16 @@ where
 
         Some(node)
     }
+
+    pub fn prepend(self: &mut Self, node: Pin<&mut Node<T, Role>>) -> Result<(), Error> {
+        self.append(node)?;
+
+        let node = unsafe { self.list.unwrap().as_ref().prev };
+
+        self.list = Some(node);
+
+        Ok(())
+    }
 }
 
 impl<T, Role> !Sync for List<T, Role> {}
