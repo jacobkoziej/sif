@@ -31,6 +31,16 @@ impl RawNode {
 
         self.prev == ptr && self.next == ptr
     }
+
+    fn remove(mut prev: NonNull<RawNode>, mut node: NonNull<RawNode>, mut next: NonNull<RawNode>) {
+        unsafe {
+            prev.as_mut().next = next;
+            next.as_mut().prev = prev;
+
+            node.as_mut().prev = node;
+            node.as_mut().next = node;
+        }
+    }
 }
 
 pub struct Node<T, Role> {
@@ -153,22 +163,18 @@ where
     }
 
     pub fn pop_back<'a>(self: &mut Self) -> Option<Pin<&'a mut Node<T, Role>>> {
-        let list = &mut self.list;
-
-        let Some(mut head) = *list else {
+        let &mut Some(list) = &mut self.list else {
             return None;
         };
 
         let mut node = unsafe {
-            let mut tail = head.as_mut().prev;
+            let head = list;
+            let tail = head.as_ref().prev;
 
             if tail.as_ref().is_singleton() {
-                *list = None;
+                self.list = None;
             } else {
-                let mut prev = tail.as_mut().prev;
-
-                head.as_mut().prev = prev;
-                prev.as_mut().next = head;
+                RawNode::remove(tail.as_ref().prev, tail, head);
             }
 
             Node::from_raw_node(tail)
