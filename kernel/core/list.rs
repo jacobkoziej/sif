@@ -118,13 +118,6 @@ impl<T, Role> List<T, Role>
 where
     T: Linked<Role>,
 {
-    pub fn new() -> Self {
-        Self {
-            list: None,
-            _marker: PhantomData,
-        }
-    }
-
     pub fn append(self: &mut Self, node: Pin<&mut Node<T, Role>>) -> Result<(), Error> {
         let Some(mut node) = node.to_raw_node() else {
             return Err(Error::AlreadyInserted);
@@ -149,6 +142,13 @@ where
         }
 
         Ok(())
+    }
+
+    pub fn new() -> Self {
+        Self {
+            list: None,
+            _marker: PhantomData,
+        }
     }
 
     pub fn pop_back<'a>(self: &mut Self) -> Option<Pin<&'a mut Node<T, Role>>> {
