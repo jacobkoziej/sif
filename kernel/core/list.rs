@@ -110,6 +110,14 @@ impl<T, Role> Node<T, Role> {
     }
 }
 
+impl<T, Role> fmt::Debug for Node<T, Role> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Node")
+            .field("linked", &self.linked)
+            .finish_non_exhaustive()
+    }
+}
+
 impl<T, Role> !Sync for Node<T, Role> {}
 
 pub unsafe trait Linked<Role>
