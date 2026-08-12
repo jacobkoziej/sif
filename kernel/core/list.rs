@@ -50,6 +50,10 @@ pub struct Node<T, Role> {
 }
 
 impl<T, Role> Node<T, Role> {
+    pub fn is_linked(&self) -> bool {
+        self.linked
+    }
+
     pub unsafe fn new() -> Self {
         Self {
             node: RawNode {
