@@ -124,8 +124,21 @@ pub unsafe trait Linked<Role>
 where
     Self: Sized,
 {
+    unsafe fn as_item(node: NonNull<Node<Self, Role>>) -> NonNull<Self>;
+
     fn to_node(self: Pin<&mut Self>) -> Pin<&mut Node<Self, Role>>;
-    unsafe fn from_node<'a>(node: NonNull<Node<Self, Role>>) -> Pin<&'a mut Self>;
+
+    unsafe fn from_node<'a>(node: NonNull<Node<Self, Role>>) -> Pin<&'a Self> {
+        unsafe { Pin::new_unchecked(Self::as_item(node).as_ref()) }
+    }
+
+    unsafe fn from_node_mut<'a>(node: NonNull<Node<Self, Role>>) -> Pin<&'a mut Self> {
+        unsafe {
+            let mut item = Self::as_item(node);
+
+            Pin::new_unchecked(item.as_mut())
+        }
+    }
 }
 
 pub struct List<T, Role>
