@@ -185,6 +185,20 @@ where
         Some(node)
     }
 
+    pub fn pop_front<'a>(self: &mut Self) -> Option<Pin<&'a mut Node<T, Role>>> {
+        let Some(list) = self.list else {
+            return None;
+        };
+
+        unsafe {
+            if !list.as_ref().is_singleton() {
+                self.list = Some(list.as_ref().next);
+            }
+        }
+
+        self.pop_back()
+    }
+
     pub fn prepend(self: &mut Self, node: Pin<&mut Node<T, Role>>) -> Result<(), Error> {
         self.append(node)?;
 
