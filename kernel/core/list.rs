@@ -210,4 +210,13 @@ where
     }
 }
 
+impl<T, Role> Default for List<T, Role>
+where
+    T: Linked<Role>,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T, Role> !Sync for List<T, Role> {}
