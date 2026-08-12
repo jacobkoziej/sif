@@ -126,7 +126,7 @@ where
 {
     unsafe fn as_item(node: NonNull<Node<Self, Role>>) -> NonNull<Self>;
 
-    fn to_node(self: Pin<&mut Self>) -> Pin<&mut Node<Self, Role>>;
+    fn as_node(self: Pin<&mut Self>) -> Pin<&mut Node<Self, Role>>;
 
     unsafe fn from_node<'a>(node: NonNull<Node<Self, Role>>) -> Pin<&'a Self> {
         unsafe { Pin::new_unchecked(Self::as_item(node).as_ref()) }
