@@ -50,6 +50,22 @@ pub struct Node<T, Role> {
 }
 
 impl<T, Role> Node<T, Role> {
+    unsafe fn as_node(node: NonNull<RawNode>) -> NonNull<Self> {
+        unsafe { node.byte_sub(offset_of!(Self, node)).cast::<Self>() }
+    }
+
+    unsafe fn from_raw_node<'a>(node: NonNull<RawNode>) -> Pin<&'a Self> {
+        unsafe { Pin::new_unchecked(Self::as_node(node).as_ref()) }
+    }
+
+    unsafe fn from_raw_node_mut<'a>(node: NonNull<RawNode>) -> Pin<&'a mut Self> {
+        unsafe {
+            let mut node = Self::as_node(node);
+
+            Pin::new_unchecked(node.as_mut())
+        }
+    }
+
     pub fn is_linked(&self) -> bool {
         self.linked
     }
@@ -83,14 +99,6 @@ impl<T, Role> Node<T, Role> {
         }
 
         Some(ptr)
-    }
-
-    unsafe fn from_raw_node<'a>(node: NonNull<RawNode>) -> Pin<&'a mut Self> {
-        unsafe {
-            let node = node.byte_sub(offset_of!(Self, node)).cast::<Self>();
-
-            Pin::new_unchecked(&mut *node.as_ptr())
-        }
     }
 
     fn unlink(self: Pin<&mut Self>) {
@@ -159,6 +167,30 @@ where
         Ok(())
     }
 
+    pub fn back(&self) -> Option<Pin<&Node<T, Role>>> {
+        let list = self.list?;
+
+        Some(unsafe { Node::from_raw_node(list.as_ref().prev) })
+    }
+
+    pub fn back_mut(&mut self) -> Option<Pin<&mut Node<T, Role>>> {
+        let list = self.list?;
+
+        Some(unsafe { Node::from_raw_node_mut(list.as_ref().prev) })
+    }
+
+    pub fn front(&self) -> Option<Pin<&Node<T, Role>>> {
+        let list = self.list?;
+
+        Some(unsafe { Node::from_raw_node(list) })
+    }
+
+    pub fn front_mut(&mut self) -> Option<Pin<&mut Node<T, Role>>> {
+        let list = self.list?;
+
+        Some(unsafe { Node::from_raw_node_mut(list) })
+    }
+
     pub fn is_empty(&self) -> bool {
         self.list.is_none()
     }
@@ -185,7 +217,7 @@ where
                 RawNode::remove(tail.as_ref().prev, tail, head);
             }
 
-            Node::from_raw_node(tail)
+            Node::from_raw_node_mut(tail)
         };
 
         node.as_mut().unlink();
