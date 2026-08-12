@@ -155,6 +155,10 @@ where
         Ok(())
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.list.is_none()
+    }
+
     pub fn new() -> Self {
         Self {
             list: None,
