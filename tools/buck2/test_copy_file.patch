@@ -1,8 +1,8 @@
 diff --git a/app/buck2_client/src/commands/build/out.rs b/app/buck2_client/src/commands/build/out.rs
-index c67d22bb47..dff3b22228 100644
+index 11b5f4dba5..1344b4785b 100644
 --- a/app/buck2_client/src/commands/build/out.rs
 +++ b/app/buck2_client/src/commands/build/out.rs
-@@ -551,6 +551,7 @@ mod tests {
+@@ -552,6 +552,7 @@ mod tests {
              let out = dir.path().join("sleep");
 
              let res = buck2_util::process::async_background_command("cp")
@@ -10,7 +10,7 @@ index c67d22bb47..dff3b22228 100644
                  .arg(Path::new("/bin/sleep"))
                  .arg(&out)
                  .spawn()?
-@@ -559,6 +560,15 @@ mod tests {
+@@ -560,6 +561,15 @@ mod tests {
 
              assert!(res.success());
 
