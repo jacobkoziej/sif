@@ -24,11 +24,25 @@
 
       src = fetchurl {
         url = "https://static.rust-lang.org/dist/${version}/rustc-nightly-src.tar.gz";
-        hash = "sha256-pkhYkFtR/GQiUAHWWUuejMZabhbffphMEbt+aBVfvYk=";
+        hash = "sha256-5cWIu+hLd4f3IxH566PiOSJ0lJpP1smDzuNeQ6LW4I0=";
         passthru.isReleaseTarball = true;
       };
 
       bootstrapToolchain = pkgs.rust-bin.nightly.${version}.default;
+
+      llvmSharedFor =
+        pkgSet:
+        pkgSet.llvmPackages_23.libllvm.override (
+          {
+            enableSharedLibraries = true;
+          }
+          // lib.optionalAttrs (pkgSet.stdenv.targetPlatform.useLLVM or false) {
+            stdenv = pkgSet.stdenv.override {
+              allowedRequisites = null;
+              cc = pkgSet.pkgsBuildHost.llvmPackages_23.clangUseLLVM;
+            };
+          }
+        );
 
       insertTargets =
         flag:
@@ -124,6 +138,12 @@
               inherit (pkgs.rustc) targetPlatformsWithHostTools;
               inherit (pkgs.rustc) badTargetPlatforms;
             };
+
+            llvmPackages = pkgs.llvmPackages_23;
+            llvmShared = llvmSharedFor pkgs.pkgsHostTarget;
+            llvmSharedForBuild = llvmSharedFor pkgs.pkgsBuildBuild;
+            llvmSharedForHost = llvmSharedFor pkgs.pkgsBuildHost;
+            llvmSharedForTarget = llvmSharedFor pkgs.pkgsBuildTarget;
           }).overrideAttrs
             (old: {
               version = "nightly-${version}";
