@@ -85,6 +85,15 @@ def _externs(ctx: AnalysisContext) -> list[cmd_args]:
     ]
 
 
+def _sysroot_externs(ctx: AnalysisContext) -> list[cmd_args]:
+    sysroot = ctx.attrs.rustc[RustcToolchainInfo].sysroot
+
+    if sysroot == "/dev/null":
+        return []
+
+    return [cmd_args("alloc", format="--extern={}")]
+
+
 def _incremental_arg(ctx: AnalysisContext, category: str) -> cmd_args:
     if not ctx.attrs.incremental:
         return cmd_args()
@@ -105,6 +114,7 @@ def _crate_flags(ctx: AnalysisContext) -> cmd_args:
     return cmd_args(
         search_paths.flags,
         [cmd_args(extern, format="--extern={}") for extern in _externs(ctx)],
+        _sysroot_externs(ctx),
         [cmd_args(cfg, format="--cfg={}") for cfg in ctx.attrs.cfg],
         [
             cmd_args(feature, format='--cfg=feature="{}"')
