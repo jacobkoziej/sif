@@ -32,7 +32,8 @@
             commitlint-rs
             mdformat
             pre-commit
-            rustfmt
+            self'.packages.rustc
+            self'.packages.rustfmt
             statix
             toml-sort
             treefmt

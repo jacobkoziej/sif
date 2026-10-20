@@ -5,8 +5,14 @@
 
 use crate::scs::scb;
 use core::arch::naked_asm;
-use core::mem::{offset_of, size_of};
-use sif_core::elf::{Header, Phdr};
+use core::mem::{
+    offset_of,
+    size_of,
+};
+use sif_core::elf::{
+    Header,
+    Phdr,
+};
 
 #[unsafe(naked)]
 #[unsafe(export_name = "_start_arch")]

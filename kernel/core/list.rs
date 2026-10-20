@@ -3,18 +3,43 @@
 // list.rs -- instrusive doubly linked list
 // Copyright (C) 2026  Jacob Koziej <jacobkoziej@gmail.com>
 
-use alloc::alloc::{AllocatorClone, Global};
+use alloc::alloc::{
+    AllocatorClone,
+    Global,
+};
 use alloc::sync::Arc;
 use core::alloc::Allocator;
 use core::cell::UnsafeCell;
 use core::iter::{
-    DoubleEndedIterator, ExactSizeIterator, FromIterator, FusedIterator, IntoIterator, Iterator,
+    DoubleEndedIterator,
+    ExactSizeIterator,
+    FromIterator,
+    FusedIterator,
+    IntoIterator,
+    Iterator,
 };
-use core::marker::{PhantomData, PhantomPinned};
-use core::mem::{ManuallyDrop, offset_of, transmute};
-use core::ops::{Deref, Drop};
-use core::ptr::{self, DynMetadata, Pointee};
-use core::sync::atomic::{AtomicPtr, Ordering};
+use core::marker::{
+    PhantomData,
+    PhantomPinned,
+};
+use core::mem::{
+    ManuallyDrop,
+    offset_of,
+    transmute,
+};
+use core::ops::{
+    Deref,
+    Drop,
+};
+use core::ptr::{
+    self,
+    DynMetadata,
+    Pointee,
+};
+use core::sync::atomic::{
+    AtomicPtr,
+    Ordering,
+};
 
 pub struct Links {
     prev: AtomicPtr<Self>,
@@ -755,7 +780,10 @@ where
 #[cfg(test)]
 mod test {
     use super::*;
-    use core::pin::{Pin, pin};
+    use core::pin::{
+        Pin,
+        pin,
+    };
 
     struct Foo;
     impl Role for Foo {}
@@ -822,7 +850,10 @@ mod test {
 
     mod links {
         use super::*;
-        use core::pin::{Pin, pin};
+        use core::pin::{
+            Pin,
+            pin,
+        };
 
         fn prev(node: Pin<&Links>) -> *const Links {
             Links::prev(ptr(node))

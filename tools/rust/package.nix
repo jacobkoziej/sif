@@ -158,6 +158,10 @@
               ];
             });
 
+        rustfmt = pkgs.writeShellScriptBin "rustfmt" ''
+          exec ${bootstrapToolchain}/bin/rustfmt "$@"
+        '';
+
         rustup = pkgs.rust-bin.fromRustupToolchainFile ./toolchain.toml;
       };
     };

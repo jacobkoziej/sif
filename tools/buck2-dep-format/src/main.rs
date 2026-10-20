@@ -11,9 +11,15 @@ use std::ffi::OsString;
 use std::fs;
 use std::fs::File;
 use std::io;
-use std::io::{BufWriter, Write};
+use std::io::{
+    BufWriter,
+    Write,
+};
 use std::path::PathBuf;
-use std::process::{Command, exit};
+use std::process::{
+    Command,
+    exit,
+};
 
 /// buck2 dependency file formatter
 #[derive(Parser)]

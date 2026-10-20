@@ -11,7 +11,10 @@ const _: () = assert!(cfg!(target_feature = "v8m.main"));
 const _: () = assert!(cfg!(target_feature = "dsp"));
 const _: () = assert!(cfg!(target_feature = "8msecext"));
 
-use sif_arch::scs::scb::{VectorTable, default_handler};
+use sif_arch::scs::scb::{
+    VectorTable,
+    default_handler,
+};
 use sif_core::McuInit;
 
 #[derive(Default)]

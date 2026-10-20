@@ -5,12 +5,23 @@
 
 use clap::Parser;
 use elf::ElfStream;
-use elf::endian::{AnyEndian, EndianParse};
+use elf::endian::{
+    AnyEndian,
+    EndianParse,
+};
 use elf::file::FileHeader;
 use std::convert::From;
 use std::error::Error;
-use std::fs::{File, OpenOptions, copy};
-use std::io::{Seek, SeekFrom, Write};
+use std::fs::{
+    File,
+    OpenOptions,
+    copy,
+};
+use std::io::{
+    Seek,
+    SeekFrom,
+    Write,
+};
 use std::mem::size_of;
 use std::path::PathBuf;
 
