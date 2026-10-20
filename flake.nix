@@ -6,6 +6,10 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nur-packages = {
+      url = "github:jacobkoziej/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,6 +44,7 @@
             inherit system;
 
             overlays = [
+              inputs.nur-packages.overlays.default
               inputs.rust-overlay.overlays.default
             ];
           };

@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//tools/rules.bzl", "tool")
+
+derivation = ["legacyPackages", "com", "github", "herd", "herdtools7"]
+
+tool(
+    name="herd7",
+    flake="nur-packages",
+    derivation=derivation,
+)
