@@ -1,8 +1,8 @@
 diff --git a/app/buck2_common/src/legacy_configs/parser.rs b/app/buck2_common/src/legacy_configs/parser.rs
-index aa008463f5..71f3cca1b2 100644
+index f061d812c7..d91292dbb4 100644
 --- a/app/buck2_common/src/legacy_configs/parser.rs
 +++ b/app/buck2_common/src/legacy_configs/parser.rs
-@@ -136,12 +136,13 @@ impl LegacyConfigParser {
+@@ -138,12 +138,13 @@ impl LegacyConfigParser {
          config_pair: &ResolvedConfigFlag,
          current_cell: &CellRootPath,
      ) -> buck2_error::Result<()> {

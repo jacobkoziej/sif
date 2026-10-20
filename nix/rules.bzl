@@ -38,6 +38,7 @@ def _derivation_copy_impl(ctx: AnalysisContext) -> list[Provider]:
         derivation_output,
         {key: getattr(ctx.attrs, key) for key in _common_attrs.keys()},
     ).artifact("output")
+    output = ctx.actions.assert_has_content_based_path(output)
 
     out = ctx.actions.declare_output(ctx.label.name, dir=True)
 
@@ -125,6 +126,7 @@ def _derivation_output_path_impl(ctx: AnalysisContext) -> list[Provider]:
         derivation_output,
         {key: getattr(ctx.attrs, key) for key in _common_attrs.keys()},
     ).artifact("output")
+    output = ctx.actions.assert_has_content_based_path(output)
 
     return [
         DefaultInfo(

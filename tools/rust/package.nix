@@ -1,6 +1,7 @@
 {
   perSystem =
     {
+      config,
       lib,
       pkgs,
       ...
@@ -16,18 +17,32 @@
       inherit (pkgs) stdenv;
       inherit (pkgs) stdenvNoCC;
 
-      rustToolchain = importTOML ../rust-toolchain.toml;
+      rustToolchain = importTOML ./toolchain.toml;
 
       version = removePrefix "nightly-" rustToolchain.toolchain.channel;
       targets = rustToolchain.targets or [ ];
 
       src = fetchurl {
         url = "https://static.rust-lang.org/dist/${version}/rustc-nightly-src.tar.gz";
-        hash = "sha256-8QwZSxvDQunIbrbWHj2SzL/o5zMHPfKSN1lG1GRjdpg=";
+        hash = "sha256-5cWIu+hLd4f3IxH566PiOSJ0lJpP1smDzuNeQ6LW4I0=";
         passthru.isReleaseTarball = true;
       };
 
       bootstrapToolchain = pkgs.rust-bin.nightly.${version}.default;
+
+      llvmSharedFor =
+        pkgSet:
+        pkgSet.llvmPackages_23.libllvm.override (
+          {
+            enableSharedLibraries = true;
+          }
+          // lib.optionalAttrs (pkgSet.stdenv.targetPlatform.useLLVM or false) {
+            stdenv = pkgSet.stdenv.override {
+              allowedRequisites = null;
+              cc = pkgSet.pkgsBuildHost.llvmPackages_23.clangUseLLVM;
+            };
+          }
+        );
 
       insertTargets =
         flag:
@@ -49,6 +64,58 @@
     in
     {
       packages = {
+        miri-sysroot = stdenvNoCC.mkDerivation {
+          name = "mirir-sysroot-nightly-${version}";
+
+          nativeBuildInputs = [
+            config.packages.rustup
+            stdenv.cc
+          ];
+
+          dontUnpack = true;
+          dontConfigure = true;
+
+          buildPhase = ''
+            runHook preBuild
+
+            export HOME="$TMPDIR"
+
+            export CARGO_HOME="$TMPDIR/cargo-home"
+
+            export MIRI_SYSROOT="$out"
+            export MIRI_LIB_SRC="${config.packages.rustup}/lib/rustlib/src/rust/library"
+
+            mkdir -p "$CARGO_HOME" "$out"
+
+            # rustc_build_sysroot builds from a temporary package,
+            # so libary/.cargo/config.toml is not consulted.
+            cat > "$CARGO_HOME/config.toml" <<EOF
+            [net]
+            offline = true
+
+            [source.crates-io]
+            replace-with = "vendored-sources"
+
+            [source.vendored-sources]
+            directory = "$MIRI_LIB_SRC/vendor"
+            EOF
+
+            cargo miri setup --target ${stdenv.hostPlatform.rust.rustcTarget}
+
+            runHook postBuild
+          '';
+
+          installPhase = ''
+            runHook preInstall
+
+            # cargo miri setup writes directly into $MIRI_SYSROOT ($out)
+
+            runHook postInstall
+          '';
+
+          dontFixup = true;
+        };
+
         rust-src = stdenvNoCC.mkDerivation {
           name = "rust-src-nightly-${version}";
           inherit src;
@@ -71,6 +138,12 @@
               inherit (pkgs.rustc) targetPlatformsWithHostTools;
               inherit (pkgs.rustc) badTargetPlatforms;
             };
+
+            llvmPackages = pkgs.llvmPackages_23;
+            llvmShared = llvmSharedFor pkgs.pkgsHostTarget;
+            llvmSharedForBuild = llvmSharedFor pkgs.pkgsBuildBuild;
+            llvmSharedForHost = llvmSharedFor pkgs.pkgsBuildHost;
+            llvmSharedForTarget = llvmSharedFor pkgs.pkgsBuildTarget;
           }).overrideAttrs
             (old: {
               version = "nightly-${version}";
@@ -84,6 +157,8 @@
                 "--set=build.rustfmt=${bootstrapToolchain}/bin/rustfmt"
               ];
             });
+
+        rustup = pkgs.rust-bin.fromRustupToolchainFile ./toolchain.toml;
       };
     };
 }

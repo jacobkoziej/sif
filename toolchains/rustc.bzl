@@ -8,9 +8,20 @@ load(
     "attributes",
     "cpu",
 )
-load("@sif//tools/rustc:flags.bzl", "target")
+load("@sif//tools/rust:flags.bzl", "target")
 
 rust_edition: str = "2024"
+
+RustcDriver = enum("rustc", "miri")
+
+RustcToolchainInfo = provider(
+    fields={
+        "tool": provider_field(RunInfo),
+        "driver": provider_field(RustcDriver),
+        "sysroot": provider_field(Artifact | str | None, default=None),
+        "rustdoc": provider_field(RunInfo),
+    },
+)
 
 
 # `rustc` does not currently export all target features specified with codegen
@@ -33,6 +44,17 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     edition = "--edition=" + rust_edition
     target = "--target=" + ctx.attrs.target
 
+    sysroot_artifact = ctx.attrs.sysroot
+
+    if sysroot_artifact != None:
+        if not isinstance(sysroot_artifact, str):
+            sysroot_artifact = sysroot_artifact[DefaultInfo].default_outputs[0]
+
+        sysroot = cmd_args(sysroot_artifact, format="--sysroot={}")
+
+    else:
+        sysroot = cmd_args()
+
     def map_codegen_option(x: tuple) -> str:
         option, value = x
 
@@ -51,23 +73,48 @@ def _rustc_impl(ctx: AnalysisContext) -> list[Provider]:
     target_cpu = ctx.attrs.codegen_options.get("target-cpu")
     target_cpu = '--cfg=target_cpu="{}"'.format(target_cpu) if target_cpu else []
 
-    tool = ctx.attrs.tool[RunInfo].args
+    def map_unstable_option(x: tuple) -> str:
+        option, value = x
 
-    cmd = cmd_args(
-        tool,
+        return "-Z" + option + "=" + value
+
+    unstable_options = map(map_unstable_option, ctx.attrs.unstable_options.items())
+
+    common_flags = cmd_args(
         "--color=always",
-        "--sysroot=/dev/null",
+        sysroot,
         edition,
         target,
         codegen_options,
         target_feature_cfgs,
         target_cpu,
+        unstable_options,
+    )
+
+    rustc_cmd = cmd_args(
+        ctx.attrs.tool[RunInfo].args,
+        common_flags,
+    )
+
+    rustdoc_cmd = cmd_args(
+        ctx.attrs.rustdoc[RunInfo].args,
+        common_flags,
     )
 
     return [
         DefaultInfo(),
         RunInfo(
-            args=cmd,
+            args=rustc_cmd,
+        ),
+        RustcToolchainInfo(
+            tool=RunInfo(
+                args=rustc_cmd,
+            ),
+            driver=RustcDriver(ctx.attrs.driver),
+            sysroot=sysroot_artifact,
+            rustdoc=RunInfo(
+                args=rustdoc_cmd,
+            ),
         ),
     ]
 
@@ -76,8 +123,42 @@ rustc = rule(
     impl=_rustc_impl,
     is_toolchain_rule=True,
     attrs={
-        "tool": attrs.exec_dep(providers=[RunInfo], default="sif//tools:rustc"),
+        "tool": attrs.exec_dep(
+            providers=[RunInfo],
+            default=select(
+                {
+                    "sif//constraints/rust:driver[rustc]": "sif//tools/rust:rustc",
+                    "sif//constraints/rust:driver[miri]": "sif//tools/rust:miri",
+                }
+            ),
+        ),
+        "rustdoc": attrs.exec_dep(
+            providers=[RunInfo],
+            default="sif//tools/rust:rustdoc",
+        ),
+        "driver": attrs.enum(
+            RustcDriver.values(),
+            default=select(
+                {
+                    "sif//constraints/rust:driver[rustc]": "rustc",
+                    "sif//constraints/rust:driver[miri]": "miri",
+                }
+            ),
+        ),
         "target": attrs.string(default=target()),
+        "sysroot": attrs.option(
+            attrs.one_of(
+                attrs.dep(),
+                attrs.string(),
+            ),
+            default=select(
+                {
+                    "sif//constraints/rust:disable-sysroot[true]": "/dev/null",
+                    "sif//constraints/rust:driver[miri]": "sif//vendor:miri-sysroot",
+                    "DEFAULT": None,
+                }
+            ),
+        ),
         "codegen_options": attrs.dict(
             key=attrs.string(),
             value=attrs.one_of(attrs.string(), attrs.list(attrs.string())),
@@ -86,6 +167,18 @@ rustc = rule(
                 "target-cpu": cpu(),
                 "target-feature": attributes(),
             },
+        ),
+        "unstable_options": attrs.dict(
+            key=attrs.string(),
+            value=attrs.string(),
+            default=select(
+                {
+                    "sif//constraints/rust:driver[miri]": {
+                        "miri-backtrace": "full",
+                    },
+                    "DEFAULT": {},
+                }
+            ),
         ),
     },
 )

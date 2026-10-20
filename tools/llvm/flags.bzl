@@ -39,6 +39,7 @@ def cpu() -> Select:
     return select(
         {
             "sif//constraints/arch/arm:cpu[cortex-m33]": "cortex-m33",
+            "DEFAULT": "",
         }
     )
 

@@ -1,11 +1,15 @@
 [toolchain]
-channel = "nightly-2026-05-22"
+channel = "nightly-2026-10-19"
 components = [
-  "rustc",
+  "clippy",
+  "miri",
   "rust-src",
+  "rustc",
 ]
 targets = [
+  "aarch64-unknown-linux-gnu",
   "thumbv8m.base-none-eabi",
   "thumbv8m.main-none-eabi",
   "thumbv8m.main-none-eabihf",
+  "x86_64-unknown-linux-gnu",
 ]

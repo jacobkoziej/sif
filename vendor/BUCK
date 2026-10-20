@@ -1,5 +1,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
+load("@sif//execution-platforms:rules.bzl", "get_host_constraints")
+load(
+    "@sif//nix/rules.bzl",
+    "derivation_output_path",
+    "get_system",
+)
 load("@sif//rules:crate.bzl", "crate_unwrapped")
 load("@sif//vendor:rules.bzl", "src")
 
@@ -9,8 +15,20 @@ src(
     derivation=["packages", "rust-src"],
     path=".",
     sub_paths=[
+        "alloc/src/lib.rs",
         "compiler-builtins/compiler-builtins/src/lib.rs",
         "core/src/lib.rs",
+    ],
+    visibility=[],
+)
+
+crate_unwrapped(
+    name="alloc",
+    root=":rustlib[alloc/src/lib.rs]",
+    src_deps=[":rustlib"],
+    deps=[
+        ":compiler_builtins",
+        ":core",
     ],
 )
 
@@ -23,7 +41,6 @@ crate_unwrapped(
         "arch",
         "compiler-builtins",
     ],
-    visibility=["PUBLIC"],
 )
 
 crate_unwrapped(
@@ -33,5 +50,13 @@ crate_unwrapped(
     cfg=[
         "no_fp_fmt_parse",
     ],
-    visibility=["PUBLIC"],
+)
+
+derivation_output_path(
+    name="miri-sysroot",
+    flake=".",
+    derivation=["packages", "miri-sysroot"],
+    system=get_system(),
+    path=[],
+    target_compatible_with=get_host_constraints(),
 )

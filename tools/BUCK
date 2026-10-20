@@ -21,19 +21,6 @@ tool(
 )
 
 tool(
-    name="rustc",
-    flake=".",
-    derivation=["packages", "rustc"],
-)
-
-tool(
-    name="rustc-bin",
-    binary="rustc",
-    flake=".",
-    derivation=["packages", "rust-bin"],
-)
-
-tool(
     name="srec_cat",
     flake="nixpkgs",
     derivation=["legacyPackages", "srecord"],

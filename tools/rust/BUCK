@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: MPL-2.0
+
+load("@sif//tools/rules.bzl", "tool")
+
+tool(
+    name="miri",
+    flake=".",
+    derivation=["packages", "rustup"],
+)
+
+tool(
+    name="rustc",
+    flake=".",
+    derivation=["packages", "rustc"],
+)
+
+tool(
+    name="rustdoc",
+    flake=".",
+    derivation=["packages", "rustup"],
+)
+
+tool(
+    name="rustc-bin",
+    binary="rustc",
+    flake=".",
+    derivation=["packages", "rustup"],
+)
