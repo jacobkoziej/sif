@@ -132,6 +132,7 @@ def _object_impl(ctx: AnalysisContext) -> list[Provider]:
             "toolchain": toolchain,
         },
     ).artifact("object")
+    out = ctx.actions.assert_has_content_based_path(out)
 
     return [
         DefaultInfo(
