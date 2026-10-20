@@ -482,8 +482,9 @@ def crate(**kwargs: dict[str, typing.Any]) -> None:
     kwargs["deps"] = select(
         {
             (disable_sysroot + "[true]"): [
-                "sif//vendor:core",
+                "sif//vendor:alloc",
                 "sif//vendor:compiler_builtins",
+                "sif//vendor:core",
             ],
             (disable_sysroot + "[false]"): [],
         }
